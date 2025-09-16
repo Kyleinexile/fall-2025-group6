@@ -17,13 +17,13 @@ This project builds a **tool-agnostic KSA (Knowledge, Skills, Abilities) extract
 
 ### Air Force Reference Documents
 - **AFOCD_2024.pdf** - Air Force Officer Classification Directory 2024
-  - Source: Official military website (CAC-authenticated)
+  - Source: Official military website
   - Date Retrieved: April 2024
   - File Size: 4.67 MB
   - Purpose: Officer specialty codes reference for KSA extraction
 
 - **AFECD_2024.pdf** - Air Force Enlisted Classification Directory 2024  
-  - Source: Official military website (CAC-authenticated)
+  - Source: Official military website
   - Date Retrieved: April 2024
   - File Size: 10.2 MB
   - Purpose: Enlisted specialty codes reference for KSA extraction
