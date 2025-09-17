@@ -1,0 +1,106 @@
+AFSC: 14N
+Title: INTELLIGENCE
+Category: Intelligence
+Pages: 74-75
+Notes: None
+==================================================
+
+AFSC 14N4, Staff 
+INTELLIGENCE 
+DAFOCD, 31 Oct 24 
+AFSC 14N3, Qualified  
+AFSC 14N1, Entry 
+(Changed 30 Apr 21) 
+1. Specialty Summary. Leads and performs intelligence activities across the full range of military operations supporting the Air Force’s 
+Service Core Function (SCF) of Global Integrated Intelligence, Surveillance and Reconnaissance (ISR). The Air Force conducts global 
+integrated ISR operations through a five-phase process commonly known by its acronym, PCPAD: planning and direction; collection; 
+processing and exploitation; analysis and production; and dissemination. Additionally, ISR professionals conduct assessment, evaluation, 
+and feedback throughout each phase. Air Force intelligence officers lead Airmen through the PCPAD process across four main areas, also 
+known as functional competencies: Analysis, Collection, Targeting, and Sensing Grid Activities. To execute these functional competencies 
+intelligence officers utilize subject matter expertise in the six intelligence disciplines of geospatial intelligence (GEOINT), human 
+intelligence (HUMINT), measurement and signature intelligence (MASINT), open source intelligence (OSINT), signals intelligence 
+(SIGINT), and technical intelligence (TECHINT); utilize professional tradecraft to include assessment, counterdrug, counter proliferation, 
+counterterrorism, current intelligence, general military intelligence, indications and warning, irregular warfare and target intelligence; and 
+integrate thoroughly within cross functional capabilities, missions, and organizations to include airborne ISR, the Air Operations Center 
+(AOC), the Air Support Operations Center (ASOC), cyberspace ISR, the Distributed Common Ground Station (DCGS), flying unit level 
+support, force protection, information operations, space, and special operations forces (SOF). Finally, intelligence officers perform ISR 
+enterprise management/staff functions to include acquisition, career broadening, doctrine, education and training, financial management, 
+human capital/talent management, information technology, modeling and simulation, policy, research and technology, security, and 
+strategy. Related DoD Occupational Group: 230100. 
+2. Duties and Responsibilities: 
+2.1. 
+Directs intelligence activities. Directs ISR activities and organizations and establishes goals and objectives. Reviews requirements 
+for objectives and relative priorities. Serves as the commander’s senior intelligence advisor. Directs preparation of intelligence budget 
+estimates and financial plans. Implements standardization, evaluation, and training programs, and monitors compliance. 
+2.2. 
+Develops intelligence plans and policies. Evaluates impact of legislative action, executive orders, regulations, directives, and 
+management decisions. Integrates intelligence activities into plans and programs. Develops and implements intelligence operations and 
+applications policies, plans, concepts, systems, and orders for the intelligence disciplines, professional tradecraft, and integration with 
+cross functional capabilities. Conducts force development, management and structure planning. 
+2.3. 
+Manages and coordinates intelligence activities. Confers with government, business, professional, scientific, and other nations' 
+organizations to provide support, exchange ideas, participate in studies, and coordinate on proposals and findings. Manages intelligence 
+responsibilities of the Department of Defense Planning, Programming, and Budgeting System. Coordinates with personnel, materiel, 
+planning, programming, and operational functions on allocation of resources, availability of funds, and preparation and implementation of 
+operational plans. Supports weapon system acquisition. 
+2.4. 
+Produces timely and accurate fused intelligence analysis. Uses structured analytical techniques to convert processed information 
+into finished intelligence through the integration, evaluation, analysis, and interpretation of all-source data and the preparation of 
+intelligence products in support of known or anticipated user requirements. Produces intelligence from the information gathered by the 
+collection capabilities assigned or attached to the joint force and from the refinement and compilation of intelligence received from 
+subordinate units and external organizations. Integrates, evaluates, analyzes, and interprets all processed information to create products 
+that will satisfy the commander’s priority intelligence requirements (PIRs) and requests for information (RFIs). 
+2.5. 
+Conducts collection and ISR operations. Executes collection management by converting intelligence requirements into collection 
+requirements, establishing priorities, tasking or coordinating with appropriate collection sources or agencies, monitoring results, and re- 
+tasking, as required. Conducts collection operations by directing, scheduling, and controlling specific collection platforms, sensors and 
+HUMINT sources to include the physical operation of airborne systems (both manned and remotely piloted), space-based systems, cyber, 
+non-traditional ISR and HUMINT sources as well as near real time (NRT) coordination and control. Performs processing, exploitation, 
+and dissemination by converting raw collection into forms that can be readily used by commanders, decision makers at all levels, 
+intelligence analysts and other consumers. 
+2.6. 
+Employs multi-domain sensing grid activities. Performs activities such as collection operations (sensing), analysis (identify and 
+attribute), delivering information to customers, and collaborating with partners (sharing). Understands cloud technology, machine 
+intelligence, and big data analytics combined with critical thinking skills to accelerate intelligence activities in a fast-paced, data-intensive 
+environment where Airmen act as both producers and consumers of information. Understands how to operate within a collaborative 
+sensing grid and use a common data environment to enable human-machine teaming and empower ISR Airmen to be more effective in 
+solving problems and delivering time-dominant intelligence. 
+2.7. 
+Performs targeting functions. Performs targeting functions to include kinetic and non-kinetic target development, weaponeering, 
+precision point mensuration (PPM), force application, execution planning, and combat assessment. Selects and prioritizes targets and 
+matches appropriate actions to those targets to create specific desired effects that achieve objectives, taking account of operational 
+requirements and capabilities. Conducts analysis of enemy personnel, units, disposition, facilities, systems, and nodes relative to the 
+mission, objectives, and the capabilities at the Joint Force Commander’s disposal, to identify and nominate specific centers of gravity 
+(COG) and high-value targets (HVT) that, if exploited in a systematic manner, will create the desired effects and support accomplishment 
+of the commander’s objectives. 
+74 
+DAFOCD, 31 Oct 24 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and methods, the presentation of friendly forces, 
+friendly weapons systems, adversary capabilities, ISR operations, targeting, integration, and sensing grid activities. 
+3.2. 
+Education. For entry education requirements see Appendix A, 14N CIP Education Matrix. 
+3.3. Training. The following training is mandatory for award of the AFSC indicated: 
+3.3.1. 14N1. Completion of the Intelligence Officer Initial Skills Course.14N3. Completion of mission qualification, which includes but 
+is not limited to IQT/MQT, mission certification, or other training deemed necessary to be considered qualified to perform assigned 
+duties. (Note: Waivers for mandatory Intelligence Officer Initial Skills Course training must be submitted in accordance with AFMAN 36
+2100 and 14N Career Field Manager guidance.) 
+3.4. 
+Experience. The following experience is mandatory for award of the AFSC indicated: 
+3.4.1. 14N3. Complete a minimum of 36 months performing intelligence functions. 
+3.5. Other. 
+3.5.1. For entry and retention in this specialty: 
+3.5.1.1. 
+Specialty requires routine access to Tier 5 (T5) information, systems or similar classified environments. For award and 
+retention of AFSCs 14NX, completion of a current T5 Investigation IAW DoDM 5200.02_AFMAN 16-1405, Air Force Personnel 
+Security Program is mandatory. Access to T5 material is determined by favorable adjudication of the T5 updates, according to applicable 
+security and intelligence regulations. The Department of Defense Central Adjudication Facility (DoD CAF) is solely responsible for 
+determining and certifying eligibility for access to T5 material. 
+3.5.1.2. 
+In accordance with AFMAN 36-2100, revocation of eligibility for access to T5 information or systems requires a withdrawal of 
+14NX AFSCs, unless an exemption is granted by HQ AFPC/DPMSSM on the recommendation of HQ USAF/A2/A6. Revocation of an 
+officer’s security clearance by AFCAF requires a withdrawal of 14NX AFSCs without exception.  
+NOTE: Award of the entry level AFSC without a completed T5 Investigation is authorized provided an interim Top Secret security 
+clearance has been granted according to DoDM 5200.02_AFMAN 16 -1405.

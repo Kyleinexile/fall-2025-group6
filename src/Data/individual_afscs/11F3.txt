@@ -1,0 +1,76 @@
+AFSC: 11F3
+Title: FIGHTER PILOT
+Category: Operations
+Pages: 36-36
+Notes: None
+==================================================
+
+AFSC 11F4*, Staff 
+AFSC 11F3*, Flight Lead  
+AFSC 11F2*, Wingman  
+AFSC 11F1*, Entry/Student 
+FIGHTER PILOT 
+(Changed 30 Apr 23) 
+1. Specialty Summary. Pilots fighter aircraft and commands crews to accomplish combat, training, and other missions. Related DoD 
+Occupational Group: 220100. 
+2. Duties and Responsibilities: 
+2.1. 
+Plans and prepares for mission. Reviews mission tasking, intelligence, and weather information. Supervises mission planning, 
+preparation and filing of flight plan, and crew briefing. Ensures aircraft is preflighted, inspected, loaded, equipped, and manned for 
+mission. 
+2.2. 
+Pilots aircraft and commands crew. Operates aircraft controls and equipment. Performs, supervises, or directs navigation, in-flight 
+refueling (except Q Suffix, IFF (AT-38/T-38C)), and weapons delivery. 
+2.3. 
+Conducts or supervises training of crewmembers. Ensures operational readiness of crew by conducting or supervising mission 
+specific training. 
+2.4. 
+Develops plans and policies, monitors operations, and advises commanders. Assists commanders and performs staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics. 
+3.2. 
+Education. For entry into this specialty, an undergraduate degree specializing in physical sciences, mathematics, administration, or 
+management is desirable. 
+3.3. Training. The following training is mandatory as indicated: 
+3.3.1. For entry into this specialty, completion of Air Force Specialized Undergraduate Pilot Training (SUPT). 
+3.3.2. For award of AFSC 11F3X, completion of transition and operational training in the suffix specific aircraft. 
+3.4. 
+Experience. For upgrade to AFSCs 11F3X, unit commander determines proficiency based on performance, experience, and 
+completion of minimum training requirements. 
+3.5. Other. The following are mandatory as indicated: 
+3.5.1. For award and retention of this AFSC, current aeronautical rating and qualification for aviation service as pilot. 
+3.5.2. For award of AFSC 11F2X, certification of wingman qualification by appropriate operations authority.  
+3.5.3. For award of AFSC 11F3X, certification of flight lead qualification by appropriate operations authority. 
+3.5.4. Specialty requires routine access to Tier 5 (T5) information, systems or similar classified environments (except Q Suffix). For 
+award and retention of AFSCs 11FXX, completion of a current T5 Investigation IAW DoDM 5200.02_AFMAN 16-1405, Air Force 
+Personnel Security Program. (Desirable for Q Suffix). 
+NOTE: Award of the entry level without a completed T5 Investigation is authorized provided an interim Top Secret security clearance has 
+been granted according to DoDM 5200.02_AFMAN 16 -1405. 
+4. *Specialty Shredouts: 
+Suffix 
+Portion of AFS to Which Related  
+B 
+A-10  
+Suffix 
+Portion of AFS to Which Related 
+N 
+F 
+F-15  
+F-35 
+Q 
+G 
+F-15E  
+IFF (AT-38/T-38C) 
+U 
+H 
+F-16  
+Air Liaison Officer (ALO) 
+Y 
+J 
+F-22  
+Z 
+General 
+Other

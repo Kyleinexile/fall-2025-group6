@@ -1,0 +1,86 @@
+AFSC: 2A5
+Title: AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE
+Category: Maintenance
+Pages: 131-132
+Notes: None
+==================================================
+
+AFSC 2A571, Craftsman 
+AFSC 2A551*, Journeyman 
+AFSC 2A531*, Apprentice 
+AFSC 2A511*, Helper 
+★AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE 
+(Changed 31 Oct 24) 
+1. Specialty Summary. Maintains aircraft, support equipment, forms, and records. Performs and supervises flight chief, expediter, crew 
+chief, repair and reclamation, quality assurance and maintenance support functions. Related DoD Occupational Subgroup: 160000. 
+2. Duties and Responsibilities: 
+2.1. 
+Performs sortie generation, ground handling, and servicing operations. Performs aircraft inspections such as preflight, thru-flight, 
+postflight, hourly postflight, special inspections, and isochronal inspections. Advises on problems, maintenance, servicing, and inspection 
+of aircraft and related aerospace equipment. Uses technical data to diagnose and solve maintenance problems on aircraft systems. 
+Interprets and advises on maintenance procedures and policies to repair aircraft and related equipment. 
+2.2. 
+Inspects, troubleshoots, and maintains aircraft structures, engines, hydraulic, and other related systems, components, and 
+equipment. Removes and installs aircraft and engine components. Conducts operational checks and repairs components and systems. 
+Performs ground engine operation. Adjusts, aligns, and rigs aircraft systems. Accomplishes weight and balance functions. Supervises and 
+performs aircraft jacking, lifting, and towing operations. 
+2.3. 
+Supervises and performs aircraft, engine, and component inspections. Interprets inspection findings and determines adequacy of 
+corrective actions. Inspects and checks components for clearances, tolerances, proper installation, and operation. Performs pre-use 
+inspections and operates powered and non-powered aerospace ground equipment. Inspects and identifies aircraft corrosion for prevention 
+and repair. Reviews maintenance forms, aircraft records, automated maintenance data systems, and historical reports to ensure complete 
+documentation. Inventories and maintains alternate mission equipment. Inventories and maintains aircraft equipment. 
+2.4. 
+Coordinates maintenance plans and schedules to meet operational requirements. Supervises and assists in launching and recovering 
+aircraft. Reviews maintenance data collection summaries to determine trends and production effectiveness. Performs crash recovery 
+duties. Performs staff and supervisory management functions. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data reporting; using technical data; Air Force supply and 
+deficiency reporting procedures; and proper handling, use, and disposal of hazardous waste and materials. 
+3.2. 
+Education. For entry into this specialty, completion of high school is mandatory. Completion of related vocational courses is highly 
+desirable. 
+3.3. Training. 
+3.3.1. For award of AFSC 2A531X, completion of a suffix specific basic aircraft maintenance course is mandatory. 
+3.3.2. For award of AFSC 2A571, complete craftsman aircraft maintenance course, if applicable. 
+3.4. 
+Experience. The following experience is mandatory for award of AFSC indicated: 
+3.4.1. ★2A551. Qualification in and possession of AFSC 2A531X or previous award of 2A338X. 
+3.4.2. ★2A571. Qualification in and possession of AFSC 2A551 or previous award of 2A358X. 
+3.5. Other. The following are mandatory as indicated: 
+3.5.1. For entry into this specialty: 
+3.5.1.1. 
+Normal color vision as defined in AFI 48-123, Medical Examinations and Standards. 
+3.5.1.2. 
+See attachment 4 for additional entry requirements. 
+3.5.2. For award and retention of these AFSCs: 
+3.5.2.1. 
+Must maintain local network access IAW AFI 17-130, Cybersecurity Program Management and AFMAN 17-1301, Computer 
+Security. 
+3.5.2.2. 
+Specialty requires routine access to Tier 3 (T3) information, systems, or similar classified environment. For award and retention 
+of AFSCs 2A5X1/X, completion of a current T3 Investigation required IAW DoDM 5200.02, AFMAN 16-1405, Air Force Personnel 
+Security Program, is mandatory. 
+NOTE: Award of the entry level without a completed T3 Investigation is authorized provided an interim Secret security clearance has 
+been granted according to DoDM 5200.02, AFMAN 16 -1405. 
+4. *Specialty Shredouts: 
+Suffix 
+Primary Aircraft  
+A 
+C-20/C-21/C-22/C-37/C-40/E-4/VC- 25  
+Suffix 
+Primary Aircraft 
+C 
+C-5 
+B 
+C-130/C-27J  
+MQ-1/9  
+D 
+C-17 
+★M 
+★R 
+RQ-4 
+131 
+NOTE: Suffixes are applicable to the 1-, and 3 skill levels only.

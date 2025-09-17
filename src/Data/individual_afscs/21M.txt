@@ -1,0 +1,113 @@
+AFSC: 21M
+Title: MUNITIONS AND MISSILE MAINTENANCE
+Category: Maintenance
+Pages: 111-112
+Notes: --- RAW_TEXT_START ---
+==================================================
+
+AFSC 21M4*, Staff  
+AFSC 21M3*, Qualified  
+AFSC 21M1*, Entry 
+(Changed 31 Oct 18) 
+1. Specialty Summary. Manages maintenance and modification of conventional munitions, nuclear weapons, intercontinental ballistic 
+missiles (ICBM), and associated equipment. Administers weapons programs and resources. Directs nuclear weapons and conventional 
+munitions accountability, storage, and maintenance production, staff activities, and related material programs. Manages missile 
+maintenance activities at launch/missile alert facilities and launch control centers, including maintenance, repair, and inspection of missile 
+systems, nuclear certified support vehicles and equipment, and other associated support equipment (SE). Serves as munitions and missile 
+maintenance staff advisor to commanders. Related DoD Occupational Groups: 240500. 
+2. Duties and Responsibilities: 
+2.1. 
+Formulates maintenance procedures for all munitions and missile systems. Builds integrated logistics support plans and develops 
+maintenance support structures to sustain maintenance and personnel. Manages storage and distribution of Air Force munitions. 
+Establishes training requirements and support standards of operational systems. Identifies and upgrades system deficiencies to meet 
+mission requirements and enhance safety. 
+2.2. 
+Assesses operational requirements and environment. Advises commanders on risks associated with conventional munitions, 
+nuclear weapons, and missile operations. Evaluates explosives and nuclear safety criteria and develops explosives site plans for storage, 
+movement, and operations of conventional munitions, nuclear weapons, and missiles. Conducts conventional munitions, nuclear weapons, 
+and missile safety training. 
+2.3. 
+Manages conventional munitions, nuclear weapons, and missile maintenance production. Recommends procedural and technical 
+improvements and modifications. Schedules resources to ensure required readiness. Enforces technical performance standards and ensures 
+assigned work force is properly trained and equipped. Assesses unit capability and advises commanders, supervisors, and staff. Budgets 
+and allocates resources. Coordinates with operational and support units to ensure equipment readiness and efficiency of assigned forces. 
+2.4. 
+Formulates maintenance plans. Plans and programs support requirements, modifications, and modernization. Defines technical 
+problems and economic factors related to research and development, and system application. Reviews maintenance and operational data 
+to evaluate programs, assess trends, and identify improvements and deficiencies. 
+2.5. 
+2.6. 
+Plans and directs munitions support for in-place and Air Expeditionary Force operations. 
+Plans and organizes munitions and missile maintenance activities; provides space, tools, test equipment, and spare parts; 
+establishes workflow. Develops and improves methods and procedures for assembly, checkout, calibration, and analysis of aerospace 
+systems. Establishes performance standards for system assembly, checkout, and component replacement. 
+2.7. 
+Manages and coordinates activities to support intercontinental ballistic missile (ICBM) launch readiness operations. Advises 
+commander on operational status of ICBM assets. Maintains liaison with manufacturers' representatives to solve maintenance and 
+performance problems. Coordinates lateral logistics activities to ensure supply, transportation, and funding are integrated to support 
+mission requirements. Represents logistics in development of flight procedures, mission checklists, and mission flight rules. 
+2.8. 
+Writes munitions, nuclear weapon, and missile maintenance annexes to logistics plans. Provides weapon system data for 
+operational and logistics support analysis. Monitors and evaluates contracted logistics and maintenance support activities. 
+2.9. 
+Develops procedures for storing, assembling, delivering, inventory management, and testing conventional munitions, nuclear 
+weapons, and missiles. 
+2.10. Develops procedures for, and manages, routine disposal of common US munitions. 
+2.11. Develops munitions accountability programs. Understands and manages all aspects of the Air Force munitions accountability 
+system, including systems and procedures for financial accountability and auditability of assets. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. The following knowledge is mandatory for award of the AFSC indicated: 
+3.1.1. 21M3A. Maintenance management procedures and organizational and mission requirements; capabilities, limitations, and basic 
+weapons, weapons procedures, and quality assurance; supply, transportation, civil engineer, and other unit operations related to munitions, 
+missile, or aircraft maintenance units; conventional air-to-air missiles; air-to-ground weapons including guided, rocket- boosted, and 
+unguided munitions; dispensers and submunitions; suspension and release equipment; fuses; wiring harnesses; loading procedures; safety 
+tests; munitions (ground) handling equipment; maintenance management; production control and maintenance data collection procedures; 
+and lateral logistics functions related to munitions maintenance. 
+3.1.2. 21M3I. Missile and re-entry systems; suspension and release equipment; weapon employment; nuclear surety; joint nuclear 
+procedures; related test, handling, and support equipment; evolution of missiles; missile operations; solid and liquid rocket performance, 
+maintenance capabilities, limitations, and employment of missile equipment; and ICBM life cycle logistics. 
+3.1.3. 21M3N. Nuclear weapons and warheads; nuclear armament systems; suspension and release equipment; nuclear weapons 
+employment; Munitions Accountable Systems Officer responsibilities; nuclear weapons maintenance, life cycle management, and 
+inspections; nuclear surety; nuclear theory, effects, and components; nuclear weapons storage; nuclear weapons movement; nuclear 
+weapons physical security; nuclear weapons transportation; nuclear weapons maintenance documentation, records and reports; and joint 
+nuclear procedures. 
+111 
+3.2. 
+DAFOCD, 31 Oct 24 
+Education. For entry education requirements see Appendix A, 21M CIP Education Matrix. 
+3.3. Training. The following training is mandatory for award of the AFSC indicated: 
+3.3.1. 21M1. Completion of the Munitions and Missile Maintenance Officer Fundamentals Course is mandatory and a prerequisite for 
+attending specialty shredout courses. 
+3.3.2. 21M1A. Completion of Conventional Munitions Officer Course. 
+3.3.3. 21M1I. Completion of ICBM Maintenance Officer Course. 
+3.3.4. 21M1N. Completion of Nuclear Maintenance Officer Course. 
+3.4. 
+Experience. The following experience is mandatory for award of the AFSC specialty shredout indicated: 
+3.4.1. 21M3A. A minimum of 24 months experience managing conventional munitions maintenance activities and completion of Career 
+Field Education and Training Plan requirements are mandatory. Completion of the Combat Ammunition Planning and Production 9CAPP) 
+course is required. 
+3.4.2. 21M3I. A minimum of 24 months experience managing ICBM maintenance activities and completion of Career Field Education 
+and Training Plan requirements are mandatory. 
+3.4.3. 21M3N. A minimum of 24 months experience managing nuclear weapons maintenance activities and completion of Career Field 
+Education and Training Plan requirements are mandatory. Completion of the Nuclear Accountability Course is required within 24 months 
+of assignment. 
+3.5. Other. 
+3.5.1. For entry into this specialty (ANG and AFRC officers exempt), accessions must be screened for eligibility and meet requirements 
+of the Personnel Reliability Program (PRP) as outlined in the HQ AETC PRP prescreening guidance. 
+3.5.2. Specialty requires routine access to Tier 5 (T5) information, systems or similar classified environments. For award and retention of 
+AFSCs 21MXX, completion of a current T5 Investigation IAW DoDM 5200.02_AFMAN 16-1405, Air Force Personnel Security 
+Program. 
+NOTE: Award of the entry level without a completed T5 Investigation is authorized provided an interim Top Secret security clearance has 
+been granted according to DoDM 5200.02_AFMAN 16 -1405. 
+4. *Specialty Shredouts: 
+Suffix 
+Portion of AFS to Which Related  
+A 
+Conventional  
+Suffix 
+Portion of AFS to Which Related 
+N 
+I 
+ICBM    
+Nuclear

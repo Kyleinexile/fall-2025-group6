@@ -1,0 +1,169 @@
+AFSC: 1C3
+Title: ALL-DOMAIN COMMAND AND CONTROL OPERATIONS
+Category: Operations
+Pages: 45-47
+Notes: Includes these AFSCs-AFSC 1C391, Superintendent AFSC 1C371, Craftsman AFSC 1C351, Journeyman AFSC 1C331, Apprentice AFSC 1C311, Helper
+==================================================
+
+CEM Code 1C300 
+DAFECD, 31 Oct 24 
+AFSC 1C391, Superintendent 
+AFSC 1C371, Craftsman 
+AFSC 1C351, Journeyman 
+AFSC 1C331, Apprentice 
+AFSC 1C311, Helper 
+ALL-DOMAIN COMMAND AND CONTROL OPERATIONS 
+(Changed 30 Apr 24) 
+1. Specialty Summary. Manages and performs activities within fixed ground, mobile and airborne command and control (C2) facilities 
+such as installation and expeditionary command posts (CP), operations centers, rescue coordination centers, and Higher Headquarters 
+Command Centers/Operations Centers. Provides command, control, communications, and information support throughout the full 
+spectrum of operations to include peacetime, emergency and disaster situations, crisis, contingency, and war. Responsible for emergency 
+action messages from the Chairman of the Joint Chiefs of Staff, Headquarters Air Force, Headquarters Space Force, or Combatant 
+Commands. Disseminates time- sensitive critical information to senior leaders and support agencies. Establishes procedures for 
+Department of the Air Force (DAF) Operational Reporting Program. Reports international treaty compliance information. Uses 
+communications systems and consoles to affect positive control of assigned forces and weapons systems. Supports chemical, biological, 
+radiological, and nuclear (CBRN), and conventional warning and reporting activities. AFSC Duty Identifier: C2OPS. Related DoD 
+Occupational Subgroup: 125000. 
+2. Duties and Responsibilities: 
+2.1. 
+Performs Command, Control, and Communications (C3) actions to support National Defense, Homeland Security, and All-Domain 
+Air and Space Force operations throughout the full spectrum of operations. Provides a single, consolidated C2 center to monitor mission 
+execution of wing/installation commander assigned or supported missions (to include tenant, joint, and combined missions) by fusion of 
+data from disparate C2 nodes across the installation (BDOC, EOC, AMOPS, etc.). Provides C2 of worldwide nuclear and conventional 
+forces supporting Emergency Plans, Operations Orders, and Operations Plans. Coordinates the execution of Mission Type Orders (e.g., 
+Warning Orders, Tasking Orders, Prepare to Deploy Orders, Planning Orders and Execution Orders). Supports joint force operations and 
+Joint All Domain Operations (JADO) through the combined Joint All Domain C2 (CJADC2) concept. Facilitates C3 in support of the Air 
+Force Emergency Management (EM) Program. Provides functional expertise to ensure synergy among the various components of the Air 
+Force EM Program. Coordinates actions to ensure prompt response during EM operations including immediate mobilization of resources 
+and participation of agencies and organizations. Liaisons communications/supports first responders to provide life-saving response support 
+to base personnel. Receives, processes, and disseminates emergency action messages via voice and record copy systems. Encodes, 
+decodes, and transmits and relays presidential decisions to execute and terminate nuclear and conventional force operations at all levels of 
+command, both on the ground and in-flight. Relays C2 instructions for diversion, recall, evacuation, recovery, and reconstitution of forces. 
+Coordinates and executes search and rescue activities. Coordinates with other agencies and organizations during planning, executing, and 
+evaluation phases of C2 operations. Executes Aerospace Control Alert mission as quick response launch authority for immediate intercept, 
+inspection, influence, or defeat of potential airborne threats. Flight follows and manages aerospace resources and monitors mission status 
+to include aircraft, aircrew support, transportation, maintenance support, fleet services, and passenger and cargo support. Monitors aircraft 
+movement and relays information between aircrews and operations centers. Coordinates mission delays with installation and external 
+agencies. Monitors status of launch and space assets. Monitors status and location of key personnel to facilitate immediate 
+communications with higher headquarters. Ensures proper use and control of resources and classified material. Develops and evaluates C2 
+Operations processes. Performs self-assessments. Ensures operational readiness and adherence to standards. Recommends actions to 
+correct C2 Operations procedural deficiencies. Maintains and disseminates local and worldwide current and forecasted weather to include 
+watches, advisories and warnings to installation populace and aerospace resources. The functional organization for the exercise of mission 
+command authority and direction by a properly designated commander over assigned and attached forces in the accomplishment of the 
+mission. 
+2.2. 
+Manages and executes the DAF Reporting Program. Prepares and submits Operational Reports (OPREP) and Commander’s Critical 
+Information Requirement (CCIR) reports, attainment/deviation reporting, nuclear execution reporting (NEREP), international treaty, and aerospace 
+asset reports. Analyzes and disseminates information derived from DAF reporting. Establishes policy for operational and, if applicable, 
+defense readiness reporting to include developing procedures, maintaining databases, and training personnel. Ensures reported data is 
+current and accurate. 
+2.3. 
+Operates and monitors voice, data, and alerting systems. Develops operating instructions directing All-Domain C2 Operations and 
+lateral agency C2 activities. Develops, maintains, and initiates procedures to save lives, protect resources, and rapidly disseminate time 
+sensitive information. These procedures support situations such as suspected or actual sabotage nuclear incidents, natural disasters, aircraft 
+accidents or incidents, evacuations, dispersal, and aerospace anomalies. Receives and disseminates time-critical information to and from 
+the commander to internal and external agencies during daily operations, natural disasters and wartime and contingency operations to 
+affect positive control of assigned forces and weapons systems. Coordinates actions to ensure prompt response during disaster operations 
+(pre-, trans-, and post-), including immediate activation and recall of all resources and participating agencies and organizations. Monitors 
+actions to preserve life, minimize damage, and restore operations following natural disasters (trans- and post-), accidents, wartime attacks, 
+and military operations other than war. Coordinates, directs, and monitors actions to allow continuation or restoration of vital functions and 
+45 
+DAFECD, 31 Oct 24 
+operations. Maintains operational status displays. Maintains proficiency in C2/CJADC2 systems and aircraft flight following and mission 
+management systems. Establishes manpower, communications, equipment, and facility requirements. Monitors and alerts local and base 
+agencies of threats affecting the installation. 
+2.4. 
+Maintains Communications Security (COMSEC) to include receiving, safeguarding, utilizing, inventorying, issuing, and 
+destroying COMSEC material. Maintains personnel, information, operations, computer, emission, industrial and physical security 
+programs. 
+2.5. 
+Performs administrative actions. Compiles and maintains entry authority lists. Coordinates and provides input to installation support 
+plans. Maintains directives and daily events log. Updates and maintains national, HHQ, or installation key personnel rosters. Performs as 
+the Installation’s Emergency Mass Warning Notification (EMWN) program manager for mass notification systems. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+processing equipment use, capabilities, and limitations; techniques of presenting data; data collection procedures and summary techniques; 
+purpose of command post for preparing, executing, and controlling assigned forces; emergency actions and directives; command weapon 
+systems movement and transfer procedures; encode, decode; and authorization procedures used by command of assignment. 
+3.2. 
+Education. For entry into this specialty, completion of high school or General Education Development Equivalency is mandatory. 
+Courses in English or oral communication is desirable. 
+3.3. Training. For award of the AFSC 1C331, completion of the Command and Control Operations Apprentice Course is mandatory. 
+3.4. 
+Experience. The following experience is mandatory for award of the AFSC indicated: 
+3.4.1. 1C351. Qualification in and possession of AFSC 1C331. Also, experience performing functions of C2 operations.  
+3.4.2. 1C371. Qualification in and possession of AFSC 1C351. Also, experience performing or supervising functions of C2 operations. 
+3.4.3. 1C391. Qualification in and possession of AFSC 1C371. Also, experience managing and directing C2 Operations functions. 
+3.5. Other. The following are mandatory as indicated: 
+3.5.1. For entry into this specialty for initial accessions: 
+3.5.1.1. 
+Meet mandatory AFSC aptitude, physical profile, and citizenship entry requirements as identified in attachment 4. 
+3.5.1.2. 
+3.5.1.3. 
+3.5.1.4. 
+3.5.1.5. 
+NOTE 1: Entry into AFSC 1C3X1 is not open to non-United States Citizens or members with dual-citizenship status. 
+Must pass Reading Aloud Test as defined in current version of Medical Standards Directory (MSD). 
+Must have a S-1 profile (for PULHES clearance) 
+Completion of the Command and Control operations Apprentice Course in residence is mandatory. 
+3.5.2. For entry into this specialty for personnel in retraining status: 
+3.5.2.1. 
+Retrainees are only accepted IAW the following: E-1 through E-5 (no Time in Service (TIS) restrictions), E-6 (less than 12 
+years TIS). SNCOs are not accepted without prior coordination of the 1C3 CFM. NOTE: TIS/grade restrictions do not apply to the ARC. 
+3.5.2.2. 
+Meet mandatory AFSC aptitude, physical profile, and citizenship entry requirements as identified in attachment 4. 
+3.5.2.3. 
+3.5.2.4. 
+3.5.2.5. 
+Must pass Reading Aloud Test as defined in current version of Medical Standards Directory (MSD). 
+Must have an S-1 profile (for PULHES clearance). 
+Interviewed and recommended by a 1C3 SNCO (retraining action needed for entry into 1C3X1 IAW AFMAN 10-207, 
+Command Posts.) NOTE: Retraining interview do not apply to the ARC. Must be screened for eligibility for Personnel Reliability 
+Assurance Program (PRAP) as outlined in the HQ AETC PRP Prescreening Guidance and deemed a suitable candidate for follow-on 
+PRAP duties. PRAP standards are outlined in DoDM 5210.42 DAFMAN 13-501, Nuclear Weapons Personnel Reliability Program (PRP). 
+3.5.2.6. 
+NOTE 1: AETC/A2N will only make recommendations for PRP, not for AFSC classification. Note 2: PRAP Screening does not 
+apply to the ARC. 
+3.5.2.7. 
+Completion of the Command and Control Operations Apprentice Distance Learning Course is mandatory.  
+3.5.3. For entry, award, and retention of these AFSCs: 
+3.5.3.1. 
+No history or record of psychiatric hospitalization that results in unresolved diagnosis or prolonged medical treatment (or 
+observation) which precludes execution of daily AFSC duties and/or reasonable judgment. 
+3.5.3.2. 
+No history or evidence of personality disorder, substance use disorder, emotional instability or impulsive behaviors as 
+diagnosed by a competent medical authority (examples include but are not limited to: alcohol/drug misuse, intentional self-injury, 
+difficulty controlling/intense anger or sadness, etc.) which precludes execution of daily AFSC duties and/or reasonable judgment. 
+3.5.3.3. 
+No evidence or history of misconduct that resulted in a court martial conviction (examples include, but are not limited to: illicit 
+drug use, financial irresponsibility, physical or sexual assault, domestic violence, discrimination, harassment, threats, or reprisal, etc.). For 
+award, waiverable on a case-by-case basis by the 1C3 CFM. 
+3.5.3.4. 
+Must have a S-1 profile (for PULHES clearance) for entry. For retention, Commanders should contact the 1C3 CFM, or their 
+respective 1C3 MFM, for questions on retaining a member in the 1C3 AFS. 
+3.5.4. For award, and retention of these AFSCs: 
+3.5.4.1. 
+Must maintain certification according to AFMAN 10-207, Command Posts. 
+3.5.4.2. 
+3.5.4.3. 
+Must obtain initial certification within 180 calendar days from date entered training.  
+Must maintain local network access IAW 17-130, Cybersecurity Program Management and AFMAN 17-1301, Computer 
+Security (COMPUSEC). 
+3.5.4.4. 
+Specialty requires routine access to Tier 5 (T5) information, systems, or similar classified environments. Completion of a 
+current T5 Investigation IAW DoDM 5200.02, AFMAN 16-1405, Air Force Personnel Security Program. 
+46 
+DAFECD, 31 Oct 24 
+3.5.4.5. 
+3.5.4.6. 
+Individuals with suspended clearances greater than 180 calendar days will be considered for removal from the AFSC. 
+Reclassified and/or retraining personnel may enter the career field with a Secret clearance. NOTE: Award of the entry level 
+without a completed T5 Investigation is authorized provided an interim Top Secret security clearance has been granted according to 
+DoDM 5200.02, AFMAN 16-405, Air Force Personnel Security Program. 
+3.5.4.7. 
+Must have a S-1 profile (for PULHES clearance). For retention, Commanders should contact the 1C3 CFM, or their respective 
+1C3 MFM, for questions on retraining a member in the 1C3 AFS. 
+3.5.4.8. 
+NOTE:  All AFSC withdrawals must be coordinated with HAF AF/A3TC

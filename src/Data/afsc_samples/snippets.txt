@@ -1,0 +1,63 @@
+AFSC Sample Snippets for Manual Review
+==================================================
+
+AFSC: 14N3 (AFOCD) - Category: Intelligence
+Score: 111.21 | Pages: 7-74 | KSA Cues: 39
+Sample: DAFOCD, 31 Oct 24 PREFIX B SQUADRON OPERATIONS/OPERATIONS SUPPORT OFFICER (Changed 31 Oct 24) Prefix B identifies positions on manning documents and officers serving in, or qualified to serve in, pos
+--------------------------------------------------------------------------------
+
+AFSC: 71S3 (AFOCD) - Category: Investigations
+Score: 32.99 | Pages: 24-25 | KSA Cues: 12
+Sample: DAFOCD, 31 Oct 24 PREFIX U INFORMATION OPERATIONS (Changed 31 Oct 24) Prefix U identifies positions on manpower documents and officers serving in, qualified to serve in, or receiving formal training
+--------------------------------------------------------------------------------
+
+AFSC: 21RX (AFOCD) - Category: Maintenance
+Score: 82.83 | Pages: 11-113 | KSA Cues: 27
+Sample: DAFOCD, 31 Oct 24 PREFIX F AIRCRAFT SYSTEMS FLIGHT EVALUATION (Changed 31 Oct 24) Prefix F identifies positions on manning documents and officers serving in, or qualified to serve in, positions requi
+--------------------------------------------------------------------------------
+
+AFSC: 46N3 (AFOCD) - Category: Medical
+Score: 120.94 | Pages: 13-195 | KSA Cues: 40
+Sample: DAFOCD, 31 Oct 24 PREFIX H MILITARY CONSULTANT TO THE SURGEON GENERAL (Changed 31 Oct 24) Prefix H identifies officers selected by the Air Force Surgeon General's Officer Classification Board as havi
+--------------------------------------------------------------------------------
+
+AFSC: 12XX (AFOCD) - Category: Operations
+Score: 133.78 | Pages: 15-293 | KSA Cues: 36
+Sample: DAFOCD, 31 Oct 24 PREFIX K INSTRUCTOR (Changed 31 Oct 24) Prefix K identifies positions on manning documents and officers serving in or qualified to serve in positions as an Instructor Pilot, Navigat
+--------------------------------------------------------------------------------
+
+AFSC: 02XX (AFOCD) - Category: Other
+Score: 89.22 | Pages: 277-299 | KSA Cues: 13
+Sample: DAFOCD, 31 Oct 24 13HX – AEROSPACE PHYSIOLOGIST (Changed 31 Oct 23) Tier Target Accession Rate CIP Education Program Description Requirement 1 > 70% 30.2701 Human Biology Mandatory Or 26.0912 Aerospac
+--------------------------------------------------------------------------------
+
+AFSC: 1N2X1A (AFECD) - Category: Intelligence
+Score: 32.38 | Pages: 11-78 | KSA Cues: 10
+Sample: DAFECD, 31 Oct 24 ★Prefix J Parachutist (Changed 31 Oct 24) Prefix J identifies positions on manpower documents and enlisted Airmen serving in or qualified to serve in parachutist positions. (See AFI
+--------------------------------------------------------------------------------
+
+AFSC: 7S0X1 (AFECD) - Category: Investigations
+Score: 8.28 | Pages: 18-18 | KSA Cues: 3
+Sample: DAFECD, 31 Oct 24 ★Prefix V Automated Functional Applications Analyst/Monitor (Changed 31 Oct 24) Prefix V identifies positions on manpower documents and enlisted Airmen/Guardians serving in, qualifie
+--------------------------------------------------------------------------------
+
+AFSC: 2G0X1 (AFECD) - Category: Maintenance
+Score: 18.76 | Pages: 380-380 | KSA Cues: 6
+Sample: DAFECD, 31 Oct 24 54. ★9Z200, Special Warfare Mission Support (SWMS) Superintendent, Air Force Special Warfare (AFSPECWAR). (Changed 31 Oct 24). 54.1. Use this identifier to report the awarded (2AFSC,
+--------------------------------------------------------------------------------
+
+AFSC: 4N0X1F (AFECD) - Category: Medical
+Score: 45.27 | Pages: 267-268 | KSA Cues: 14
+Sample: DAFECD, 31 Oct 24 CEM Code 4N000 AFSC 4N091, Superintendent AFSC 4N071*, Craftsman AFSC 4N051*, Journeyman AFSC 4N031*, Apprentice AFSC 4N011*, Helper ★AEROSPACE MEDICAL SERVICE (Changed 31 Oct 24) 1.
+--------------------------------------------------------------------------------
+
+AFSC: 1Z1X1 (AFECD) - Category: Operations
+Score: 60.33 | Pages: 20-379 | KSA Cues: 22
+Sample: DAFECD, 31 Oct 24 ★Prefix X Aircrew (Changed 31 Oct 24) Prefix X identifies positions on manpower documents and Airmen/Guardian serving in or qualified to serve in aircraft crew positions. Affix prefi
+--------------------------------------------------------------------------------
+
+AFSC: 5R0X1 (AFECD) - Category: Other
+Score: 28.11 | Pages: 293-293 | KSA Cues: 9
+Sample: DAFECD, 31 Oct 24 observation, and interviewing skills. Protects privileged communication obtained through chaplain pastoral counseling and intervention counseling. Coordinates and facilitates force p
+--------------------------------------------------------------------------------
+
