@@ -1,0 +1,162 @@
+AFSC: 1A3X1
+Title: MOBILITY FORCE AVIATOR
+Category: Operations
+Pages: 24-25
+Notes: I believe the 1A career field has been rebranded since at least 2024. The 1A3X1 career field wasn't within the document.
+==================================================
+
+CEM Code 1A100* 
+AFSC 1A192*, Senior Enlisted Leader  
+AFSC 1A172*, Craftsman  
+AFSC 1A152*, Journeyman 
+AFSC 1A132*, Apprentice 
+AFSC 1A112, Helper 
+MOBILITY FORCE AVIATOR 
+(Established 31 Oct 23) 
+1. Specialty Summary. The Lead-MAJCOM for aircraft and mission set will determine the Mobility Force Aviator (MFA) performance 
+tasks as outlined in Master Training Tasks/Task Training Lists associated with Mission Design Series crew positions. Performs preflight and 
+post-flight of aircraft and aircraft systems. Receives cargo/passenger load briefings, checks placement of cargo/passengers against aircraft 
+limitations/restrictions, determines adequacy of cargo documentation. Supervises cargo/passenger loading and offloading activities. Services 
+aircraft (e.g. fuel, water, and hydraulics) and creates load plans for cargo and passengers. Determines and directs cargo placement and restraint 
+equipment requirements. Computes aircraft take-off and landing data/weight and balance. Demonstrates use of aircrew flight equipment. 
+Accomplishes passenger comfort activities during flight.   Performs aircrew functions and other mission specific qualification duties to 
+include the airdrop of personnel and equipment/cargo. Performs in-flight refueling aircrew functions and activities. Monitors and operates 
+complex aircraft instrumentation systems during flight, to include engine and aircraft systems controls, panels, and indicators. Some missions 
+require non-standard configurations and penetration into hostile/denied territories undetected utilizing night vision devices and terrain, 
+following procedures often in close proximity to other aircraft and operations on unprepared surfaces. The hazardous mission and training 
+environment demands high degrees of attention, focus, professionalism, knowledge, skill, discipline, coordination, and stress management to 
+successfully and safely carry out. Related DoD Occupational Subgroup: 105000, 195000, and 105000. 
+2. Duties and Responsibilities: 
+2.1. 
+Performs aircraft inspections. Performs aircrew visual inspection; non-scheduled aircraft maintenance; and preflight, through- flight, 
+and post flight inspections of aircraft away from home station. Accomplishes preflight and post- flight records and reports. Maintains aircraft 
+forms and records during flight and while aircraft is away from home station. 
+2.2. 
+Manages cargo and passenger load briefings. Accomplishes load planning of cargo and passenger loads if required. Supervises cargo 
+and passenger loading for off-loading operations. Directs the placement of material handling equipment to accomplish cargo on/off loading 
+operations. Ensures cargo and passengers are placed according to load plans. Determines cargo restraint requirements according to criteria and 
+directs and checks the application of cargo restraint equipment. Checks cargo/passenger loads against manifests. Determines and verifies 
+passenger, cargo, fuel, and emergency and special equipment distribution and weight. Computes and applies aircraft weight and balance. 
+2.3. 
+Computes takeoff, climb, cruise, and landing data. Determines engine fuel consumption using airspeed, atmospheric data, charts, 
+computer, or electronic calculator. Records actual aircraft performance data in flight engineer's log. 
+2.4. 
+Operates and monitors engine and aircraft systems controls and indicators according to flight manual procedures.  Assists pilot or 
+performs engine starts, and monitors run-up, flight operations, and engine shutdown. Operates engine controls to provide desired efficiency 
+and economy. Monitors engine instruments throughout period of operation. Controls, monitors, and regulates aircraft systems such as electric, 
+communication, navigation, hydraulic, pneumatic, fuel, air conditioning, and pressurization; ventilation; auxiliary power unit; and lubrication 
+systems. Observes warning indicators and light for fire, overheat, depressurization, and system failure. Reports abnormal conditions to pilot 
+and recommends corrective action. Monitors provides passenger comfort. Prepares and dispenses passenger meals, snacks, and refreshments. 
+Completes required aircraft forms documentation and border clearance requirements. Visually monitors aircraft clearances (interior and 
+exterior), identifies proximal threats to the aircraft and initiates corrective actions (aircraft scanning). 
+2.5. 
+Performs in-flight refueling aircrew duties. Checks forms for equipment status. Performs visual and operational check of air refueling 
+and associated systems and equipment. Performs in-flight operational check of air refueling systems. Directs receiver aircraft into air refueling 
+position. Operates in-flight air refueling controls and switches to safely affect contact between tanker and receiver aircraft. Monitors control 
+panel for proper operation of equipment during air refueling and advises receiver pilot of actions required to safely maintain position within 
+the air-refueling envelope. Keeps tanker pilot informed as to progress of air refueling operations. Performs emergency operations and 
+procedures as required for emergency off-load and on-load of fuel. 
+2.6. 
+Ensures availability of fleet service equipment and receives and stows in-flight meals. Accomplishes passenger briefings to include the 
+use of emergency equipment, evacuation procedures, and border clearance requirements. Demonstrates the use of passenger emergency 
+oxygen systems and life vests. Supervises passengers in-flight. Performs jumpmaster duties. 
+2.7. 
+Conducts cargo and personnel airdrops according to directives. Attaches extraction parachutes to cargo and platforms. Inspects cargo 
+and platforms, extraction systems and connects static lines. Checks tiedowns, parachutes, containers, suspension systems, and extraction 
+systems to ensure proper cargo extraction or release. Operates aircraft airdrop systems and supervises cargo and paratroopers exiting the 
+aircraft. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight maintenance; aircraft emergency procedures; in-flight refueling 
+system; using and interpreting diagrams, schematics, aircraft performance charts, loading charts, technical publications and flight manuals; 
+aircraft refueling systems; flying directives; weight and balance factors; cargo tie- down techniques; using survival equipment and oxygen; 
+24 
+DAFECD, 31 Oct 24 
+border agency clearance; dispensing and preserving food aboard aircraft; and understanding types, capacities, and configuration of transport 
+aircraft. 
+3.2. 
+Education. For entry into this specialty, completion of high school with course(s) in mechanics, mathematics, physics, computer 
+principles, speech, and English is desirable. 
+3.2.1. 1A112 Completion of Career Enlisted Aviator Preparatory School. 
+3.2.2. 1A132. Completion of Initial Qualification Training for the assigned aircraft/crew-position and Initial Qualification Course and 
+accompanying Certificate of Aircrew Qualification AF Form 8 in Mission Design Series. 
+3.3. 
+Experience. The following experience is mandatory for award of the AFSC indicated: 
+3.3.1. 1A152. Qualification in and possession of AFSC 1A132. Also, experience is mandatory in functions such as aircraft and performance 
+weight and balance computations, aircraft records maintenance, aircraft systems maintenance and inspections, inspecting, operating, and 
+troubleshooting in-flight refueling systems; preparing or verifying load plans; loading and unloading aircraft; and instructing passengers in the 
+use of emergency equipment and procedures, in-flight emergency procedures; using personal equipment and oxygen, communications; current 
+flying directives; interpreting diagrams, loading charts, and applicable technical publications; border agency clearance requirements and 
+forms; principles of dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and 
+maintain Mission Ready (MR) and/or Combat Mission Ready (CMR) status; experience and understanding in aviation organizational 
+functions and shops to include Training, Tactics, Scheduling, and Evaluations. 
+3.3.2. 1A172. Qualification in and possession of AFSC 1A152. Also, experience is mandatory in performing or supervising functions such as 
+flight engineer activities., inspecting, operating, and troubleshooting in-flight refueling systems; preparing or verifying load plans; loading and 
+unloading cargo on aircraft; and instructing passengers in the use of emergency equipment and procedures, airdrop techniques; weight and 
+balance factors; arithmetic, emergency equipment and in-flight emergency procedures; personal equipment and oxygen use; communications; 
+current flying directives; interpreting diagrams, and applicable technical publications; border agency clearance requirements and forms; 
+principles of dispensing and preserving food aboard aircraft; and cargo restraint techniques. Ability to supervise aviation organizational 
+functions and shops to include Training, Tactics, Scheduling, and Evaluations. 
+3.3.3. 1A192. Qualification in and possession of AFSC 1A172 and experience managing and directing Mobility Mission functions and 
+activities. 
+3.4. 
+Other: The following are mandatory as indicated: 
+3.4.1. For entry into this specialty: 
+3.4.2. See attachment 4 for entry requirements. 
+3.4.3. For entry, award, and retention of these AFSCs: 
+3.5. 
+Physical qualification for aircrew duty according to DAFMAN 48-123, Medical Examinations and Standards, Class III medical 
+standards. 
+3.6. 
+3.7. 
+Normal depth perception as defined in DAFMAN 48-123. 
+Qualification for aviation service according to AFI 11-402, Aviation and Parachutist Service, Aeronautical Ratings and Aviation 
+Badges. 
+3.8. 
+3.9. 
+Must maintain eligibility to deploy and mobilize worldwide. 
+Height in accordance with DAFMAN 48-123 and as directed in the current Medical Standards Directory Section T. 
+3.10. For award and retention of these AFSCs: 
+3.11. Must maintain local network access IAW AFI 17-130, Cybersecurity Program Management and AFMAN 17-1301, Computer Security. 
+3.12. Specialty requires routine access to Tier 3 (T3) information, systems or similar classified environments. 
+3.13. Completion of a current T3 Investigation required IAW DoDM 5200.02, AFMAN 16-1405, Air Force Personnel Security Program. 
+3.14. Must not be downgraded to Non-Mission Ready/Non-Combat Mission Ready (NMR/NCMR), or Unqualified (UQ) Status more than 
+four periods in a Ready Aircrew Program cycle due to events under the aircrew member’s control. 
+NOTE: Award of the entry level without a completed T3 Investigation is authorized provided an interim Secret security clearance has been 
+granted according to DoDM 5200.02, AFMAN 16-1405. 
+4. *Specialty Shredouts:
+ Suffix 
+A 
+Primary Aircraft 
+Suffix 
+C-5 Flight Engineer
+ I 
+Primary Aircraft 
+KC-10 Boom Operator 
+B 
+C-5 Loadmaster
+ J 
+KC-10 Flight Engineer 
+C 
+C-17 Loadmaster
+ K E-8 Flight Engineer
+ D 
+C-130J Loadmaster
+ L 
+C-130H Flight Engineer
+ E 
+WC-130 Loadmaster 
+N 
+C-130H Loadmaster
+ F 
+G 
+E-3 Flight Engineer
+ O EC-130H Flight Engineer 
+KC-46 Boom Operator 
+Z 
+Data Mask Mobility Force 
+Aviator 
+H 
+25 
+KC-135 Boom Operator

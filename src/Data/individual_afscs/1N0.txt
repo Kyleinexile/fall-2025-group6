@@ -1,0 +1,98 @@
+AFSC: 1N0
+Title: ALL SOURCE INTELLIGENCE ANALYST
+Category: Intelligence
+Pages: 72-73
+Notes: None
+==================================================
+
+AFSC 1N071, Craftsman 
+AFSC 1N051, Journeyman 
+AFSC 1N031, Apprentice 
+AFSC 1N011, Helper 
+ALL SOURCE INTELLIGENCE ANALYST 
+(Changed 30 Apr 24) 
+1. Specialty Summary. Performs/manages intelligence activities/functions including discovering, developing, evaluating, and providing 
+intelligence information. Related DoD Occupational Subgroup: 124300. 
+2. Duties and Responsibilities: 
+2.1. 
+Supports all aspects of Air Force operations by discovering, collating, analyzing, evaluating, and disseminating intelligence 
+information. Produces all-source intelligence, situation estimates, adversarial nation, terrorist, insurgent threat studies, and other 
+intelligence reports and studies. Advises commanders on force protection and intelligence information for US and Partner Nations. 
+Conducts intelligence debriefings of US and allied military personnel involved in combat operations. Prepares mission reports. 
+2.2. 
+Conducts intelligence Training. Instructs military personnel on collecting and reporting requirements and procedures, recognition 
+techniques, and assessing offensive and defensive weapon system capabilities. Assists SERE (Survival Evasion Resistance and Escape) 
+and Aircrew Flight Equipment personnel in training personnel recovery and code of conduct, when necessary. Collates intelligence and 
+operations materials, and assembles final products for mission briefing, study, and use. 
+2.3. 
+Produces intelligence materials. Prepares, maintains, and presents intelligence displays, reports, and briefings. Discovers, compiles, 
+evaluates, researches, analyzes, and disseminates intelligence information. Establishes intelligence collection requirements. Identifies and 
+establishes unit requirements for intelligence reference materials and maintains intelligence reference files and automated intelligence 
+databases. Uses intelligence automated data systems to store, retrieve, display, and report intelligence information. 
+2.4. 
+Performs support to mission planning and execution. Provides tailored collections planning, threat analysis, and intelligence 
+expertise necessary to develop detailed mission plans for air, space, cyberspace, and special operations. Provides current situational 
+awareness and Intelligence, Surveillance and Reconnaissance (ISR) management for the accomplishment of the Air Tasking Order (ATO), 
+Integrated Tasking Order (ITO), Cyber Tasking Order (CTO) or Space Tasking Order (STO). Analyzes intelligence to support military 
+operations. Assists in the performance of, targeting functions to include target development, weaponeering, force application, mission 
+planning, and combat assessment. 
+2.5. 
+Support to Force Protection (FP). Provides FP intelligence support to commanders and their staffs through all source intelligence 
+products and briefings, focusing on human threat capabilities, tactics, trends, courses of action and ongoing threats in the unit's Area of 
+Interest or Area of Responsibility. Analyzes incoming intelligence for FP value and impact. Ensures FP is addressed in current intelligence 
+briefings, pre-mission, and pre-deployment briefings. Provides guidance for unit-level FP-related intelligence external and internal 
+Training. Participates in the installation-level Threat Working Group (TWG). Develops realistic human threat scenarios for exercises. 
+Responsible for providing FP for at-home, in-transit, and deployed units. 
+2.6. 
+Processes, exploits, and disseminates intelligence products and conducts analysis concerning threat countries or targets of interest 
+via written and/or verbal means. These products provide specificity and knowledge to commanders and national leaders to impact tactical 
+through strategic level decision making processes. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, evaluating, and analyzing information; geographical and 
+cultural aspects of foreign countries; current military capabilities and employment tactics of potential enemy offensive and defensive 
+weapon systems; special operations forces tactics; techniques and procedures, and associated equipment, procedures for acquiring, 
+updating, and maintaining intelligence documents, maps, and charts; maps and charts use techniques; graphic, oral, and written 
+intelligence presentation; support to targeting; capabilities and application of respective computer systems; security classification marking 
+and control; US sensor systems; regional physical characteristics relative to radar significance; basic electromagnetic theory; and digital 
+terrain and feature databases. 
+3.2. 
+Education. For entry into this specialty, completion of high school or General Education Development equivalency, with courses in 
+speech, journalism, critical thinking, geography, modern world history, statistics, algebra, and geometry are desirable. 
+3.3. Training. For award of AFSC 1N031, completion of the All Source Intelligence Apprentice Course is mandatory. 
+3.3.1. For US Space Force, completion of the All Sourced Intelligence Apprentice Course and Space Warfighter Intelligence Formal Unit 
+is mandatory until replaced by new courses as determined by US Space Force. 
+3.4. 
+Experience. The following experience is mandatory for award of AFSC indicated: 
+3.4.1. 1N051. Qualification in and possession of AFSC 1N031. 
+3.4.2. 1N071. Qualification in and possession of AFSC 1N051. 
+3.5. Other. The following are mandatory as indicated: 
+3.5.1. For entry into this specialty: 
+3.5.1.1. 
+No speech disorders or noticeable communications deficiencies as defined by AFI 48-123, Medical Examinations and 
+Standards. 
+72 
+3.5.1.2. 
+DAFECD, 31 Oct 24 
+A minimum score of G53 and PSM 26 on the 1N0X1 Tailored Adaptive Personality Assessment System (TAPAS)/Armed 
+Services Vocational Aptitude Battery (ASVAB) predictive success model (PSM) or a standalone score of G55 is required.  
+3.5.1.3. 
+See attachment 4 for additional entry requirements. 
+3.5.2. For award and retention of AFSC 1N0X1: 
+3.5.2.1. 
+When required for a current or future assignment, must successfully complete a Counter- Intelligence (CI) polygraph 
+examination and meet all customer access eligibility requirements. Airmen unable to access mission, systems and/or facilities after 12 
+months of investigation/security screening should be considered for change of assignment, retraining or separation. 
+3.5.2.2. 
+Must maintain local network access IAW AFI 17-130, Cybersecurity Program Management Systems and AFMAN 17-1301, 
+Computer Security. 
+3.5.2.3. 
+Specialty requires routine access to Tier 5 (T5) information, systems, or similar classified environment. 
+3.5.3. For award and retention of AFSCs 1N031, 1N051, and 1N071: 
+3.5.3.1. 
+Completion of a current T5 Investigation IAW DoDM 5200.02, AFMAN 16-1405, Air Force Personnel Security Program, is 
+mandatory. 
+NOTE: Initial attendance in 1N0X1 AFSC awarding course without a completed T5 investigation is authorized provided interim T5 
+eligibility has been granted IAW Intelligence Community Directive (ICD) 704. Airmen who cannot obtain at least an interim T5 for 
+programmed class-start are not eligible for entry into the AFSC.

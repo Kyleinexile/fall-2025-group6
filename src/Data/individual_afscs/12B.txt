@@ -1,0 +1,70 @@
+AFSC: 12B
+Title: BOMBER COMBAT SYSTEMS OFFICER
+Category: Operations
+Pages: 46-46
+Notes: None
+==================================================
+
+AFSC 12B4*, Staff  
+AFSC 12B3*, Qualified 
+AFSC 12B2*, Intermediate  
+AFSC 12B1*, Entry/Student 
+BOMBER COMBAT SYSTEMS OFFICER 
+(Changed 31 Oct 21) 
+1. Specialty Summary. Performs duties of navigator, electronic warfare officer (EWO), or weapon systems officer (WSO) to accomplish 
+combat, training, and other assigned missions. Related DoD Occupational Group: 220400. 
+2. Duties and Responsibilities: 
+2.1. 
+Plans and prepares for mission. Reviews mission tasking, intelligence, and weather information. Participates in mission planning, 
+preparation and filing of flight plan, and crew briefing. Ensures aircraft is preflighted, inspected, loaded, equipped, and manned for 
+mission. 
+2.2. 
+2.3. 
+Navigates aircraft to accomplish assigned mission. Operates available navigation systems. 
+Conducts or supervises training of crewmembers. Ensures operational readiness of crew by conducting or supervising mission 
+specific training. 
+2.4. 
+Develops plans and policies, monitors operations, and advises commanders. Assists commanders and performs staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics. 
+3.2. 
+Education. For entry into this specialty, an undergraduate degree specializing in physical sciences, mathematics, administration, or 
+management is desirable. 
+3.3. Training. The following training is mandatory as indicated: 
+3.4. 
+For entry into this specialty, completion of Air Force Specialized Undergraduate Navigator Training (SUNT) or Undergraduate 
+CSO Training. 
+3.4.1. For award of AFSC 12B2X/3X, completion of transition and operational training in the suffix specific aircraft. 
+3.4.2. For award of AFSC 12B3C/D/W, completion of a EWO course or Undergraduate CSO Training. 
+3.5. 
+Experience. For upgrade to AFSCs 12B2X/3X, unit commander determines proficiency based on performance, experience, and 
+completion of minimum training requirements. 
+3.6. Other. The following are mandatory as indicated: 
+3.6.1. For award and retention of these AFSCs, current aeronautical rating and qualification for aviation service as navigator. 
+3.6.2. Specialty requires routine access to Tier 5 (T5) information, systems or similar classified environments. For award and retention of 
+AFSCs 12BXX, completion of a current T5 Investigation IAW DoDM 5200.02_AFMAN 16-1405, Air Force Personnel Security 
+Program. 
+NOTE: Award of the entry level without a completed T5 Investigation is authorized provided an interim Top Secret security clearance has 
+been granted according to DoDM 5200.02_AFMAN 16 -1405. 
+4. *Specialty Shredouts: 
+Suffix 
+Portion of AFS to Which Related  
+C 
+B-1 WSO  
+Suffix 
+Portion of AFS to Which Related 
+W 
+D 
+B-52 EWO  
+EWO, General 
+Y 
+E 
+B-52 WSO  
+General 
+Z 
+U 
+Air Liaison (ALO)  
+Other
