@@ -1,0 +1,98 @@
+{
+  "pipeline_run": "2025-09-30T10:29:52.082452",
+  "total_extractions": 73,
+  "unique_afscs": 12,
+  "avg_confidence": 0.6007735035190843,
+  "min_confidence": 0.5505449771881104,
+  "max_confidence": 0.7668882608413696,
+  "ksa_distribution": {
+    "skill": 65,
+    "ability": 8
+  },
+  "items_per_afsc": {
+    "11F3": {
+      "total": 3,
+      "knowledge": 0,
+      "skills": 3,
+      "abilities": 0,
+      "avg_confidence": 0.5781969626744589
+    },
+    "12B": {
+      "total": 1,
+      "knowledge": 0,
+      "skills": 1,
+      "abilities": 0,
+      "avg_confidence": 0.5680825710296631
+    },
+    "14N": {
+      "total": 2,
+      "knowledge": 0,
+      "skills": 2,
+      "abilities": 0,
+      "avg_confidence": 0.566910058259964
+    },
+    "14F": {
+      "total": 6,
+      "knowledge": 0,
+      "skills": 6,
+      "abilities": 0,
+      "avg_confidence": 0.592415859301885
+    },
+    "21A": {
+      "total": 10,
+      "knowledge": 0,
+      "skills": 8,
+      "abilities": 2,
+      "avg_confidence": 0.6039655148983002
+    },
+    "21M": {
+      "total": 6,
+      "knowledge": 0,
+      "skills": 5,
+      "abilities": 1,
+      "avg_confidence": 0.608739584684372
+    },
+    "1A3X1": {
+      "total": 11,
+      "knowledge": 0,
+      "skills": 10,
+      "abilities": 1,
+      "avg_confidence": 0.5775253772735596
+    },
+    "1C3": {
+      "total": 4,
+      "knowledge": 0,
+      "skills": 4,
+      "abilities": 0,
+      "avg_confidence": 0.578964114189148
+    },
+    "1N0": {
+      "total": 2,
+      "knowledge": 0,
+      "skills": 2,
+      "abilities": 0,
+      "avg_confidence": 0.5958555936813354
+    },
+    "1N4": {
+      "total": 1,
+      "knowledge": 0,
+      "skills": 1,
+      "abilities": 0,
+      "avg_confidence": 0.5885803699493408
+    },
+    "2A3": {
+      "total": 12,
+      "knowledge": 0,
+      "skills": 10,
+      "abilities": 2,
+      "avg_confidence": 0.6233251939217249
+    },
+    "2A5": {
+      "total": 15,
+      "knowledge": 0,
+      "skills": 13,
+      "abilities": 2,
+      "avg_confidence": 0.6163036584854126
+    }
+  }
+}
