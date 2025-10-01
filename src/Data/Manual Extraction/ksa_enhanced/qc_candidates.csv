@@ -1,0 +1,338 @@
+text,type,confidence,source_method,evidence_snippet,doc_id,title,category,afsc,section,page,parent_skills,review_status,origin
+aircraft operating procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+flying directives,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+flight operations,knowledge,0.82,document_explicit,"...flight, air navigation, meteorology, flying directives, aircraft operating...",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+theory of flight,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+mission tactics,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+air navigation,knowledge,0.82,document_explicit,"...Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics....",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+meteorology,knowledge,0.82,document_explicit,"...is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics....",manual::11F3,FIGHTER PILOT,Operations,11F3,"3.1. 
+Knowledge",36.0,,pending,enhancement
+aircraft operating procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+flying directives,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+flight operations,knowledge,0.82,document_explicit,"...flight, air navigation, meteorology, flying directives, aircraft operating...",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+theory of flight,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+mission tactics,knowledge,0.82,document_explicit,"Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics.",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+air navigation,knowledge,0.82,document_explicit,"...Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics....",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+meteorology,knowledge,0.82,document_explicit,"...is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics....",manual::12B,BOMBER COMBAT SYSTEMS OFFICER,Operations,12B,"3.1. 
+Knowledge",46.0,,pending,enhancement
+information capabilities synchronization,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+information capabilities application,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+information capabilities integration,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+deception activities knowledge,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+mildec knowledge,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+opsec knowledge,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+miso knowledge,knowledge,0.82,document_explicit,"Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+synchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+io knowledge,knowledge,0.82,document_explicit,"...Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and 
+s...",manual::14F,INFORMATION OPERATIONS,Intelligence,14F,"3.1. 
+Knowledge",71.0,,pending,enhancement
+research sources and methods,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+friendly forces presentation,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+intelligence fundamentals,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+intelligence disciplines,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+isr information systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+intelligence community,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+adversary capabilities,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+communications skills,knowledge,0.82,document_explicit,"Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+isr operations,knowledge,0.82,document_explicit,"...ndly weapons systems, adversary capabilities, ISR operations, targeting, integration, and sensing grid activities....",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+security,knowledge,0.82,document_explicit,"...wledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR in...",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+analysis,knowledge,0.82,document_explicit,"...mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information...",manual::14N,INTELLIGENCE,Intelligence,14N,"3.1. 
+Knowledge",74.0,,pending,enhancement
+dispensing food aboard aircraft,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+preserving food aboard aircraft,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+aircraft emergency procedures,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+personnel airdrop techniques,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+personnel airdrop equipment,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+in-flight refueling system,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+cargo restraint techniques,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo restraint techniques.,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+cargo airdrop techniques,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+cargo airdrop equipment,knowledge,0.82,document_explicit,dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and,manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,3.1 Knowledge,24.0,,pending,enhancement
+communication systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+electrical systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+arithmetic systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+mechanical systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+navigation systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+hydraulic systems,knowledge,0.82,document_explicit,"Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight mainte",manual::1A3X1,MOBILITY FORCE AVIATOR,Operations,1A3X1,"3.1. 
+Knowledge",24.0,,pending,enhancement
+command weapon systems movement procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+air force organization and administration,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+automated data processing equipment use,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+encode decode authorization procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+air force incident management system,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+national incident management system,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+automated data processing equipment,knowledge,0.82,document_explicit,"Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+pro",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+emergency actions and directives,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+command and control data systems,knowledge,0.82,document_explicit,"Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+pro",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+command weapon systems movement,knowledge,0.82,document_explicit,"Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+pro",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+c2 data systems and reporting,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+encode and decode procedures,knowledge,0.82,document_explicit,"Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+pro",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+data collection procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+command post operations,knowledge,0.82,document_explicit,"Air Force organization and administration; JADO; EM the National Incident 
+Management System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data 
+pro",manual::1C3,ALL-DOMAIN COMMAND AND CONTROL OPERATIONS,Operations,1C3,"3.1. 
+Knowledge",45.0,,pending,enhancement
+intelligence documents maintenance procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+intelligence organizations and systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+foreign countries geographical aspects,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+foreign countries cultural aspects,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+special operations forces tactics,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+collection and reporting systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+intelligence information sources,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+enemy offensive weapon systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+enemy defensive weapon systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+us sensor systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and 
+methods; intelligence information sources; techniques of identifying, collating, e",manual::1N0,ALL SOURCE INTELLIGENCE ANALYST,Intelligence,1N0,"3.1. 
+Knowledge",72.0,,pending,enhancement
+classified information handling directives,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+designated military forces organization,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+intelligence organizations and systems,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+global communications procedures,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+collection and reporting systems,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+national intelligence structure,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+effective writing principles,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+information operations,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+analytical techniques,knowledge,0.82,document_explicit,"Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information O",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+geography,knowledge,0.82,document_explicit,"...ons; organization of designated military forces; 
+geography; collection and reporting, systems, principles, methods, and procedures; effective writing principl...",manual::1N4,CYBER INTELLIGENCE,Intelligence,1N4,"3.1. 
+Knowledge",82.0,,pending,enhancement
+maintenance and personnel management procedures,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+aircraft systems capabilities and limitations,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+organizational and mission requirements,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+aircraft systems operating principles,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+supply transportation logistics plans,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+aircraft maintenance unit operations,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+flight and airframe construction,knowledge,0.82,document_explicit,"flight and airframe construction; life cycle sustainment, quality assurance; supply, transportation, logistics plans, contracting,",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,3.1 Knowledge,110.0,,pending,enhancement
+life cycle sustainment,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+airframe construction,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+aircraft components,knowledge,0.82,document_explicit,aircraft systems and components;,manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,3.1 Knowledge,110.0,,pending,enhancement
+quality assurance,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+theory of flight,knowledge,0.82,document_explicit,"The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operatin",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,"3.1. 
+Knowledge",110.0,,pending,enhancement
+aircraft systems,knowledge,0.82,document_explicit,aircraft systems and components;,manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,3.1 Knowledge,110.0,,pending,enhancement
+contracting,knowledge,0.82,document_explicit,"...surance; supply, transportation, logistics plans, contracting,...",manual::21A,AIRCRAFT MAINTENANCE,Maintenance,21A,3.1 Knowledge,110.0,,pending,enhancement
+Military maintenance procedures and standards,knowledge,0.45,skill_inferred,"Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",manual::21M,MUNITIONS AND MISSILE MAINTENANCE,Maintenance,21M,inferred,,"['supervise the maintenance of military equipment', 'assist in military logistics', 'military logistics', 'instruct in military duties', 'air force operations']",pending,enhancement
+Logistics planning and coordination principles,knowledge,0.45,skill_inferred,"Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",manual::21M,MUNITIONS AND MISSILE MAINTENANCE,Maintenance,21M,inferred,,"['supervise the maintenance of military equipment', 'assist in military logistics', 'military logistics', 'instruct in military duties', 'air force operations']",pending,enhancement
+Air Force operational doctrine,knowledge,0.45,skill_inferred,"Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",manual::21M,MUNITIONS AND MISSILE MAINTENANCE,Maintenance,21M,inferred,,"['supervise the maintenance of military equipment', 'assist in military logistics', 'military logistics', 'instruct in military duties', 'air force operations']",pending,enhancement
+maintenance directives principles concepts application,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+data reporting principles concepts application,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+principles applying to aircraft systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+hazardous waste handling use disposal,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+deficiency reporting procedures,knowledge,0.82,document_explicit,"principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data reporting; using technical da",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+air force supply procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+hydraulic principles,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+technical data usage,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+technical data using,knowledge,0.82,document_explicit,"principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data reporting; using technical da",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+technical order use,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+electrical theory,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+flight theory,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A3,TACTICAL AIRCRAFT MAINTENANCE,Maintenance,2A3,"3.1. 
+Knowledge",123.0,,pending,enhancement
+maintenance directives principles concepts application,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+data reporting principles concepts application,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+principles applying to aircraft systems,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+hazardous waste handling use disposal,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+deficiency reporting procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+air force supply procedures,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+hydraulic principles,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+using technical data,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+electrical theory,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
+flight theory,knowledge,0.82,document_explicit,"Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical 
+theory; principles, concepts, and application of maintenance directives and data re",manual::2A5,AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE,Maintenance,2A5,"3.1. 
+Knowledge",131.0,,pending,enhancement
