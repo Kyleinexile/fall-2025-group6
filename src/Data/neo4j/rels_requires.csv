@@ -1,0 +1,5 @@
+afsc_code,item_name,item_type,evidence,esco_id,confidence,sim_skill_evidence,sim_skill_esco
+1N0X1,Analyze intelligence reports,skill,"Briefing source docs and SIGINT summaries",,0.82,,
+1N0X1,Maintain ISR databases,skill,"Maintains and updates ISR data stores",,0.78,,
+1N0X1,Intelligence cycle fundamentals,knowledge,"Understands tasking, collection, processing, exploitation, dissemination",,,,
+1N0X1,Briefing delivery,ability,"Delivers concise senior-leader briefings",,,,
