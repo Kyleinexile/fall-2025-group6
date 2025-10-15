@@ -66,13 +66,17 @@ if afsc_list and selected and selected != "(none)":
     col3.metric("Abilities", len([k for k in ksas if k["type"] == "ability"]))
 
     # Display
-    for ksa_type in ["knowledge", "skill", "ability"]:
-        items = [k for k in ksas if k["type"] == ksa_type]
-        if items:
-            st.write(f"**{ksa_type.title()}:**")
-            for item in items:
-                link = f"  [ESCO]({item['esco']})" if item.get("esco") else ""
-                st.markdown(f"- {item['ksa']}{link}")
+for ksa_type in ["knowledge", "skill", "ability"]:
+    items = [k for k in ksas if k["type"] == ksa_type]
+    if items:
+        st.write(f"**{ksa_type.title()}:**")
+        for item in items:
+            esco = item.get("esco")
+            if esco:
+                st.markdown(f"- {item['ksa']}  [ESCO]({esco})")
+            else:
+                st.markdown(f"- {item['ksa']}")
+
 
     # Download (unique key avoids duplicate element id)
     csv_data = "Type,KSA\n" + "\n".join([f"{k['type']},{k['ksa']}" for k in ksas])
