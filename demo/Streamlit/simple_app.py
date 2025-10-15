@@ -73,8 +73,14 @@ for ksa_type in ["knowledge", "skill", "ability"]:
 
 
     # Download
-    csv_data = "Type,KSA\n" + "\n".join([f"{k['type']},{k['ksa']}" for k in ksas])
-    st.download_button("⬇️ Download CSV", csv_data, f"{selected}_ksas.csv", "text/csv")
+st.download_button(
+    label="⬇️ Download CSV",
+    data=csv_data,
+    file_name=f"{selected}_ksas.csv",
+    mime="text/csv",
+    key=f"dl_{selected}"
+)
+
 
     # Overlaps
     st.markdown("---")
