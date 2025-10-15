@@ -1,15 +1,22 @@
+# src/afsc_pipeline/extract_laiser.py
 """
 Real LAiSER integration with robust guards and graceful fallback.
 
-Dependencies (add to requirements.txt if not present):
-- pydantic>=2.7
-- httpx>=0.27
-- tenacity>=8.2
-- python-slugify>=8.0  (optional, nice-to-have)
+Env toggles:
+  USE_LAISER=true|false          # enable/disable LAiSER (fallback to heuristics)
+  LAISER_MODE=auto|lib|http      # prefer local lib or HTTP endpoint
+  LAISER_TIMEOUT_S=30            # request timeout for HTTP mode
+  LAISER_HTTP_URL=<url>          # e.g., http://localhost:8000/extract
+  LAISER_HTTP_KEY=<token>        # optional bearer token
+
+Add to requirements (if not already pinned):
+  pydantic>=2.7
+  httpx>=0.27
+  tenacity>=8.2
 """
 
 from __future__ import annotations
-from dataclasses import dataclass
+
 from enum import Enum
 from typing import List, Optional, Tuple, Dict, Any
 import hashlib
@@ -21,23 +28,21 @@ import time
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_type
-from pydantic import BaseModel, Field, constr, ValidationError
-
+from pydantic import BaseModel, Field, constr
 
 # ---------- Config ----------
 
 LAISER_ENABLED = os.getenv("USE_LAISER", "true").lower() in {"1", "true", "yes"}
 LAISER_MODE = os.getenv("LAISER_MODE", "auto")     # "auto" | "lib" | "http"
 LAISER_TIMEOUT_S = int(os.getenv("LAISER_TIMEOUT_S", "30"))
-LAISER_HTTP_URL = os.getenv("LAISER_HTTP_URL", "") # e.g., http://localhost:8000/extract or hosted
-LAISER_HTTP_KEY = os.getenv("LAISER_HTTP_KEY", "") # if your endpoint requires an API key
+LAISER_HTTP_URL = os.getenv("LAISER_HTTP_URL", "")
+LAISER_HTTP_KEY = os.getenv("LAISER_HTTP_KEY", "")
 
-# If you have a Python package for LAiSER, we try to import it when LAISER_MODE in ("auto","lib")
 _HAVE_LAISER_LIB = False
 _laiser_lib = None
 if LAISER_MODE in ("auto", "lib"):
     try:
-        import laiser  # noqa: F401
+        import laiser  # your real LAiSER python package, if available
         _laiser_lib = laiser
         _HAVE_LAISER_LIB = True
     except Exception:
@@ -59,7 +64,6 @@ class ItemDraft(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0, default=0.6)
     esco_id: Optional[str] = None
     source: str = "laiser"  # "laiser" | "heuristic"
-    # Stable content signature to help dedupe/idempotent upserts down-pipeline
     content_sig: str
 
     @staticmethod
@@ -82,15 +86,15 @@ class ExtractResult(BaseModel):
 
 # ---------- Input Hygiene ----------
 
-_MIN_CHARS = 280  # require some substance to avoid garbage calls
+_MIN_CHARS = 280  # avoid garbage calls / accidental snippets
 
 def _sanitize_text(raw: str) -> str:
     if not raw:
         return ""
     txt = textwrap.dedent(raw).strip()
-    # remove markdown tables / code fences to reduce noise for extractors
+    # remove code fences / markdown tables to reduce noise
     txt = re.sub(r"```.+?```", " ", txt, flags=re.DOTALL)
-    txt = re.sub(r"\|.+\|\n", " ", txt)  # naive strip of table rows
+    txt = re.sub(r"\|.*\|\n", " ", txt)  # naive table row strip
     txt = re.sub(r"\s+", " ", txt)
     return txt.strip()
 
@@ -107,14 +111,13 @@ def _validate_ready(text: str) -> Tuple[bool, Optional[str]]:
 
 def _heuristic_extract(text: str) -> List[ItemDraft]:
     """
-    Very light heuristic stub. Keeps your existing behavior as a safety net.
+    Lightweight heuristic: parse bullet-like lines; classify by simple phrase rules.
+    Provides deterministic output to keep pipeline idempotent when LAiSER is down.
     """
-    # Example heuristics: look for bullet-ish lines and verbs/nouns
-    bullets = re.findall(r"(?:^|\s)[•\-–]\s([^•\-\n\r]{8,120})", text)
+    bullets = re.findall(r"(?:^|\s)[•\-–]\s([^•\-\n\r]{8,140})", text)
     candidates = [b.strip().rstrip(".") for b in bullets]
     out: List[ItemDraft] = []
 
-    # naive tag as 'skill' unless we detect "knowledge of" / "ability to"
     for c in candidates[:30]:
         lower = c.lower()
         if "knowledge of" in lower or "understanding of" in lower:
@@ -132,14 +135,14 @@ def _heuristic_extract(text: str) -> List[ItemDraft]:
             item_type=t,
             confidence=conf,
             source="heuristic",
-            content_sig=ItemDraft.make_sig(c, t, tag="heuristic-v1")
+            content_sig=ItemDraft.make_sig(c, t, tag="heuristic-v1"),
         ))
-    # If nothing matched, fall back to a couple of generic stubs to avoid empty set
+
     if not out:
         seeds = [
-            ("Conduct multi-source analysis", ItemType.skill),
+            ("Conduct multi-source intelligence analysis", ItemType.skill),
             ("Knowledge of intelligence cycle fundamentals", ItemType.knowledge),
-            ("Ability to synthesize findings under time constraints", ItemType.ability)
+            ("Ability to synthesize findings under time constraints", ItemType.ability),
         ]
         for c, t in seeds:
             out.append(ItemDraft(
@@ -147,7 +150,7 @@ def _heuristic_extract(text: str) -> List[ItemDraft]:
                 item_type=t,
                 confidence=0.5,
                 source="heuristic",
-                content_sig=ItemDraft.make_sig(c, t, tag="heuristic-v1")
+                content_sig=ItemDraft.make_sig(c, t, tag="heuristic-v1"),
             ))
     return out
 
@@ -168,19 +171,15 @@ class _LaiserLibClient:
     )
     def extract(self, text: str) -> List[ItemDraft]:
         """
-        Adjust to the real laiser API you have. This is a placeholder showing intent:
-        Suppose laiser.extract(text) -> [{"type":"skill","text":"...","confidence":0.83, "esco_id": "ESCO:123"}]
+        Adjust to the real laiser API you have.
+        Expected shape (example):
+          laiser.extract(text) -> [{"type":"skill","text":"...","confidence":0.83,"esco_id":"ESCO:123"}]
         """
-        # Replace this with the real call:
-        # raw_items = self._client.extract(text, types=["knowledge","skill","ability"])
-        # For demonstration, we simulate a plausible shape:
-        raw_items = getattr(self._client, "extract", lambda _t: [])(text)  # if exists; else []
+        raw_items = getattr(self._client, "extract", lambda _t: [])(text)
         items: List[ItemDraft] = []
-        for r in raw_items:
-            try:
-                t = ItemType(r.get("type", "skill"))
-            except Exception:
-                t = ItemType.skill
+        for r in raw_items or []:
+            t_raw = (r.get("type") or "skill").lower()
+            t = ItemType(t_raw) if t_raw in ItemType.__members__.keys() else ItemType.skill
             itxt = (r.get("text") or "").strip()
             if not itxt:
                 continue
@@ -192,7 +191,7 @@ class _LaiserLibClient:
                 confidence=max(0.0, min(1.0, conf)),
                 esco_id=esco_id,
                 source="laiser",
-                content_sig=ItemDraft.make_sig(itxt, t, tag="laiser-lib-v1")
+                content_sig=ItemDraft.make_sig(itxt, t, tag="laiser-lib-v1"),
             ))
         return items
 
@@ -219,8 +218,8 @@ class _LaiserHttpClient:
 
         payload = {
             "text": text,
-            "types": ["knowledge", "skill", "ability"],  # adjust if your API expects different schema
-            "return_esco": True
+            "types": ["knowledge", "skill", "ability"],
+            "return_esco": True,
         }
 
         with httpx.Client(timeout=LAISER_TIMEOUT_S) as client:
@@ -228,13 +227,10 @@ class _LaiserHttpClient:
             resp.raise_for_status()
             data = resp.json()
 
-        # Expected: {"items":[{"type":"skill","text":"...","confidence":0.82,"esco_id":"ESCO:123"}]}
         items: List[ItemDraft] = []
         for r in data.get("items", []):
-            try:
-                t = ItemType(r.get("type", "skill"))
-            except Exception:
-                t = ItemType.skill
+            t_raw = (r.get("type") or "skill").lower()
+            t = ItemType(t_raw) if t_raw in ItemType.__members__.keys() else ItemType.skill
             itxt = (r.get("text") or "").strip()
             if not itxt:
                 continue
@@ -246,7 +242,7 @@ class _LaiserHttpClient:
                 confidence=max(0.0, min(1.0, conf)),
                 esco_id=esco_id,
                 source="laiser",
-                content_sig=ItemDraft.make_sig(itxt, t, tag="laiser-http-v1")
+                content_sig=ItemDraft.make_sig(itxt, t, tag="laiser-http-v1"),
             ))
         return items
 
@@ -268,7 +264,6 @@ class LaiserExtractor:
             elif LAISER_MODE in ("auto", "http") and LAISER_HTTP_URL:
                 self._client = _LaiserHttpClient(LAISER_HTTP_URL, LAISER_HTTP_KEY)
             # else: remain None -> fallback
-        # If disabled entirely, client stays None
 
     def extract_items(self, afsc_text: str) -> ExtractResult:
         started = time.time()
@@ -277,16 +272,13 @@ class LaiserExtractor:
 
         ok, reason = _validate_ready(sanitized)
         if not ok:
-            # Don’t call remote; return small heuristic seed so pipeline can still run
             items = _heuristic_extract(sanitized)
             dur = int((time.time() - started) * 1000)
             return ExtractResult(items=items, errors=[f"input_invalid:{reason}"], used_fallback=True, duration_ms=dur)
 
-        # Try LAiSER (if configured)
         if self._client is not None:
             try:
                 items = self._client.extract(sanitized)
-                # If LAiSER returns empty, fall back but record soft error
                 if not items:
                     errors.append("laiser_empty")
                     fb = _heuristic_extract(sanitized)
@@ -296,22 +288,21 @@ class LaiserExtractor:
                 return ExtractResult(items=items, errors=errors, used_fallback=False, duration_ms=dur)
             except Exception as e:
                 errors.append(f"laiser_error:{type(e).__name__}:{str(e)[:200]}")
-                # graceful fallback
-                items = _heuristic_extract(sanitized)
+                fb = _heuristic_extract(sanitized)
                 dur = int((time.time() - started) * 1000)
-                return ExtractResult(items=items, errors=errors, used_fallback=True, duration_ms=dur)
+                return ExtractResult(items=fb, errors=errors, used_fallback=True, duration_ms=dur)
 
         # No LAiSER configured/enabled -> fallback
-        items = _heuristic_extract(sanitized)
+        fb = _heuristic_extract(sanitized)
         dur = int((time.time() - started) * 1000)
-        return ExtractResult(items=items, errors=errors, used_fallback=True, duration_ms=dur)
+        return ExtractResult(items=fb, errors=errors, used_fallback=True, duration_ms=dur)
 
 
-# ---------- Public helper for pipeline ----------
+# ---------- Public entry point for pipeline ----------
 
 def extract_ksa_items(afsc_text: str) -> ExtractResult:
     """
-    Pipeline entry point. Keep this stable for pipeline.py.
+    Pipeline entry point. Stable public function used by pipeline.py
     """
     extractor = LaiserExtractor()
     return extractor.extract_items(afsc_text)
