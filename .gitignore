@@ -4,3 +4,9 @@ __pycache__/
 runs/
 .DS_Store
 Thumbs.db
+
+# local run artifacts
+skills_alignment_results.csv
+token_dist.json
+skill_db_relax_20.json
+*.bak

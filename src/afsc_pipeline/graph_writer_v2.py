@@ -1,49 +1,25 @@
 from __future__ import annotations
-
 from typing import Dict, List
 from neo4j import Session  # type: ignore
-
 from afsc_pipeline.extract_laiser import ItemDraft
 
-
 def _items_to_param(items: List[ItemDraft]) -> List[Dict]:
-    out: List[Dict] = []
-    for it in items:
-        out.append(
-            {
-                "content_sig": it.content_sig,
-                "text": it.text,
-                "item_type": it.item_type.value,
-                "confidence": float(it.confidence),
-                "source": it.source,
-                "esco_id": it.esco_id or None,
-            }
-        )
-    return out
+    return [{
+        "content_sig": it.content_sig,
+        "text": it.text,
+        "item_type": it.item_type.value,
+        "confidence": float(it.confidence),
+        "source": it.source,
+        "esco_id": it.esco_id or None,
+    } for it in items]
 
-
-def upsert_afsc_and_items(
-    session: Session,
-    afsc_code: str,
-    items: List[ItemDraft],
-) -> Dict[str, int]:
-    """
-    Idempotently write AFSC + items + REQUIRES edges.
-
-    Executes THREE separate, single-statement queries in one write transaction
-    to avoid "Expected exactly one statement per query" errors on Aura.
-    """
-    params = {
-        "afsc_code": afsc_code,
-        "items": _items_to_param(items),
-    }
-
+def upsert_afsc_and_items(session: Session, afsc_code: str, items: List[ItemDraft]) -> Dict[str, int]:
+    params = {"afsc_code": afsc_code, "items": _items_to_param(items)}
     cypher_afsc = """
     MERGE (a:AFSC {code: $afsc_code})
     ON CREATE SET a.created_at = timestamp()
     SET a.updated_at = timestamp()
     """
-
     cypher_items = """
     UNWIND $items AS it
     MERGE (i:Item {content_sig: it.content_sig})
@@ -59,13 +35,11 @@ def upsert_afsc_and_items(
         i.source     = coalesce(it.source, i.source),
         i.confidence = coalesce(it.confidence, i.confidence),
         i.esco_id    = CASE
-                         WHEN it.esco_id IS NOT NULL AND it.esco_id <> ''
-                         THEN it.esco_id
+                         WHEN it.esco_id IS NOT NULL AND it.esco_id <> '' THEN it.esco_id
                          ELSE i.esco_id
                        END,
         i.last_seen  = timestamp()
     """
-
     cypher_rels = """
     MATCH (a:AFSC {code: $afsc_code})
     UNWIND $items AS it
@@ -74,13 +48,9 @@ def upsert_afsc_and_items(
       ON CREATE SET r.first_seen = timestamp()
     SET r.last_seen = timestamp()
     """
-
-    def _tx_write(tx):
-        # 1) AFSC
+    def _tx(tx):
         r1 = tx.run(cypher_afsc, {"afsc_code": params["afsc_code"]}); list(r1); s1 = r1.consume().counters
-        # 2) Items
-        r2 = tx.run(cypher_items, {"items": params["items"]}); list(r2); s2 = r2.consume().counters
-        # 3) Rels
+        r2 = tx.run(cypher_items, {"items": params["items"]});       list(r2); s2 = r2.consume().counters
         r3 = tx.run(cypher_rels, {"afsc_code": params["afsc_code"], "items": params["items"]}); list(r3); s3 = r3.consume().counters
         return {
             "nodes_created": s1.nodes_created + s2.nodes_created + s3.nodes_created,
@@ -90,11 +60,34 @@ def upsert_afsc_and_items(
             "properties_set": s1.properties_set + s2.properties_set + s3.properties_set,
             "labels_added": s1.labels_added + s2.labels_added + s3.labels_added,
             "labels_removed": s1.labels_removed + s2.labels_removed + s3.labels_removed,
-            "indexes_added": getattr(s1, "indexes_added", 0) + getattr(s2, "indexes_added", 0) + getattr(s3, "indexes_added", 0),
-            "indexes_removed": getattr(s1, "indexes_removed", 0) + getattr(s2, "indexes_removed", 0) + getattr(s3, "indexes_removed", 0),
-            "constraints_added": getattr(s1, "constraints_added", 0) + getattr(s2, "constraints_added", 0) + getattr(s3, "constraints_added", 0),
-            "constraints_removed": getattr(s1, "constraints_removed", 0) + getattr(s2, "constraints_removed", 0) + getattr(s3, "constraints_removed", 0),
         }
+    return session.execute_write(_tx)
 
-    summary = session.execute_write(_tx_write)
-    return summary
+def ensure_constraints(session: Session) -> Dict[str, int]:
+    """
+    Best-effort creation of uniqueness constraints. Safe to call repeatedly.
+    """
+    added = 0
+    statements = [
+        """
+        CREATE CONSTRAINT afsc_code_unique IF NOT EXISTS
+        FOR (a:AFSC)
+        REQUIRE a.code IS UNIQUE
+        """,
+        """
+        CREATE CONSTRAINT item_sig_unique IF NOT EXISTS
+        FOR (i:Item)
+        REQUIRE i.content_sig IS UNIQUE
+        """,
+    ]
+    def _tx(tx):
+        nonlocal added
+        for stmt in statements:
+            res = tx.run(stmt); list(res)
+            added += 1
+        return True
+    try:
+        session.execute_write(_tx)
+    except Exception:
+        pass
+    return {"constraints_added_attempted": added}
