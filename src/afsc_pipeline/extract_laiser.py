@@ -18,7 +18,7 @@ Add to requirements (if not already pinned):
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple
 import hashlib
 import json
 import os
@@ -63,7 +63,7 @@ class ItemDraft(BaseModel):
     item_type: ItemType
     confidence: float = Field(ge=0.0, le=1.0, default=0.6)
     esco_id: Optional[str] = None
-    source: str = "laiser"  # "laiser" | "heuristic"
+    source: str = "laiser"  # "laiser" | "heuristic" | "llm-*"
     content_sig: str
 
     @staticmethod
@@ -107,12 +107,12 @@ def _validate_ready(text: str) -> Tuple[bool, Optional[str]]:
     return True, None
 
 
-# ---------- Heuristic Fallback (current behavior preserved) ----------
+# ---------- Heuristic Fallback (always available) ----------
 
 def _heuristic_extract(text: str) -> List[ItemDraft]:
     """
     Lightweight heuristic: parse bullet-like lines; classify by simple phrase rules.
-    Provides deterministic output to keep pipeline idempotent when LAiSER is down.
+    Deterministic output so pipeline remains idempotent when LAiSER is down.
     """
     bullets = re.findall(r"(?:^|\s)[•\-–]\s([^•\-\n\r]{8,140})", text)
     candidates = [b.strip().rstrip(".") for b in bullets]
@@ -157,6 +157,21 @@ def _heuristic_extract(text: str) -> List[ItemDraft]:
 
 # ---------- LAiSER via Python library ----------
 
+def _extract_esco_tag(r: dict) -> Optional[str]:
+    """
+    Capture an ESCO-like tag from LAiSER output if present.
+    Accepts common field names and basic formats:
+      - 'esco_id', 'skill_tag', 'taxonomy_id'
+      - values like 'ESCO:xxxx', URIs, or strings containing 'esco'
+    """
+    raw = (r.get("esco_id") or r.get("skill_tag") or r.get("taxonomy_id") or "").strip()
+    if not raw:
+        return None
+    if raw.upper().startswith("ESCO:") or raw.startswith("http") or ("esco" in raw.lower()):
+        return raw
+    return None
+
+
 class _LaiserLibClient:
     def __init__(self) -> None:
         if not _HAVE_LAISER_LIB:
@@ -171,20 +186,21 @@ class _LaiserLibClient:
     )
     def extract(self, text: str) -> List[ItemDraft]:
         """
-        Adjust to the real laiser API you have.
-        Expected shape (example):
-          laiser.extract(text) -> [{"type":"skill","text":"...","confidence":0.83,"esco_id":"ESCO:123"}]
+        Adjust to your real laiser API.
+        Expected item shape (example):
+          {"type":"skill","text":"...","confidence":0.83,"esco_id":"ESCO:123"}
         """
         raw_items = getattr(self._client, "extract", lambda _t: [])(text)
         items: List[ItemDraft] = []
         for r in raw_items or []:
             t_raw = (r.get("type") or "skill").lower()
-            t = ItemType(t_raw) if t_raw in ItemType.__members__.keys() else ItemType.skill
+            t = ItemType(t_raw) if t_raw in ItemType.__members__ else ItemType.skill
             itxt = (r.get("text") or "").strip()
             if not itxt:
                 continue
             conf = float(r.get("confidence", 0.7))
-            esco_id = r.get("esco_id")
+            esco_id = _extract_esco_tag(r)
+
             items.append(ItemDraft(
                 text=itxt,
                 item_type=t,
@@ -219,7 +235,7 @@ class _LaiserHttpClient:
         payload = {
             "text": text,
             "types": ["knowledge", "skill", "ability"],
-            "return_esco": True,
+            "return_esco": True,  # ask server for ESCO grounding when available
         }
 
         with httpx.Client(timeout=LAISER_TIMEOUT_S) as client:
@@ -230,12 +246,13 @@ class _LaiserHttpClient:
         items: List[ItemDraft] = []
         for r in data.get("items", []):
             t_raw = (r.get("type") or "skill").lower()
-            t = ItemType(t_raw) if t_raw in ItemType.__members__.keys() else ItemType.skill
+            t = ItemType(t_raw) if t_raw in ItemType.__members__ else ItemType.skill
             itxt = (r.get("text") or "").strip()
             if not itxt:
                 continue
             conf = float(r.get("confidence", 0.7))
-            esco_id = r.get("esco_id")
+            esco_id = _extract_esco_tag(r)
+
             items.append(ItemDraft(
                 text=itxt,
                 item_type=t,
