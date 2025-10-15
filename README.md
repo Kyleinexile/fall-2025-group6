@@ -1,146 +1,135 @@
-# USAF AFSC KSA Extraction Framework
-_Fall 2025 — Group 6 Capstone_
+# AFSC → Civilian Skills Translation (Capstone)
+
+Live demo: Streamlit Cloud (public) reading from Neo4j AuraDB Free.  
+App path: `demo/Streamlit/simple_app.py` (env-driven connection)
 
 ---
 
-## Project Overview
-This project delivers a **tool-agnostic K/S/A (Knowledge, Skills, Abilities) extraction framework** for selected USAF Air Force Specialty Codes (AFSCs). It uses LAiSER (with ESCO taxonomy) to extract evidence-backed items from unclassified AFSC descriptions, applies quality filters, produces a QC sample for human validation, and exports a **graph-ready** structure for downstream analysis (e.g., Neo4j).
+## Quickstart
 
-### What you get
-- **Evidence-backed K/S/A items** with confidence scores and text snippets  
-- **De-duplication + stoplist filtering** (removes irrelevant Navy/maritime noise)  
-- **QC workflow** (stratified sample for manual validation)  
-- **Graph export** (AFSC → K/S/A weighted edges for graph DBs)
-
-### Impact
-A reusable, auditable pipeline to help translate military experience into civilian skill language and support workforce planning.
-
----
-
-## Current Status
-- **AFSCs processed:** 12  
-- **Post-filter K/S/A items & distribution:** See the latest run's `extraction_stats.json` in `src/Data/Manual Extraction/ksa_output_simple/`  
-- **Graph export:** `graph_export.json` (nodes = AFSCs + unique K/S/As; edges = AFSC→K/S/A links with confidence)  
-- **Performance:** Sub-second on Windows/CPU with Phi-2 (observed ~1k+ skills/sec in testing)
-
-> 📌 _Knowledge rarely appears because AFSC text + ESCO taxonomy are action-oriented. We apply a light heuristic to label K/S/A for reporting; most extractions are operational "skills" by design._
-
----
-
-## Data
-
-### Primary dataset
-- `src/Data/Manual Extraction/corpus_manual_dataset.jsonl`  
-  - 12 AFSCs (Operations, Intelligence, Maintenance)  
-  - Columns: `doc_id`, `text`, `title`, `afsc`, `category`
-
-### AF reference docs (for context)
-- `AFOCD_2024.pdf`, `AFECD_2024.pdf` (official sources; used for curation)
-
----
-
-## Repository Structure
-```
-src/
-  Data/
-    Manual Extraction/
-      corpus_manual_dataset.jsonl      # Input dataset (agreed source of truth)
-      ksa_output_simple/               # Extraction outputs (latest run)
-        ksa_extractions.csv            # Filtered K/S/A items (+ metadata)
-        qc_sample.csv                  # 30-item stratified QC sample
-        extraction_stats.json          # Summary statistics
-        graph_export.json              # Graph DB structure (nodes/edges)
-  notebooks/
-    laiser_ksa_pipeline.ipynb          # Main pipeline (documented)
-  component/                           # (optional helpers/modules)
-  docs/                                # (reference docs)
-  shellscripts/                        # (automation hooks)
-  tests/                               # (optional unit tests)
-demo/
-reports/
-presentation/
-research_paper/
-cookbooks/
-```
-
----
-
-## Technical Stack
-- **Extraction:** LAiSER (ESCO taxonomy)
-- **Model:** Microsoft Phi-2 (CPU-friendly)
-- **Platform:** Windows, CPU mode (no vLLM/GPU dependency)
-- **Core libs:** pandas, torch, laiser
-- **Graph:** JSON export compatible with Neo4j import scripts
-
----
-
-## Install & Run
-
-### Prerequisites
 ```bash
-# LAiSER (CPU build)
-pip install "laiser[cpu]"
+# 1) Clone & enter
+git clone https://github.com/Kyleinexile/fall-2025-group6
+cd fall-2025-group6
 
-# Core deps
-pip install pandas torch
-```
+# 2) Create a venv (example) and install
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+Required environment variables
+Set these in your shell (or Streamlit Cloud secrets):
 
-### Running the Pipeline
-1. Open the documented notebook:
-   ```bash
-   src/notebooks/laiser_ksa_pipeline.ipynb
-   ```
+bash
+Copy code
+export NEO4J_URI="neo4j+s://05f33eb6.databases.neo4j.io:7687"
+export NEO4J_USER="neo4j"
+export NEO4J_PASSWORD="<AURA_PASSWORD>"
+export NEO4J_DATABASE="neo4j"
+LAiSER integration (primary extractor & ESCO grounding):
 
-2. Then:
-   - Run all cells
-   - Enter your Hugging Face token when prompted
-   - Outputs are written to:
-     ```
-     src/Data/Manual Extraction/ksa_output_simple/
-     ```
+bash
+Copy code
+# Optional (defaults shown)
+export USE_LAISER="true"           # use LAiSER; falls back to heuristics if unavailable
+export LAISER_MODE="auto"          # auto | lib | http
+export LAISER_TIMEOUT_S="30"
+# If using an HTTP endpoint:
+# export LAISER_HTTP_URL="https://your-laiser-endpoint/extract"
+# export LAISER_HTTP_KEY="<token>"
+LLM enhancement (optional Knowledge/Ability enrichment; off by default):
 
-### Generated Files
-- **`ksa_extractions.csv`** — filtered K/S/A with AFSC, title, category, confidence, evidence_snippet
-- **`qc_sample.csv`** — 30-item balanced sample for manual review
-- **`extraction_stats.json`** — totals, distribution, per-AFSC metrics
-- **`graph_export.json`** — nodes (AFSC + K/S/A) and weighted edges (confidence)
+bash
+Copy code
+export USE_LLM_ENHANCER="false"    # set to true to enable
+# Optional model hints (only if you wire an SDK):
+# export LLM_PROVIDER="gemini|openai|anthropic"
+# export LLM_MODEL_GEMINI="gemini-1.5-pro"
+# export LLM_MODEL_OPENAI="gpt-4o-mini"
+# export LLM_MODEL_ANTHROPIC="claude-3-5-sonnet-20241022"
+Run the pipeline (single pass)
+Paste an AFSC section and upsert to Neo4j:
 
----
+bash
+Copy code
+python -m afsc_pipeline.scripts.try_pipeline --afsc 1N0X1 --stdin <<'EOF'
+(paste the AFSC duties/knowledge/skills/abilities text here)
+EOF
+Or from a file:
 
-## QC & Validation
-1. Open `qc_sample.csv`
-2. Fill reviewer fields:
-   - `reviewer_label` (knowledge/skill/ability)
-   - `is_correct` (Yes/No/Partial)
-   - `notes`
-3. (Optional) Aggregate QC results to estimate precision; adjust `MIN_CONFIDENCE` or stoplist terms and re-run if needed
+bash
+Copy code
+python -m afsc_pipeline.scripts.try_pipeline --afsc 1N0X1 --input ./data/1N0X1.txt
+Output: a compact JSON summary with counts, timing, and esco_tagged_count.
 
----
+Streamlit app (Aura live)
+bash
+Copy code
+streamlit run demo/Streamlit/simple_app.py
+Features:
 
-## Roadmap
-- **Web demo:** AFSC search + K/S/A graph visualization
-- **O*NET alignment:** map ESCO to O*NET occupations/taxonomy
-- **Scale-out:** full AFSC corpus integration
-- **Post-processing:** optional LLM refinement (e.g., cluster/disambiguate skills)
+AFSC picker, filters (type, confidence, search)
 
----
+Overlap counts across AFSCs
 
-## Notes on "Knowledge"
-- LAiSER outputs action-oriented skills aligned to ESCO by default
-- A light heuristic labels items as knowledge/skill/ability for reporting, but AFSC text rarely states "knowledge of X" explicitly—so Knowledge counts are naturally low
-- If stronger Knowledge coverage is needed, add a second-pass LLM to promote implicit concepts (theory/principles) into explicit knowledge statements
+CSV download (includes esco_id & content_sig)
 
----
+[ESCO] badge/link when items have ESCO IDs
 
-## Contributing / Reproducibility
-Inputs, code, and outputs are versioned in-repo.
+The app is read-only; it reflects whatever the pipeline has written to Aura.
 
-Reruns should match prior results unless these settings change:
-- **Confidence threshold:** `MIN_CONFIDENCE` (default 0.55)
-- **Stoplist terms:** removes irrelevant Navy/maritime noise
-- **Dedup scope:** per AFSC + skill
+Pipeline architecture (tooth → tail)
+preprocess.py – AFSC text cleanup
 
-Please open issues/PRs with:
-- Clear description of change
-- Before/after metrics (items kept, avg confidence)
-- Any dataset or threshold modification
+extract_laiser.py – LAiSER-first extractor with robust guards & fallback
+
+Captures ESCO IDs directly from LAiSER when available (no local mapper)
+
+enhance_llm.py – optional K/A enrichment (disabled unless USE_LLM_ENHANCER=true)
+
+dedupe.py – near-duplicate canonicalization within item type (lifts ESCO IDs)
+
+graph_writer.py – idempotent upserts (:Item {content_sig}), (:AFSC)-[:REQUIRES]->(:Item)
+
+audit.py – structured JSON log line per run
+
+scripts/try_pipeline.py – CLI runner for one-shot ingestion
+
+Key choice: ESCO grounding is sourced from LAiSER only (e.g., get_top_esco_skills).
+If ESCO tags don’t appear, the pipeline will still run; the app simply won’t show ESCO badges.
+This lets us evaluate LAiSER’s ESCO alignment and feed issues back to the LAiSER team.
+
+Neo4j (Aura) schema notes
+(:AFSC {code})
+
+(:Item {content_sig, text, item_type, source, confidence, esco_id?})
+
+(:AFSC)-[:REQUIRES {first_seen,last_seen}]->(:Item)
+
+Optional constraints (run once if you have perms):
+
+cypher
+Copy code
+CREATE CONSTRAINT afsc_code_unique IF NOT EXISTS
+FOR (a:AFSC) REQUIRE a.code IS UNIQUE;
+
+CREATE CONSTRAINT item_sig_unique IF NOT EXISTS
+FOR (i:Item) REQUIRE i.content_sig IS UNIQUE;
+Troubleshooting
+No AFSCs in the app: Run the pipeline at least once to seed the graph.
+
+No ESCO badges: Ensure LAiSER is enabled/returning ESCO tags; check extract_laiser.py logs.
+
+Streamlit key collisions: App uses AFSC-scoped keys (fixed in simple_app.py).
+
+Neo4j connection errors: Verify NEO4J_URI/USER/PASSWORD/DATABASE; Aura must allow neo4j+s://.
+
+Example dev loop
+Paste AFSC text into try_pipeline.py → writes to Aura.
+
+Refresh Streamlit → see KSAs, overlaps, CSV.
+
+Iterate on extractor/dedupe → re-run → changes are idempotent in graph.
+
+License / Acknowledgments
+ESCO is © European Commission, licensed under the ESCO license.
+
+LAiSER references and indices belong to their respective owners.
