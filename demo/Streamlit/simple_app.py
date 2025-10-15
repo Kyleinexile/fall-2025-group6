@@ -37,11 +37,12 @@ with st.sidebar:
     search = st.text_input("Search KSAs")
 
 if selected:
-    # Get KSAs
     ksas = run_query(
         """
-        MATCH (a:AFSC {code: $code})-[:REQUIRES]->(i:Item)
-        RETURN i.name as ksa, i.type as type
+        MATCH (a:AFSC {code: $code})-[r:REQUIRES]->(i:Item)
+        RETURN i.name AS ksa,
+               i.type AS type,
+               coalesce(r.esco_id, i.esco_id) AS esco
         ORDER BY i.type, i.name
         """,
         {"code": selected}
