@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import os
+import time
 from typing import Any, Dict, List
 
 # Local pipeline modules
-from afsc_pipeline.extract_laiser import extract_ksa_items, ItemDraft
+from afsc_pipeline.extract_laiser import extract_ksa_items, ItemDraft, ItemType
 from afsc_pipeline.preprocess import clean_afsc_text
-from afsc_pipeline.graph_writer_v2 import upsert_afsc_and_items
+from afsc_pipeline.graph_writer import upsert_afsc_and_items
 from afsc_pipeline.audit import log_extract_event
 
 # Optional: fuzzy/near-duplicate canonicalization.
@@ -27,6 +28,24 @@ if _USE_LLM_ENHANCER:
         _USE_LLM_ENHANCER = False  # fail closed if import not available
 
 
+def _fallback_items(clean_text: str) -> List[ItemDraft]:
+    """
+    Extremely light heuristic fallback so a run still produces something.
+    """
+    text_lower = clean_text.lower()
+    out: List[ItemDraft] = []
+    # Very naive splits
+    if "knowledge" in text_lower:
+        out.append(ItemDraft(text="knowledge of intelligence cycle", item_type=ItemType.KNOWLEDGE, confidence=0.2, source="fallback"))
+    if "skill" in text_lower:
+        out.append(ItemDraft(text="imagery analysis", item_type=ItemType.SKILL, confidence=0.2, source="fallback"))
+    if "abilit" in text_lower:
+        out.append(ItemDraft(text="briefing and communication", item_type=ItemType.ABILITY, confidence=0.2, source="fallback"))
+    if not out:
+        out.append(ItemDraft(text="general geospatial intelligence competence", item_type=ItemType.SKILL, confidence=0.1, source="fallback"))
+    return out
+
+
 def run_pipeline(
     afsc_code: str,
     afsc_raw_text: str,
@@ -37,92 +56,101 @@ def run_pipeline(
 ) -> Dict[str, Any]:
     """
     End-to-end pipeline stage for a single AFSC text blob.
-
-    Parameters
-    ----------
-    afsc_code : str
-        AFSC identifier (e.g., '1N0X1').
-    afsc_raw_text : str
-        Raw AFSC document/section text.
-    neo4j_session :
-        An active Neo4j session (e.g., driver.session(database='neo4j')).
-    min_confidence : float, optional
-        Drop items below this confidence (0.0-1.0). Default from env MIN_CONFIDENCE or 0.0.
-    keep_types : bool, optional
-        If True, ensures we keep at least one of each item_type (K/S/A) after filtering.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Summary dict for logs/UI.
+    - Clean text
+    - Extract K/S/A items (LAiSER or fallback)
+    - Optional LLM enhancement
+    - Optional dedupe/canonicalization
+    - Write to Neo4j (idempotent)
+    - Emit a small telemetry dict
     """
+    t0 = time.time()
+    used_fallback = False
+    errors: List[str] = []
 
-    # --- 1) Preprocess / clean the AFSC text ---
-    cleaned = clean_afsc_text(afsc_raw_text)
+    clean_text = clean_afsc_text(afsc_raw_text or "")
 
-    # --- 2) Extraction (LAiSER with robust fallback; includes ESCO tags when available) ---
-    extract_result = extract_ksa_items(cleaned)
-    items: List[ItemDraft] = list(extract_result.items)
+    # ---- Extraction (LAiSER or fallback) ----
+    try:
+        extract_result = extract_ksa_items(clean_text)
+        # Accept both a plain list and an object with `.items`
+        items: List[ItemDraft] = (
+            extract_result
+            if isinstance(extract_result, list)
+            else list(getattr(extract_result, "items", []))
+        )
+    except Exception as e:
+        errors.append(f"extract_error:{type(e).__name__}")
+        items = []
 
-    # --- 3) Optional: confidence filtering ---
-    if min_confidence > 0.0:
-        items = [it for it in items if it.confidence >= min_confidence]
+    if not items:
+        items = _fallback_items(clean_text)
+        used_fallback = True
 
-    # --- 4) Optional: keep at least one of each type (K/S/A) ---
+    n_items_raw = len(items)
+
+    # ---- Filter by confidence / item types (if requested) ----
+    if min_confidence > 0:
+        items = [it for it in items if (it.confidence or 0.0) >= min_confidence]
+
     if keep_types:
-        if not any(it.item_type.value == "knowledge" for it in items):
-            candidates = [it for it in extract_result.items if it.item_type.value == "knowledge"]
-            if candidates:
-                items.append(sorted(candidates, key=lambda x: x.confidence, reverse=True)[0])
-        if not any(it.item_type.value == "skill" for it in items):
-            candidates = [it for it in extract_result.items if it.item_type.value == "skill"]
-            if candidates:
-                items.append(sorted(candidates, key=lambda x: x.confidence, reverse=True)[0])
-        if not any(it.item_type.value == "ability" for it in items):
-            candidates = [it for it in extract_result.items if it.item_type.value == "ability"]
-            if candidates:
-                items.append(sorted(candidates, key=lambda x: x.confidence, reverse=True)[0])
+        pass  # keep as is
+    else:
+        # If KEEP_TYPES=false, coerce everything to 'skill' (simple UX mode)
+        for it in items:
+            it.item_type = ItemType.SKILL
 
-    # --- 5) Optional: LLM enhancement (adds extra K/A) ---
-    if _USE_LLM_ENHANCER:
+    # ---- Optional LLM enhancement ----
+    if _USE_LLM_ENHANCER and items:
         try:
-            extra = enhance_items_with_llm(afsc_code, cleaned, items)
-            if extra:
-                items.extend(extra)
-        except Exception:
-            # Hardening: silently skip if any provider/parse error occurs
-            pass
+            items = enhance_items_with_llm(items, context=clean_text)
+        except Exception as e:
+            errors.append(f"llm_enhance_error:{type(e).__name__}")
 
-    # --- 6) Dedupe / canonicalize ---
-    items_canon: List[ItemDraft] = canonicalize_items(items) if items else []
+    # ---- Optional canonicalization / dedupe ----
+    try:
+        items = canonicalize_items(items)
+    except Exception as e:
+        errors.append(f"dedupe_error:{type(e).__name__}")
 
-    # --- 7) Graph write (idempotent upserts) ---
-    write_stats = upsert_afsc_and_items(
-        session=neo4j_session,
-        afsc_code=afsc_code,
-        items=items_canon,
-    )
+    n_items_after_dedupe = len(items)
 
-    # --- 8) Audit / metrics ---
-    log_extract_event(
-        afsc_code=afsc_code,
-        used_fallback=extract_result.used_fallback,
-        errors=extract_result.errors,
-        duration_ms=extract_result.duration_ms,
-        n_items=len(items_canon),
-        write_stats=write_stats,
-    )
+    # ---- Write to Neo4j ----
+    write_stats: Dict[str, int] = {}
+    try:
+        write_stats = upsert_afsc_and_items(
+            session=neo4j_session,
+            afsc_code=afsc_code,
+            items=items,
+        )
+    except Exception as e:
+        errors.append(f"write_error:{type(e).__name__}")
 
-    # --- 9) Return a concise summary for CLI/UI logging ---
-    esco_tagged_count = sum(1 for it in items_canon if (it.esco_id or "").strip())
+    duration_ms = int((time.time() - t0) * 1000)
+
+    # ---- Telemetry ----
+    try:
+        log_extract_event(
+            afsc_code=afsc_code,
+            n_items_written=n_items_after_dedupe,
+            used_fallback=used_fallback,
+            errors=errors,
+            duration_ms=duration_ms,
+            write_stats=write_stats,
+        )
+    except Exception:
+        # Best-effort logging; never fail the pipeline on telemetry
+        pass
+
+    # ---- Return a compact summary for CLI/debug ----
+    esco_tagged_count = sum(1 for it in items if (it.esco_id or "").strip())
     return {
         "afsc": afsc_code,
-        "n_items_raw": len(extract_result.items),
+        "n_items_raw": n_items_raw,
         "n_items_after_filters": len(items),
-        "n_items_after_dedupe": len(items_canon),
+        "n_items_after_dedupe": n_items_after_dedupe,
         "esco_tagged_count": esco_tagged_count,
-        "used_fallback": extract_result.used_fallback,
-        "errors": extract_result.errors,
-        "duration_ms": extract_result.duration_ms,
+        "used_fallback": used_fallback,
+        "errors": errors,
+        "duration_ms": duration_ms,
         "write_stats": write_stats,
     }
