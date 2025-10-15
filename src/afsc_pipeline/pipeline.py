@@ -9,7 +9,6 @@ from afsc_pipeline.extract_laiser import extract_ksa_items, ItemDraft
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.graph_writer import upsert_afsc_and_items
 from afsc_pipeline.audit import log_extract_event
-from afsc_pipeline.esco_mapper import map_esco_ids
 
 # Optional: fuzzy/near-duplicate canonicalization.
 # If your dedupe stage isn't implemented yet, we no-op gracefully.
@@ -61,7 +60,7 @@ def run_pipeline(
     # --- 1) Preprocess / clean the AFSC text ---
     cleaned = clean_afsc_text(afsc_raw_text)
 
-    # --- 2) Extraction (LAiSER with robust fallback) ---
+    # --- 2) Extraction (LAiSER with robust fallback; includes ESCO tags when available) ---
     extract_result = extract_ksa_items(cleaned)
     items: List[ItemDraft] = list(extract_result.items)
 
@@ -71,8 +70,6 @@ def run_pipeline(
 
     # --- 4) Optional: keep at least one of each type (K/S/A) ---
     if keep_types:
-        # Ensure at least one knowledge/skill/ability survives filtering.
-        # If a type is missing, re-add the best candidate of that type from the raw set.
         if not any(it.item_type.value == "knowledge" for it in items):
             candidates = [it for it in extract_result.items if it.item_type.value == "knowledge"]
             if candidates:
@@ -96,20 +93,17 @@ def run_pipeline(
             # Hardening: silently skip if any provider/parse error occurs
             pass
 
-    # --- 6) ESCO mapping before dedupe (lets deduper lift ESCO within clusters) ---
-    items = map_esco_ids(items)
-
-    # --- 7) Dedupe / canonicalize ---
+    # --- 6) Dedupe / canonicalize ---
     items_canon: List[ItemDraft] = canonicalize_items(items) if items else []
 
-    # --- 8) Graph write (idempotent upserts) ---
+    # --- 7) Graph write (idempotent upserts) ---
     write_stats = upsert_afsc_and_items(
         session=neo4j_session,
         afsc_code=afsc_code,
         items=items_canon,
     )
 
-    # --- 9) Audit / metrics ---
+    # --- 8) Audit / metrics ---
     log_extract_event(
         afsc_code=afsc_code,
         used_fallback=extract_result.used_fallback,
@@ -119,12 +113,14 @@ def run_pipeline(
         write_stats=write_stats,
     )
 
-    # --- 10) Return a concise summary for CLI/UI logging ---
+    # --- 9) Return a concise summary for CLI/UI logging ---
+    esco_tagged_count = sum(1 for it in items_canon if (it.esco_id or "").strip())
     return {
         "afsc": afsc_code,
         "n_items_raw": len(extract_result.items),
         "n_items_after_filters": len(items),
         "n_items_after_dedupe": len(items_canon),
+        "esco_tagged_count": esco_tagged_count,
         "used_fallback": extract_result.used_fallback,
         "errors": extract_result.errors,
         "duration_ms": extract_result.duration_ms,
