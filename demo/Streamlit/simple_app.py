@@ -59,7 +59,6 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
     Columns:
       text, item_type, confidence, source, esco_id, content_sig, overlap_count
     """
-    # NOTE: match either relationship type so the demo works regardless of writer version
     cypher = """
     MATCH (a:AFSC {code: $code})-[:HAS_ITEM|REQUIRES]->(i)
     WITH a, i
@@ -76,10 +75,15 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
     ORDER BY confidence DESC, text ASC
     """
     with get_driver().session(database=NEO4J_DATABASE) as s:
-        rows = list(s.run(cypher, {"code": afsc_code}))
+        res = s.run(cypher, {"code": afsc_code})
+        rows = [r.data() for r in res]  # <-- convert Record -> dict
+
     if not rows:
-        return pd.DataFrame(columns=["text","item_type","confidence","source","esco_id","content_sig","overlap_count"])
+        return pd.DataFrame(columns=[
+            "text","item_type","confidence","source","esco_id","content_sig","overlap_count"
+        ])
     return pd.DataFrame(rows)
+
 
 
 def esco_link_for(value: str) -> str:
