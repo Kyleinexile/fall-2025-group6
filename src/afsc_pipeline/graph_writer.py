@@ -1,4 +1,4 @@
-# src/afsc_pipeline/graph_writer.py
+cat > src/afsc_pipeline/graph_writer.py <<'PY'
 from __future__ import annotations
 
 from typing import Dict, List
@@ -31,9 +31,8 @@ def upsert_afsc_and_items(
     """
     Idempotently write AFSC + items + REQUIRES edges.
 
-    This version executes THREE separate, single-statement queries
-    in one write transaction to avoid the "Expected exactly one statement"
-    error on Aura.
+    Executes THREE separate, single-statement queries in one write transaction
+    to avoid "Expected exactly one statement per query" errors on Aura.
     """
     params = {
         "afsc_code": afsc_code,
@@ -81,17 +80,16 @@ def upsert_afsc_and_items(
         # 1) AFSC node
         res1 = tx.run(cypher_afsc, {"afsc_code": params["afsc_code"]})
         list(res1)
+        s1 = res1.consume().counters
         # 2) Items
         res2 = tx.run(cypher_items, {"items": params["items"]})
         list(res2)
+        s2 = res2.consume().counters
         # 3) Relationships
         res3 = tx.run(cypher_rels, {"afsc_code": params["afsc_code"], "items": params["items"]})
         list(res3)
-        # Return last summary (counters only available per statement)
-        s1 = res1.consume().counters
-        s2 = res2.consume().counters
         s3 = res3.consume().counters
-        # Combine counters roughly
+
         return {
             "nodes_created": s1.nodes_created + s2.nodes_created + s3.nodes_created,
             "nodes_deleted": s1.nodes_deleted + s2.nodes_deleted + s3.nodes_deleted,
@@ -137,3 +135,4 @@ def ensure_constraints(session: Session) -> Dict[str, int]:
     except Exception:
         pass
     return {"constraints_added_attempted": added}
+PY
