@@ -28,18 +28,26 @@ def upsert_afsc_and_items(
     afsc_code: str,
     items: List[ItemDraft],
 ) -> Dict[str, int]:
+    """
+    Idempotently write AFSC + items + REQUIRES edges.
+
+    This version executes THREE separate, single-statement queries
+    in one write transaction to avoid the "Expected exactly one statement"
+    error on Aura.
+    """
     params = {
         "afsc_code": afsc_code,
         "items": _items_to_param(items),
     }
 
-    # SINGLE Cypher statement (no semicolons)
-    cypher = """
+    cypher_afsc = """
     MERGE (a:AFSC {code: $afsc_code})
     ON CREATE SET a.created_at = timestamp()
     SET a.updated_at = timestamp()
-    WITH a, $items AS items
-    UNWIND items AS it
+    """
+
+    cypher_items = """
+    UNWIND $items AS it
     MERGE (i:Item {content_sig: it.content_sig})
       ON CREATE SET
         i.text       = it.text,
@@ -48,43 +56,58 @@ def upsert_afsc_and_items(
         i.confidence = it.confidence,
         i.first_seen = timestamp()
     SET
-        // keep text/item_type/source/confidence fresh but non-destructive
         i.text       = coalesce(it.text, i.text),
         i.item_type  = coalesce(it.item_type, i.item_type),
         i.source     = coalesce(it.source, i.source),
         i.confidence = coalesce(it.confidence, i.confidence),
-        // only set/overwrite esco_id when provided
         i.esco_id    = CASE
                          WHEN it.esco_id IS NOT NULL AND it.esco_id <> ''
                          THEN it.esco_id
                          ELSE i.esco_id
                        END,
         i.last_seen  = timestamp()
+    """
+
+    cypher_rels = """
+    MATCH (a:AFSC {code: $afsc_code})
+    UNWIND $items AS it
+    MATCH (i:Item {content_sig: it.content_sig})
     MERGE (a)-[r:REQUIRES]->(i)
       ON CREATE SET r.first_seen = timestamp()
     SET r.last_seen = timestamp()
     """
 
     def _tx_write(tx):
-        result = tx.run(cypher, params)
-        list(result)  # exhaust
-        return result.consume()
+        # 1) AFSC node
+        res1 = tx.run(cypher_afsc, {"afsc_code": params["afsc_code"]})
+        list(res1)
+        # 2) Items
+        res2 = tx.run(cypher_items, {"items": params["items"]})
+        list(res2)
+        # 3) Relationships
+        res3 = tx.run(cypher_rels, {"afsc_code": params["afsc_code"], "items": params["items"]})
+        list(res3)
+        # Return last summary (counters only available per statement)
+        s1 = res1.consume().counters
+        s2 = res2.consume().counters
+        s3 = res3.consume().counters
+        # Combine counters roughly
+        return {
+            "nodes_created": s1.nodes_created + s2.nodes_created + s3.nodes_created,
+            "nodes_deleted": s1.nodes_deleted + s2.nodes_deleted + s3.nodes_deleted,
+            "relationships_created": s1.relationships_created + s2.relationships_created + s3.relationships_created,
+            "relationships_deleted": s1.relationships_deleted + s2.relationships_deleted + s3.relationships_deleted,
+            "properties_set": s1.properties_set + s2.properties_set + s3.properties_set,
+            "labels_added": s1.labels_added + s2.labels_added + s3.labels_added,
+            "labels_removed": s1.labels_removed + s2.labels_removed + s3.labels_removed,
+            "indexes_added": getattr(s1, "indexes_added", 0) + getattr(s2, "indexes_added", 0) + getattr(s3, "indexes_added", 0),
+            "indexes_removed": getattr(s1, "indexes_removed", 0) + getattr(s2, "indexes_removed", 0) + getattr(s3, "indexes_removed", 0),
+            "constraints_added": getattr(s1, "constraints_added", 0) + getattr(s2, "constraints_added", 0) + getattr(s3, "constraints_added", 0),
+            "constraints_removed": getattr(s1, "constraints_removed", 0) + getattr(s2, "constraints_removed", 0) + getattr(s3, "constraints_removed", 0),
+        }
 
     summary = session.execute_write(_tx_write)
-    counters = summary.counters
-    return {
-        "nodes_created": counters.nodes_created,
-        "nodes_deleted": counters.nodes_deleted,
-        "relationships_created": counters.relationships_created,
-        "relationships_deleted": counters.relationships_deleted,
-        "properties_set": counters.properties_set,
-        "labels_added": counters.labels_added,
-        "labels_removed": counters.labels_removed,
-        "indexes_added": getattr(counters, "indexes_added", 0),
-        "indexes_removed": getattr(counters, "indexes_removed", 0),
-        "constraints_added": getattr(counters, "constraints_added", 0),
-        "constraints_removed": getattr(counters, "constraints_removed", 0),
-    }
+    return summary
 
 
 def ensure_constraints(session: Session) -> Dict[str, int]:
