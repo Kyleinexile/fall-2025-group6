@@ -64,11 +64,12 @@ if selected:
 
     # Display
     for ksa_type in ["knowledge", "skill", "ability"]:
-        items = [k for k in ksas if k['type'] == ksa_type]
-        if items:
-            st.write(f"**{ksa_type.title()}:**")
-            for item in items:
-                st.write(f"- {item['ksa']}")
+    items = [k for k in ksas if k["type"] == ksa_type]
+    if items:
+        st.write(f"**{ksa_type.title()}:**")
+        for item in items:
+            link = f"  [ESCO]({item['esco']})" if item.get("esco") else ""
+            st.write(f"- {item['ksa']}{link}")
 
     # Download
     csv_data = "Type,KSA\n" + "\n".join([f"{k['type']},{k['ksa']}" for k in ksas])
