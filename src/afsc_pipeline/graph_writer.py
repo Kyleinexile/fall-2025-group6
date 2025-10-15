@@ -1,103 +1,151 @@
-from typing import List, Dict, Any
-from neo4j import GraphDatabase
-from .types import AfscDoc, KsaItem
-from . import config
+# src/afsc_pipeline/graph_writer.py
+from __future__ import annotations
 
-CONSTRAINTS = [
-    "CREATE CONSTRAINT afsc_code_unique IF NOT EXISTS "
-    "FOR (a:AFSC) REQUIRE a.code IS UNIQUE",
-    "CREATE CONSTRAINT item_name_type_unique IF NOT EXISTS "
-    "FOR (i:Item) REQUIRE (i.name, i.type) IS UNIQUE",
-]
+from typing import Dict, List
+from neo4j import Session  # type: ignore
 
-COUNT_Q = """
-MATCH (a:AFSC {code:$code})-[:REQUIRES]->(i:Item)
-RETURN count(DISTINCT i) AS items, count(*) AS edges
-"""
+from afsc_pipeline.extract_laiser import ItemDraft
 
-UPSERT_Q = """
-UNWIND $items AS it
-WITH it
-WHERE it.name IS NOT NULL AND trim(it.name) <> ''
-  AND it.type IN ['knowledge','skill','ability']
-MERGE (a:AFSC {code:$code})
-  ON CREATE SET a.name = $title
-MERGE (i:Item {name: it.name, type: it.type})
-  ON CREATE SET i.source = coalesce(it.source, 'enhanced')
-MERGE (a)-[r:REQUIRES]->(i)
-SET r.evidence   = coalesce(it.evidence, ''),
-    r.esco_id    = coalesce(it.esco_id, ''),
-    r.confidence = CASE WHEN it.confidence IS NULL THEN null ELSE toFloat(it.confidence) END
-"""
 
-class Neo4jWriter:
-    """
-    Idempotent upserts:
-      - Ensures constraints
-      - MERGE (:AFSC {code}) SET name
-      - MERGE (:Item {name,type})
-      - MERGE (AFSC)-[:REQUIRES]->(Item) with optional props
-    Returns simple before/after stats for created_items/edges deltas.
-    """
-
-    def __init__(self):
-        self._driver = GraphDatabase.driver(
-            config.NEO4J_URI, auth=(config.NEO4J_USER, config.NEO4J_PASSWORD)
+def _items_to_param(items: List[ItemDraft]) -> List[Dict]:
+    """Convert ItemDraft models to plain dicts for Cypher params."""
+    out: List[Dict] = []
+    for it in items:
+        out.append(
+            {
+                "content_sig": it.content_sig,
+                "text": it.text,
+                "item_type": it.item_type.value,
+                "confidence": float(it.confidence),
+                "source": it.source,
+                "esco_id": it.esco_id or None,
+            }
         )
-        self._ensure_constraints()
+    return out
 
-    def _session(self):
-        if config.NEO4J_DATABASE:
-            return self._driver.session(database=config.NEO4J_DATABASE)
-        return self._driver.session()
 
-    def _ensure_constraints(self):
-        with self._session() as s:
-            for q in CONSTRAINTS:
-                s.run(q)
+def upsert_afsc_and_items(
+    session: Session,
+    afsc_code: str,
+    items: List[ItemDraft],
+) -> Dict[str, int]:
+    """
+    Idempotently write AFSC + items + REQUIRES edges.
 
-    def _count(self, code: str) -> Dict[str, int]:
-        with self._session() as s:
-            rec = s.run(COUNT_Q, code=code).single()
-            return {"items": rec["items"], "edges": rec["edges"]}
+    Schema (minimal assumptions):
+      (:AFSC {code})
+      (:Item {content_sig}) with properties:
+        text, item_type, source, confidence, esco_id?, first_seen, last_seen
+      (:AFSC)-[:REQUIRES {first_seen, last_seen}]->(:Item)
 
-    def upsert(self, doc: AfscDoc, items: List[KsaItem]) -> Dict[str, int]:
+    Returns
+    -------
+    Dict[str, int]
+        Neo4j summary counters for quick telemetry.
+    """
+
+    params = {
+        "afsc_code": afsc_code,
+        "items": _items_to_param(items),
+    }
+
+    cypher = """
+    MERGE (a:AFSC {code: $afsc_code})
+    ON CREATE SET a.created_at = timestamp()
+    SET a.updated_at = timestamp();
+
+    UNWIND $items AS it
+    MERGE (i:Item {content_sig: it.content_sig})
+      ON CREATE SET
+        i.text       = it.text,
+        i.item_type  = it.item_type,
+        i.source     = it.source,
+        i.confidence = it.confidence,
+        i.first_seen = timestamp()
+    SET
+        // keep text/item_type/source/confidence fresh but non-destructive
+        i.text       = coalesce(it.text, i.text),
+        i.item_type  = coalesce(it.item_type, i.item_type),
+        i.source     = coalesce(it.source, i.source),
+        i.confidence = coalesce(it.confidence, i.confidence),
+        // only set/overwrite esco_id when provided
+        i.esco_id    = CASE
+                         WHEN it.esco_id IS NOT NULL AND it.esco_id <> ''
+                         THEN it.esco_id
+                         ELSE i.esco_id
+                       END,
+        i.last_seen  = timestamp();
+
+    WITH it, i
+    MATCH (a:AFSC {code: $afsc_code})
+    MERGE (a)-[r:REQUIRES]->(i)
+      ON CREATE SET r.first_seen = timestamp()
+    SET r.last_seen = timestamp();
+    """
+
+    # Use a single write transaction so counters reflect the whole batch
+    def _tx_write(tx):
+        result = tx.run(cypher, params)
+        # Exhaust result to ensure counters are finalized
+        list(result)
+        return result.consume()
+
+    summary = session.execute_write(_tx_write)
+
+    counters = summary.counters
+    write_stats = {
+        "nodes_created": counters.nodes_created,
+        "nodes_deleted": counters.nodes_deleted,
+        "relationships_created": counters.relationships_created,
+        "relationships_deleted": counters.relationships_deleted,
+        "properties_set": counters.properties_set,
+        "labels_added": counters.labels_added,
+        "labels_removed": counters.labels_removed,
+        "indexes_added": getattr(counters, "indexes_added", 0),
+        "indexes_removed": getattr(counters, "indexes_removed", 0),
+        "constraints_added": getattr(counters, "constraints_added", 0),
+        "constraints_removed": getattr(counters, "constraints_removed", 0),
+    }
+    return write_stats
+
+
+# Optional: helper to create uniqueness constraints (safe to call at app startup).
+# Requires appropriate permissions on the AuraDB instance.
+def ensure_constraints(session: Session) -> Dict[str, int]:
+    """
+    Best-effort creation of useful constraints. If they already exist, Neo4j will no-op.
+    Returns count of constraints added per label.
+    """
+    added = 0
+
+    statements = [
+        # Unique AFSC code
         """
-        Upserts AFSC + Items + REQUIRES. Returns:
-          {
-            'created_items': <post_items - pre_items>,
-            'created_edges': <post_edges - pre_edges>,
-            'updated_items': 0  # not tracked distinctly with MERGE
-          }
+        CREATE CONSTRAINT afsc_code_unique IF NOT EXISTS
+        FOR (a:AFSC)
+        REQUIRE a.code IS UNIQUE
+        """,
+        # Unique Item by content_sig (our natural key)
         """
-        # Pre-count
-        before = self._count(doc.code)
+        CREATE CONSTRAINT item_sig_unique IF NOT EXISTS
+        FOR (i:Item)
+        REQUIRE i.content_sig IS UNIQUE
+        """,
+    ]
 
-        # Prepare payload for UNWIND
-        payload: List[Dict[str, Any]] = []
-        for it in items:
-            payload.append({
-                "name": (it.name or "").strip(),
-                "type": (it.type or "").strip().lower(),
-                "evidence": (it.evidence or "").strip() if it.evidence else "",
-                "esco_id": (it.esco_id or "").strip() if it.esco_id else "",
-                "confidence": it.confidence if it.confidence is not None else None,
-                # allow per-item source override via meta, else default in Cypher
-                "source": (it.meta.get("source") if it.meta else None),
-            })
+    def _tx(tx):
+        nonlocal added
+        for stmt in statements:
+            res = tx.run(stmt)
+            # consume result so side effects apply
+            list(res)
+            added += 1
+        return True
 
-        # Execute upserts
-        with self._session() as s:
-            s.run(UPSERT_Q, code=doc.code, title=doc.title, items=payload).consume()
+    try:
+        session.execute_write(_tx)
+    except Exception:
+        # Lack of perms or Aura plan limitations: ignore silently
+        pass
 
-        # Post-count
-        after = self._count(doc.code)
-
-        return {
-            "created_items": max(0, after["items"] - before["items"]),
-            "created_edges": max(0, after["edges"] - before["edges"]),
-            "updated_items": 0,  # MERGE doesn't expose updated vs existing here
-        }
-
-    def close(self):
-        self._driver.close()
+    return {"constraints_added_attempted": added}
