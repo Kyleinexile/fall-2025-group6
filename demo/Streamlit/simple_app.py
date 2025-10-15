@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import os
+import re
 import urllib.parse
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 import pandas as pd
 import streamlit as st
@@ -22,10 +23,13 @@ NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 APP_TITLE = "AFSC → Civilian KSAs (Aura Live)"
 APP_SUBTITLE = "Search • Filter • Overlaps • CSV"
 
+# GEOINT-ish demo regex (case-insensitive)
+GEOINT_REGEX = r"(?i)(imag(e|ery)|geospatial|geoint|gis|remote sensing|target(ing| development)|mensurat|terrain|azimuth|coordinates|order of battle|brief(ing)?|synthesi[sz]e|damage assessment|annotation|mensuration|collection requirement|AOC|IPO[Ee])"
+
+
 # ----------------------------
 # Helpers
 # ----------------------------
-
 @st.cache_resource(show_spinner=False)
 def get_driver():
     if not (NEO4J_URI and NEO4J_USER and NEO4J_PASSWORD):
@@ -55,10 +59,11 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
     Columns:
       text, item_type, confidence, source, esco_id, content_sig, overlap_count
     """
+    # NOTE: match either relationship type so the demo works regardless of writer version
     cypher = """
-    MATCH (a:AFSC {code: $code})-[:REQUIRES]->(i:Item)
+    MATCH (a:AFSC {code: $code})-[:HAS_ITEM|REQUIRES]->(i)
     WITH a, i
-    OPTIONAL MATCH (other:AFSC)-[:REQUIRES]->(i)
+    OPTIONAL MATCH (other:AFSC)-[:HAS_ITEM|REQUIRES]->(i)
     WITH i, collect(DISTINCT other.code) AS afscs
     RETURN
       i.text AS text,
@@ -66,7 +71,7 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
       coalesce(i.confidence, 0.0) AS confidence,
       coalesce(i.source, 'unknown') AS source,
       coalesce(i.esco_id, '') AS esco_id,
-      i.content_sig AS content_sig,
+      coalesce(i.content_sig, '') AS content_sig,
       size(afscs) AS overlap_count
     ORDER BY confidence DESC, text ASC
     """
@@ -74,8 +79,7 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
         rows = list(s.run(cypher, {"code": afsc_code}))
     if not rows:
         return pd.DataFrame(columns=["text","item_type","confidence","source","esco_id","content_sig","overlap_count"])
-    df = pd.DataFrame(rows)
-    return df
+    return pd.DataFrame(rows)
 
 
 def esco_link_for(value: str) -> str:
@@ -90,18 +94,13 @@ def esco_link_for(value: str) -> str:
     return f"[ESCO](https://esco.ec.europa.eu/en/classification?text={q})"
 
 
-def render_badge(esco_id: str) -> str:
-    if not esco_id:
-        return ""
-    return f"<span style='background:#eef6ff;border:1px solid #cde3ff;color:#0366d6;padding:2px 6px;border-radius:12px;font-size:12px;'>ESCO</span>"
-
-
 def filter_dataframe(
     df: pd.DataFrame,
     *,
     item_types: List[str],
     min_conf: float,
-    search_text: str
+    search_text: str,
+    regex_text: Optional[str] = None,
 ) -> pd.DataFrame:
     out = df.copy()
     if item_types:
@@ -111,6 +110,13 @@ def filter_dataframe(
     if search_text:
         s = search_text.strip().lower()
         out = out[out["text"].str.lower().str.contains(s, na=False)]
+    if regex_text:
+        pattern = regex_text.strip()
+        if pattern:
+            try:
+                out = out[out["text"].str.contains(pattern, regex=True, na=False)]
+            except re.error:
+                st.warning("Invalid regex pattern. Showing un-regexed results.")
     return out.reset_index(drop=True)
 
 
@@ -148,18 +154,30 @@ with st.sidebar:
         st.error("No AFSC nodes found in the database.")
         st.stop()
 
-    selected_afsc = st.selectbox("AFSC", afsc_list, index=0, key="afsc_select")
+    selected_afsc = st.selectbox("AFSC", afsc_list, index=max(0, afsc_list.index("1N1X1") if "1N1X1" in afsc_list else 0), key="afsc_select")
 
     st.markdown("---")
     st.subheader("Filters")
+
+    # Demo-friendly defaults: show 'skill' only and 0.55 confidence
     type_opts = ["knowledge", "skill", "ability"]
-    pick_types = st.multiselect("Item Types", type_opts, default=type_opts, key="type_filter")
-    min_conf = st.slider("Min Confidence", 0.0, 1.0, 0.0, 0.05, key="conf_filter")
-    search_text = st.text_input("Search text", placeholder="e.g., intelligence cycle", key="search_filter")
+    pick_types = st.multiselect("Item Types", type_opts, default=["skill"], key="type_filter")
+
+    min_conf = st.slider("Min Confidence", 0.0, 1.0, 0.55, 0.05, key="conf_filter")
+
+    search_text = st.text_input("Search text (simple contains)", placeholder="e.g., intelligence cycle", key="search_filter")
+
+    use_geoint_preset = st.checkbox("Use GEOINT demo regex", value=True)
+    regex_text = st.text_input(
+        "Regex (advanced)",
+        value=GEOINT_REGEX if use_geoint_preset else "",
+        help="Python-style regex applied to item text, case-insensitive supported (e.g., (?i)imagery)",
+        key="regex_filter",
+    )
 
     st.markdown("---")
     csv_filename = f"afsc_{selected_afsc}_items.csv"
-    st.caption(f"CSV export will include: text, item_type, confidence, source, esco_id, content_sig, overlap_count.")
+    st.caption("CSV export includes: text, item_type, confidence, source, esco_id, content_sig, overlap_count.")
 
 # Main area
 try:
@@ -177,7 +195,8 @@ with left:
         df_all,
         item_types=pick_types,
         min_conf=min_conf,
-        search_text=search_text
+        search_text=search_text,
+        regex_text=regex_text,
     )
 
     st.write(f"Showing **{len(df_filtered)}** of **{len(df_all)}** items")
@@ -208,7 +227,6 @@ with right:
     csv_df = df_filtered[csv_cols] if not df_filtered.empty else pd.DataFrame(columns=csv_cols)
     csv_bytes = csv_df.to_csv(index=False).encode("utf-8")
 
-    # Unique key to avoid StreamlitDuplicateElementKey (scoped by AFSC)
     st.download_button(
         label="⬇️ Download CSV",
         data=csv_bytes,
