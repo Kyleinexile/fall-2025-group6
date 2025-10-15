@@ -72,7 +72,7 @@ if afsc_list and selected and selected != "(none)":
             st.write(f"**{ksa_type.title()}:**")
             for item in items:
                 link = f"  [ESCO]({item['esco']})" if item.get("esco") else ""
-                st.write(f"- {item['ksa']}{link}")
+                st.markdown(f"- {item['ksa']}{link}")
 
     # Download (unique key avoids duplicate element id)
     csv_data = "Type,KSA\n" + "\n".join([f"{k['type']},{k['ksa']}" for k in ksas])
