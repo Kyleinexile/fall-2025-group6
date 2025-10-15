@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 # Local pipeline modules
 from afsc_pipeline.extract_laiser import extract_ksa_items, ItemDraft
 from afsc_pipeline.preprocess import clean_afsc_text
-from afsc_pipeline.graph_writer import upsert_afsc_and_items
+from afsc_pipeline.graph_writer_v2 import upsert_afsc_and_items
 from afsc_pipeline.audit import log_extract_event
 
 # Optional: fuzzy/near-duplicate canonicalization.
