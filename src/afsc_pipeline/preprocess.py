@@ -1,68 +1,48 @@
+# src/afsc_pipeline/preprocess.py
+from __future__ import annotations
+
 import re
-from .types import AfscDoc
+import textwrap
 
-class AfscPreprocessor:
+# Precompiled regexes for speed/readability
+_WS = re.compile(r"\s+")
+_CODE_FENCE = re.compile(r"```.+?```", re.DOTALL)
+_TABLE_ROW = re.compile(r"^(\s*\|.*\|)\s*$", re.MULTILINE)  # markdown-style tables
+_PAGE_HEADER = re.compile(r"^\s*(DAFECD|AFECD|AFI|AFMAN|USSF).*$", re.IGNORECASE | re.MULTILINE)
+_PAGE_FOOTER = re.compile(r"^\s*\d{1,4}\s*$", re.MULTILINE)  # bare page numbers on their own line
+_SECTION_NUM_GUNK = re.compile(r"\s{2,}")  # collapse long spacing
+_HYPHEN_BREAK = re.compile(r"(\w)-\n(\w)")  # fix hyphenated line breaks: some- \n thing -> something
+_NOTE_TRAILER = re.compile(r"^\s*NOTE:.*$", re.IGNORECASE | re.MULTILINE)
+
+def clean_afsc_text(raw: str) -> str:
     """
-    Parse and normalize an AFSC section (AFOCD/AFECD).
-    - Extracts AFSC code/title from headings.
-    - Cleans PDF artifacts (bullets, tables, weird glyphs).
-    - Returns AfscDoc with raw_text and clean_text.
-    Raises ValueError if code/title cannot be found.
+    Light cleanup to give LAiSER a clean, narrative block.
+    - Dedent/strip
+    - Remove code fences / tables / obvious headers/footers
+    - Fix hyphenated line breaks
+    - Collapse whitespace to single spaces
     """
+    if not raw:
+        return ""
 
-    # Examples it will match:
-    #  "1N0X1 – Intelligence Analyst"
-    #  "AFSC 1N0X1: Intelligence Analyst"
-    #  "AFSC: 1N0X1 (Intelligence Analyst)"
-    CODE_TITLE_PATTERNS = [
-        r"AFSC[:\s]+(?P<code>[0-9A-Z]{3,5}[A-Z]?)\s*[-–:]\s*(?P<title>.+)",
-        r"(?P<code>[0-9A-Z]{3,5}[A-Z]?)\s*[-–:]\s*(?P<title>.+)",
-        r"AFSC[:\s]+(?P<code>[0-9A-Z]{3,5}[A-Z]?)\s*\((?P<title>.+?)\)",
-    ]
+    txt = textwrap.dedent(raw).strip()
 
-    def _extract_header(self, text: str) -> tuple[str, str]:
-        head = text.splitlines()[0:5]  # look in first few lines
-        snippet = "\n".join(head)
-        for pat in self.CODE_TITLE_PATTERNS:
-            m = re.search(pat, snippet, flags=re.IGNORECASE)
-            if m:
-                code = m.group("code").strip().upper()
-                title = m.group("title").strip()
-                return code, title
-        raise ValueError("Could not parse AFSC code/title from header.")
+    # Remove code fences (just in case)
+    txt = _CODE_FENCE.sub(" ", txt)
 
-    def _clean_text(self, text: str) -> str:
-        t = text
+    # Remove obvious tables and single-number footers
+    txt = _TABLE_ROW.sub(" ", txt)
+    txt = _PAGE_FOOTER.sub(" ", txt)
 
-        # Normalize bullets/dashes and odd glyphs
-        t = t.replace("•", "- ").replace("·", "- ").replace("–", "-").replace("—", "-")
-        t = re.sub(r"[“”]", '"', t)
-        t = re.sub(r"[’]", "'", t)
+    # Remove common headers (AFECD/DAFECD/etc.) and NOTE trailers
+    txt = _PAGE_HEADER.sub(" ", txt)
+    txt = _NOTE_TRAILER.sub(" ", txt)
 
-        # Drop obvious table-like lines (lots of pipes/tabs)
-        t = "\n".join(
-            ln for ln in t.splitlines()
-            if ln.count("|") < 3 and ln.count("\t") < 4
-        )
+    # Normalize line breaks; fix hyphenated wraps first
+    txt = _HYPHEN_BREAK.sub(r"\1\2", txt)
+    txt = txt.replace("\r", "\n")
 
-        # Collapse excessive whitespace
-        t = re.sub(r"\s+\n", "\n", t)
-        t = re.sub(r"\n{3,}", "\n\n", t)
-        t = re.sub(r"[ \t]{2,}", " ", t)
+    # Collapse whitespace/newlines to single spaces
+    txt = _WS.sub(" ", txt)
 
-        # Keep only the section after the header (heuristic)
-        # Find first blank line after header; keep from there
-        lines = t.splitlines()
-        start = 0
-        # skip first 1–2 lines (header area)
-        start = min(2, max(0, len(lines)-1))
-        clean = "\n".join(lines[start:]).strip()
-
-        return clean
-
-    def process(self, raw_text: str) -> AfscDoc:
-        if not raw_text or len(raw_text.strip()) < 40:
-            raise ValueError("Input AFSC text too short.")
-        code, title = self._extract_header(raw_text)
-        clean = self._clean_text(raw_text)
-        return AfscDoc(code=code, title=title, raw_text=raw_text.strip(), clean_text=clean)
+    return txt.strip()
