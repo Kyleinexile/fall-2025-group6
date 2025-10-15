@@ -4,13 +4,12 @@ from __future__ import annotations
 import os
 import re
 import urllib.parse
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Optional
 
 import pandas as pd
 import streamlit as st
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
-
 
 # ----------------------------
 # Env / Config
@@ -26,9 +25,8 @@ APP_SUBTITLE = "Search • Filter • Overlaps • CSV"
 # GEOINT-ish demo regex (case-insensitive)
 GEOINT_REGEX = r"(?i)(imag(e|ery)|geospatial|geoint|gis|remote sensing|target(ing| development)|mensurat|terrain|azimuth|coordinates|order of battle|brief(ing)?|synthesi[sz]e|damage assessment|annotation|mensuration|collection requirement|AOC|IPO[Ee])"
 
-
 # ----------------------------
-# Helpers
+# Neo4j helpers
 # ----------------------------
 @st.cache_resource(show_spinner=False)
 def get_driver():
@@ -51,41 +49,65 @@ def fetch_afsc_list() -> List[str]:
         return [r["code"] for r in res]
 
 
-@st.cache_data(show_spinner=False, ttl=15)
-def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
-    """
-    Returns items and basic overlap stats for a given AFSC.
-
-    Columns:
-      text, item_type, confidence, source, esco_id, content_sig, overlap_count
-    """
-    cypher = """
-    MATCH (a:AFSC {code: $code})-[:HAS_ITEM|REQUIRES]->(i)
-    WITH a, i
-    OPTIONAL MATCH (other:AFSC)-[:HAS_ITEM|REQUIRES]->(i)
-    WITH i, collect(DISTINCT other.code) AS afscs
-    RETURN
-      i.text AS text,
-      i.item_type AS item_type,
-      coalesce(i.confidence, 0.0) AS confidence,
-      coalesce(i.source, 'unknown') AS source,
-      coalesce(i.esco_id, '') AS esco_id,
-      coalesce(i.content_sig, '') AS content_sig,
-      size(afscs) AS overlap_count
-    ORDER BY confidence DESC, text ASC
-    """
+@st.cache_data(show_spinner=False, ttl=10)
+def fetch_debug_counts(afsc_code: str):
     with get_driver().session(database=NEO4J_DATABASE) as s:
-        res = s.run(cypher, {"code": afsc_code})
-        rows = [r.data() for r in res]  # <-- convert Record -> dict
+        n_has = s.run(
+            "MATCH (:AFSC {code:$c})-[:HAS_ITEM]->(:Item) RETURN count(*) AS n",
+            {"c": afsc_code},
+        ).single()["n"]
+        n_req = s.run(
+            "MATCH (:AFSC {code:$c})-[:REQUIRES]->(:Item) RETURN count(*) AS n",
+            {"c": afsc_code},
+        ).single()["n"]
+        sample = s.run(
+            """
+            MATCH (:AFSC {code:$c})-[:HAS_ITEM|REQUIRES]->(i:Item)
+            RETURN i.text AS text, i.item_type AS item_type, coalesce(i.confidence,0.0) AS conf
+            ORDER BY conf DESC, text ASC
+            LIMIT 5
+            """,
+            {"c": afsc_code},
+        )
+        rows = [r.data() for r in sample]
+    return n_has, n_req, rows
+
+
+@st.cache_data(show_spinner=False, ttl=10)
+def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
+    def run_query(rel: str) -> list[dict]:
+        cypher = f"""
+        MATCH (a:AFSC {{code: $code}})-[:{rel}]->(i:Item)
+        WITH a, i
+        OPTIONAL MATCH (other:AFSC)-[:{rel}]->(i)
+        WITH i, collect(DISTINCT other.code) AS afscs
+        RETURN
+          i.text AS text,
+          i.item_type AS item_type,
+          coalesce(i.confidence, 0.0) AS confidence,
+          coalesce(i.source, 'unknown') AS source,
+          coalesce(i.esco_id, '') AS esco_id,
+          coalesce(i.content_sig, '') AS content_sig,
+          size(afscs) AS overlap_count
+        ORDER BY confidence DESC, text ASC
+        """
+        with get_driver().session(database=NEO4J_DATABASE) as s:
+            res = s.run(cypher, {"code": afsc_code})
+            return [r.data() for r in res]
+
+    rows = run_query("HAS_ITEM")
+    if not rows:
+        rows = run_query("REQUIRES")
 
     if not rows:
-        return pd.DataFrame(columns=[
-            "text","item_type","confidence","source","esco_id","content_sig","overlap_count"
-        ])
+        return pd.DataFrame(
+            columns=["text","item_type","confidence","source","esco_id","content_sig","overlap_count"]
+        )
     return pd.DataFrame(rows)
 
-
-
+# ----------------------------
+# Display helpers
+# ----------------------------
 def esco_link_for(value: str) -> str:
     """Return a markdown link for an ESCO id or a search link if format is unknown."""
     if not value:
@@ -128,15 +150,12 @@ def df_with_display_cols(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
     display = df.copy()
-    # Add ESCO link column (markdown)
     display["ESCO"] = display["esco_id"].apply(esco_link_for)
-    # Reorder columns for display
     cols = ["text", "item_type", "confidence", "source", "ESCO", "overlap_count", "esco_id", "content_sig"]
     for c in cols:
         if c not in display.columns:
             display[c] = ""
     return display[cols]
-
 
 # ----------------------------
 # UI
@@ -158,30 +177,41 @@ with st.sidebar:
         st.error("No AFSC nodes found in the database.")
         st.stop()
 
-    selected_afsc = st.selectbox("AFSC", afsc_list, index=max(0, afsc_list.index("1N1X1") if "1N1X1" in afsc_list else 0), key="afsc_select")
+    default_idx = afsc_list.index("1N1X1") if "1N1X1" in afsc_list else 0
+    selected_afsc = st.selectbox("AFSC", afsc_list, index=default_idx, key="afsc_select")
 
     st.markdown("---")
     st.subheader("Filters")
 
-    # Demo-friendly defaults: show 'skill' only and 0.55 confidence
     type_opts = ["knowledge", "skill", "ability"]
     pick_types = st.multiselect("Item Types", type_opts, default=["skill"], key="type_filter")
-
     min_conf = st.slider("Min Confidence", 0.0, 1.0, 0.55, 0.05, key="conf_filter")
-
     search_text = st.text_input("Search text (simple contains)", placeholder="e.g., intelligence cycle", key="search_filter")
 
     use_geoint_preset = st.checkbox("Use GEOINT demo regex", value=True)
     regex_text = st.text_input(
         "Regex (advanced)",
         value=GEOINT_REGEX if use_geoint_preset else "",
-        help="Python-style regex applied to item text, case-insensitive supported (e.g., (?i)imagery)",
+        help="Python-style regex applied to item text (e.g., (?i)imagery)",
         key="regex_filter",
     )
 
     st.markdown("---")
     csv_filename = f"afsc_{selected_afsc}_items.csv"
     st.caption("CSV export includes: text, item_type, confidence, source, esco_id, content_sig, overlap_count.")
+
+# Debug panel (see what Aura really has)
+with st.expander("Debug (Aura live counts)", expanded=True):
+    try:
+        n_has, n_req, peek = fetch_debug_counts(selected_afsc)
+        st.write(f"AFSC {selected_afsc} → HAS_ITEM: **{n_has}**, REQUIRES: **{n_req}**")
+        if peek:
+            st.write("Sample rows:")
+            st.table(pd.DataFrame(peek))
+        else:
+            st.info("No sample rows returned.")
+    except RuntimeError as e:
+        st.error(str(e))
 
 # Main area
 try:
@@ -205,7 +235,6 @@ with left:
 
     st.write(f"Showing **{len(df_filtered)}** of **{len(df_all)}** items")
 
-    # Display table with ESCO markdown links
     df_display = df_with_display_cols(df_filtered)
     st.dataframe(
         df_display,
@@ -226,7 +255,6 @@ with right:
     st.metric("Total Overlap Sum", overlaps)
 
     st.markdown("---")
-    # CSV export includes esco_id + content_sig for downstream QA
     csv_cols = ["text","item_type","confidence","source","esco_id","content_sig","overlap_count"]
     csv_df = df_filtered[csv_cols] if not df_filtered.empty else pd.DataFrame(columns=csv_cols)
     csv_bytes = csv_df.to_csv(index=False).encode("utf-8")
