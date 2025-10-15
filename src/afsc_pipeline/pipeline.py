@@ -1,6 +1,7 @@
 # src/afsc_pipeline/pipeline.py
 from __future__ import annotations
 
+import os
 from typing import Any, Dict, List
 
 # Local pipeline modules
@@ -8,6 +9,7 @@ from afsc_pipeline.extract_laiser import extract_ksa_items, ItemDraft
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.graph_writer import upsert_afsc_and_items
 from afsc_pipeline.audit import log_extract_event
+from afsc_pipeline.esco_mapper import map_esco_ids
 
 # Optional: fuzzy/near-duplicate canonicalization.
 # If your dedupe stage isn't implemented yet, we no-op gracefully.
@@ -17,14 +19,22 @@ except Exception:
     def canonicalize_items(items: List[ItemDraft]) -> List[ItemDraft]:
         return items
 
+# Optional: LLM enhancer (disabled by default via env)
+_USE_LLM_ENHANCER = (os.getenv("USE_LLM_ENHANCER") or "false").strip().lower() in {"1", "true", "yes"}
+if _USE_LLM_ENHANCER:
+    try:
+        from afsc_pipeline.enhance_llm import enhance_items_with_llm  # type: ignore
+    except Exception:
+        _USE_LLM_ENHANCER = False  # fail closed if import not available
+
 
 def run_pipeline(
     afsc_code: str,
     afsc_raw_text: str,
     neo4j_session,
     *,
-    min_confidence: float = 0.0,
-    keep_types: bool = True,
+    min_confidence: float = float(os.getenv("MIN_CONFIDENCE", "0.0")),
+    keep_types: bool = (os.getenv("KEEP_TYPES", "true").strip().lower() in {"1", "true", "yes"}),
 ) -> Dict[str, Any]:
     """
     End-to-end pipeline stage for a single AFSC text blob.
@@ -38,7 +48,7 @@ def run_pipeline(
     neo4j_session :
         An active Neo4j session (e.g., driver.session(database='neo4j')).
     min_confidence : float, optional
-        Drop items below this confidence (0.0-1.0). Default 0.0 keeps all.
+        Drop items below this confidence (0.0-1.0). Default from env MIN_CONFIDENCE or 0.0.
     keep_types : bool, optional
         If True, ensures we keep at least one of each item_type (K/S/A) after filtering.
 
@@ -55,14 +65,14 @@ def run_pipeline(
     extract_result = extract_ksa_items(cleaned)
     items: List[ItemDraft] = list(extract_result.items)
 
-    # --- 3) Optional filtering by confidence ---
+    # --- 3) Optional: confidence filtering ---
     if min_confidence > 0.0:
         items = [it for it in items if it.confidence >= min_confidence]
 
-    # --- 4) Optional type balance: keep at least 1 each (K/S/A) if requested ---
+    # --- 4) Optional: keep at least one of each type (K/S/A) ---
     if keep_types:
         # Ensure at least one knowledge/skill/ability survives filtering.
-        # If a type is missing, try to re-add best candidate of that type from the raw set.
+        # If a type is missing, re-add the best candidate of that type from the raw set.
         if not any(it.item_type.value == "knowledge" for it in items):
             candidates = [it for it in extract_result.items if it.item_type.value == "knowledge"]
             if candidates:
@@ -76,17 +86,30 @@ def run_pipeline(
             if candidates:
                 items.append(sorted(candidates, key=lambda x: x.confidence, reverse=True)[0])
 
-    # --- 5) Dedupe / canonicalize (no-op if not implemented) ---
+    # --- 5) Optional: LLM enhancement (adds extra K/A) ---
+    if _USE_LLM_ENHANCER:
+        try:
+            extra = enhance_items_with_llm(afsc_code, cleaned, items)
+            if extra:
+                items.extend(extra)
+        except Exception:
+            # Hardening: silently skip if any provider/parse error occurs
+            pass
+
+    # --- 6) ESCO mapping before dedupe (lets deduper lift ESCO within clusters) ---
+    items = map_esco_ids(items)
+
+    # --- 7) Dedupe / canonicalize ---
     items_canon: List[ItemDraft] = canonicalize_items(items) if items else []
 
-    # --- 6) Graph write (idempotent upserts) ---
+    # --- 8) Graph write (idempotent upserts) ---
     write_stats = upsert_afsc_and_items(
         session=neo4j_session,
         afsc_code=afsc_code,
         items=items_canon,
     )
 
-    # --- 7) Audit / metrics ---
+    # --- 9) Audit / metrics ---
     log_extract_event(
         afsc_code=afsc_code,
         used_fallback=extract_result.used_fallback,
@@ -96,7 +119,7 @@ def run_pipeline(
         write_stats=write_stats,
     )
 
-    # --- 8) Return a concise summary for CLI/UI logging ---
+    # --- 10) Return a concise summary for CLI/UI logging ---
     return {
         "afsc": afsc_code,
         "n_items_raw": len(extract_result.items),
