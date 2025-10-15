@@ -1,5 +1,5 @@
-name,type,source
-Analyze intelligence reports,skill,enhanced
-Maintain ISR databases,skill,enhanced
-Intelligence cycle fundamentals,knowledge,enhanced
-Briefing delivery,ability,enhanced
+name,type,source,esco_id
+Analyze intelligence reports,skill,enhanced,
+Maintain ISR databases,skill,enhanced,
+Intelligence cycle fundamentals,knowledge,enhanced,
+Briefing delivery,ability,enhanced,
