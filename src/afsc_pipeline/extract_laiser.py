@@ -202,32 +202,131 @@ def _extract_with_laiser_http(text: str) -> List[ItemDraft]:
 
 def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     """
-    Decide which extractor to run based on env:
-      USE_LAISER=true + LAISER_MODE in {lib,http,auto}
-    Returns [] if nothing found; the pipeline will fallback.
+    Primary extractor:
+      1) Try LAiSER.extract_and_align (structured DF path).
+      2) If it returns 0 rows OR the model can't init on CPU, fall back to
+         LAiSER.align_skills(raw_skills=...) which uses FAISS+spaCy and
+         returns ESCO-aligned skills without a heavy LM.
     """
-    use_laiser = _is_truthy("USE_LAISER", "false")
-    mode = (os.getenv("LAISER_MODE", "auto") or "auto").strip().lower()
+    use_laiser = (os.getenv("USE_LAISER") or "false").strip().lower() in {"1", "true", "yes"}
+    mode = (os.getenv("LAISER_MODE") or "auto").strip().lower()
+    top_k = int(os.getenv("LAISER_ALIGN_TOPK", "20"))
+
     if not use_laiser:
-        _dbg("[extract] USE_LAISER=false -> skipping LAiSER")
-        return []
+        # Heuristic tiny fallback (same as before)
+        return _fallback_extract(clean_text)
 
-    _dbg(f"[extract] USE_LAISER=true, mode={mode}")
-    lib_items: List[ItemDraft] = []
-    http_items: List[ItemDraft] = []
+    try:
+        # -------- 1) Try the refactored DF path (may be 0 on CPU) --------
+        extractor = _get_laiser_extractor(mode=mode)
+        if extractor is None:
+            raise RuntimeError("laiser_extractor_unavailable")
 
-    if mode in {"lib", "auto"}:
-        lib_items = _extract_with_laiser_lib(clean_text)
-        if lib_items:
-            return lib_items
+        # DF path expects a dataframe with an ID + text column
+        import pandas as pd  # local import to avoid hard dep at import time
+        df = pd.DataFrame([{"Research ID": "AFSC-0", "text": clean_text}])
+        try:
+            df_out = extractor.extract_and_align(
+                data=df,
+                id_column="Research ID",
+                text_columns=["text"],
+                input_type="job_desc",
+                top_k=None,              # let LAiSER pick
+                levels=False,
+                batch_size=32,
+                warnings=False,
+            )
+        except Exception:
+            df_out = None
 
-    if mode in {"http", "auto"}:
-        http_items = _extract_with_laiser_http(clean_text)
-        if http_items:
-            return http_items
+        items: List[ItemDraft] = []
+        if df_out is not None and len(df_out) > 0:
+            # Expecting columns like: "cleaned_text","type","label","confidence","esco_id"
+            for _, row in df_out.iterrows():
+                txt = str(row.get("label") or row.get("cleaned_text") or "").strip()
+                if not txt:
+                    continue
+                # LAiSER tends to emit skills; if "type" available, map it; else default SKILL
+                t = str(row.get("type") or "skill").strip().lower()
+                if t.startswith("know"):
+                    itype = ItemType.KNOWLEDGE
+                elif t.startswith("abil"):
+                    itype = ItemType.ABILITY
+                else:
+                    itype = ItemType.SKILL
+                conf = float(row.get("confidence") or 0.5)
+                esco_id = (row.get("esco_id") or "").strip() or None
+                items.append(
+                    ItemDraft(
+                        text=txt,
+                        item_type=itype,
+                        confidence=conf,
+                        source="laiser:df",
+                        esco_id=esco_id,
+                    )
+                )
 
-    _dbg("[extract] LAiSER produced no items (laiser_empty)")
-    return []
+        # If DF path yielded items, return them
+        if items:
+            return items
+
+        # -------- 2) CPU-friendly fallback: align_skills(...) --------
+        # Build simple candidate phrases from the text (sentences & comma splits)
+        raw_candidates: List[str] = []
+        for line in re.split(r"[;\n\.]", clean_text):
+            c = line.strip(" -•\t\r ")
+            if len(c) >= 4:
+                raw_candidates.append(c)
+
+        # If still too short, seed a few generic phrases so we get something back
+        if not raw_candidates:
+            raw_candidates = [
+                "imagery analysis",
+                "geospatial intelligence",
+                "target development",
+                "mensuration",
+                "intelligence briefing",
+            ]
+
+        try:
+            df2 = extractor.align_skills(
+                raw_skills=raw_candidates,
+                document_id="AFSC-0",
+                description="AFSC narrative",
+            )
+        except Exception:
+            df2 = None
+
+        items2: List[ItemDraft] = []
+        if df2 is not None and len(df2) > 0:
+            # Expect columns: text/label, confidence, esco_id (names vary slightly)
+            for _, row in df2.iterrows():
+                txt = str(row.get("label") or row.get("text") or "").strip()
+                if not txt:
+                    continue
+                conf = float(row.get("confidence") or 0.5)
+                esco_id = (row.get("esco_id") or "").strip() or None
+                items2.append(
+                    ItemDraft(
+                        text=txt,
+                        item_type=ItemType.SKILL,  # align_skills emits skills
+                        confidence=conf,
+                        source="laiser:align",
+                        esco_id=esco_id,
+                    )
+                )
+
+        # Keep only the top_k highest-confidence matches (optional)
+        if len(items2) > top_k:
+            items2.sort(key=lambda x: (x.confidence or 0.0), reverse=True)
+            items2 = items2[:top_k]
+
+        return items2 or _fallback_extract(clean_text)
+
+    except Exception:
+        # Total failure: last-resort tiny fallback so the pipeline still runs
+        return _fallback_extract(clean_text)
+
 
 
 # ---------- Heuristic fallback (kept here so try_pipeline import works) ----------
