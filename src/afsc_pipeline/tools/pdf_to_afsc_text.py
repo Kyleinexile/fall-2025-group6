@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 from pypdf import PdfReader
 
 HERE = pathlib.Path(__file__).resolve().parent
-REPO = HERE.parent
+REPO = HERE.parents[3]
 OUT_DIR = REPO / "docs_text"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
