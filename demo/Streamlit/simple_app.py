@@ -1,19 +1,14 @@
-# demo/Streamlit/simple_app.py
 from __future__ import annotations
 
 # --- repo path bootstrap (so imports work when run via streamlit) ---
-import sys, pathlib
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # repo root (…/fall-2025-group6)
+import sys, pathlib, os, re, urllib.parse
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # …/demo/Streamlit -> repo root
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 # -------------------------------------------------------------------
 
-import os
-import re
-import urllib.parse
 from typing import List, Optional
-
 import pandas as pd
 import streamlit as st
 from neo4j import GraphDatabase
@@ -27,11 +22,20 @@ NEO4J_USER = os.getenv("NEO4J_USER", "")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 
-APP_TITLE = "AFSC → Civilian KSAs (Aura Live)"
+APP_TITLE = "Explore KSAs"
 APP_SUBTITLE = "Search • Filter • Overlaps • CSV"
 
-# GEOINT-ish demo regex (case-insensitive)
 GEOINT_REGEX = r"(?i)(imag(e|ery)|geospatial|geoint|gis|remote sensing|target(ing| development)|mensurat|terrain|azimuth|coordinates|order of battle|brief(ing)?|synthesi[sz]e|damage assessment|annotation|mensuration|collection requirement|AOC|IPO[Ee])"
+
+# ----------------------------
+# Utilities
+# ----------------------------
+def clear_all_caches():
+    try:
+        st.cache_data.clear()
+        st.cache_resource.clear()
+    except Exception:
+        pass
 
 # ----------------------------
 # Neo4j helpers
@@ -41,7 +45,6 @@ def get_driver():
     if not (NEO4J_URI and NEO4J_USER and NEO4J_PASSWORD):
         raise RuntimeError("Neo4j connection env vars are not fully set.")
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
-    # probe connection
     try:
         with driver.session(database=NEO4J_DATABASE) as s:
             s.run("RETURN 1 AS ok").single()
@@ -49,13 +52,11 @@ def get_driver():
         raise RuntimeError(f"Neo4j connection failed: {e}") from e
     return driver
 
-
 @st.cache_data(show_spinner=False, ttl=30)
 def fetch_afsc_list() -> List[str]:
     with get_driver().session(database=NEO4J_DATABASE) as s:
         res = s.run("MATCH (a:AFSC) RETURN a.code AS code ORDER BY code")
         return [r["code"] for r in res]
-
 
 @st.cache_data(show_spinner=False, ttl=10)
 def fetch_debug_counts(afsc_code: str):
@@ -79,7 +80,6 @@ def fetch_debug_counts(afsc_code: str):
         )
         rows = [r.data() for r in sample]
     return n_has, n_req, rows
-
 
 @st.cache_data(show_spinner=False, ttl=10)
 def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
@@ -117,16 +117,13 @@ def fetch_items_for_afsc(afsc_code: str) -> pd.DataFrame:
 # Display helpers
 # ----------------------------
 def esco_link_for(value: str) -> str:
-    """Return a markdown link for an ESCO id or a search link if format is unknown."""
     if not value:
         return ""
     v = str(value).strip()
     if v.startswith("http://") or v.startswith("https://"):
         return f"[ESCO]({v})"
-    # Fallback to ESCO site search
     q = urllib.parse.quote(v)
     return f"[ESCO](https://esco.ec.europa.eu/en/classification?text={q})"
-
 
 def filter_dataframe(
     df: pd.DataFrame,
@@ -153,7 +150,6 @@ def filter_dataframe(
                 st.warning("Invalid regex pattern. Showing un-regexed results.")
     return out.reset_index(drop=True)
 
-
 def df_with_display_cols(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
@@ -172,7 +168,21 @@ st.set_page_config(page_title=APP_TITLE, page_icon="🛰️", layout="wide")
 st.title(APP_TITLE)
 st.caption(APP_SUBTITLE)
 
-# Connection status
+# Top bar actions
+actions = st.columns([1, 5, 1])
+with actions[0]:
+    if st.button("🔄 Refresh data", use_container_width=True):
+        clear_all_caches()
+        st.success("Caches cleared.")
+        st.rerun()
+with actions[2]:
+    if st.button("🧪 Test connection", use_container_width=True):
+        try:
+            _ = get_driver()
+            st.success("Neo4j connection OK")
+        except Exception as e:
+            st.error(f"Neo4j connection failed: {e}")
+
 with st.expander("Connection", expanded=False):
     st.code(f"NEO4J_URI={NEO4J_URI}\nNEO4J_DATABASE={NEO4J_DATABASE}", language="bash")
 
@@ -190,7 +200,6 @@ with st.sidebar:
 
     st.markdown("---")
     st.subheader("Filters")
-
     type_opts = ["knowledge", "skill", "ability"]
     pick_types = st.multiselect("Item Types", type_opts, default=["skill"], key="type_filter")
     min_conf = st.slider("Min Confidence", 0.0, 1.0, 0.55, 0.05, key="conf_filter")
@@ -208,7 +217,7 @@ with st.sidebar:
     csv_filename = f"afsc_{selected_afsc}_items.csv"
     st.caption("CSV export includes: text, item_type, confidence, source, esco_id, content_sig, overlap_count.")
 
-# Debug panel (see what Aura really has)
+# Debug panel
 with st.expander("Debug (Aura live counts)", expanded=True):
     try:
         n_has, n_req, peek = fetch_debug_counts(selected_afsc)
@@ -221,7 +230,7 @@ with st.expander("Debug (Aura live counts)", expanded=True):
     except RuntimeError as e:
         st.error(str(e))
 
-# Main area
+# Main
 try:
     df_all = fetch_items_for_afsc(selected_afsc)
 except RuntimeError as e:
