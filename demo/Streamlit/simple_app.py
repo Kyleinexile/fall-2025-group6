@@ -1,6 +1,6 @@
 # --- repo path bootstrap (so imports work when run via streamlit) ---
 import sys, pathlib
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # repo root
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]  # repo root
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
