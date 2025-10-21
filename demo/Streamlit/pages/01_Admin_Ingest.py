@@ -94,9 +94,10 @@ with tab1:
                 path = folder / f"{code}.md"
                 try:
                     text = path.read_text(encoding="utf-8")
-                    st.session_state.loaded_code = code
-                    st.session_state.loaded_text = text
-                    st.success(f"Loaded {code}")
+                    st.session_state["admin_loaded_code"] = code
+                    st.session_state["admin_loaded_text"] = text
+                    st.success(f"✅ Loaded {code}")
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Error: {e}")
         else:
@@ -108,15 +109,19 @@ with tab1:
     with col_process:
         st.markdown("#### Process AFSC")
         
+        # Show indicator if data was loaded from View Docs
+        if st.session_state.get("admin_loaded_text"):
+            st.success("✅ Text loaded from View Docs page")
+        
         code = st.text_input(
             "AFSC Code",
-            value=st.session_state.get("loaded_code", ""),
+            value=st.session_state.get("admin_loaded_code", ""),
             placeholder="e.g., 1N1X1"
         )
         
         text = st.text_area(
             "AFSC Text",
-            value=st.session_state.get("loaded_text", ""),
+            value=st.session_state.get("admin_loaded_text", ""),
             height=300,
             placeholder="Paste duties, knowledge, skills, and abilities..."
         )
@@ -131,7 +136,12 @@ with tab1:
                     st.caption(f"Original: {len(text)} chars → Cleaned: {len(cleaned)} chars")
         
         with col_btn2:
-            process = st.button("🚀 Process", type="primary", use_container_width=True, disabled=not (code and text))
+            if st.button("🗑️ Clear Form", use_container_width=True):
+                st.session_state["admin_loaded_code"] = ""
+                st.session_state["admin_loaded_text"] = ""
+                st.rerun()
+        
+        process = st.button("🚀 Process", type="primary", use_container_width=True, disabled=not (code and text))
         
         if process:
             try:
@@ -176,6 +186,12 @@ with tab1:
                         st.dataframe(df, use_container_width=True, hide_index=True)
                 
                 st.info("💡 View results in the Explore page")
+                
+                # Clear loaded data after successful processing
+                if st.button("✨ Process Another AFSC", use_container_width=True):
+                    st.session_state["admin_loaded_code"] = ""
+                    st.session_state["admin_loaded_text"] = ""
+                    st.rerun()
                 
             except Exception as e:
                 st.error(f"Processing failed: {e}")
