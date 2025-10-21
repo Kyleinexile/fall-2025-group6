@@ -1,3 +1,4 @@
+# demo/Streamlit/pages/01_Admin_Ingest.py
 from __future__ import annotations
 
 # --- repo path bootstrap (so imports work when run via streamlit) ---
@@ -14,8 +15,9 @@ import streamlit as st
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
-# --- Import your pipeline pieces ---
-from afsc_pipeline.pipeline import run_pipeline, ItemDraft  # noqa: F401
+# --- Your pipeline pieces ---
+from afsc_pipeline.preprocess import clean_afsc_text  # import ensures module is reachable
+from afsc_pipeline.pipeline import run_pipeline, ItemDraft
 
 # ----------------------------
 # Env / Config
@@ -24,18 +26,13 @@ NEO4J_URI = os.getenv("NEO4J_URI", "")
 NEO4J_USER = os.getenv("NEO4J_USER", "")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
+ADMIN_KEY = os.getenv("ADMIN_KEY", "")  # optional guard
 
-# Optional gate (simple): set ADMIN_KEY in your Streamlit secrets or env.
-ADMIN_KEY = os.getenv("ADMIN_KEY", "")
+APP_TITLE = "Ingest AFSCs (Docs → Pipeline → Aura)"
 
-APP_TITLE = "Ingest & Manage"
-
-# Local doc roots (created by your pdf_to_afsc_text script)
+# Where the pre-split AFSC markdowns live (produced by pdf_to_afsc_text.py)
 DOCS_ROOT = pathlib.Path("/workspaces/docs_text")
-DOC_FOLDERS = [
-    ("AFECD", DOCS_ROOT / "AFECD"),  # enlisted
-    ("AFOCD", DOCS_ROOT / "AFOCD"),  # officer
-]
+DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
 
 # ----------------------------
 # Helpers
@@ -52,20 +49,15 @@ def get_driver():
         raise RuntimeError(f"Neo4j connection failed: {e}") from e
     return driver
 
-def clear_all_caches():
-    """One-click cache clear on both pages."""
-    try:
-        st.cache_data.clear()
-        st.cache_resource.clear()
-    except Exception:
-        pass
-
-def connection_badge() -> str:
-    try:
-        _ = get_driver()
-        return "<span style='background:#e8fff1;color:#05603a;border:1px solid #abefc6;padding:2px 8px;border-radius:999px;'>Aura • Connected</span>"
-    except Exception:
-        return "<span style='background:#fff1f1;color:#b42318;border:1px solid #fda29b;padding:2px 8px;border-radius:999px;'>Aura • Disconnected</span>"
+@st.cache_data(show_spinner=False, ttl=30)
+def build_afsc_index() -> pd.DataFrame:
+    rows = []
+    for source, folder in DOC_FOLDERS:
+        if not folder.exists():
+            continue
+        for p in folder.glob("*.md"):
+            rows.append({"afsc": p.stem, "source": source, "path": str(p)})
+    return pd.DataFrame(rows).sort_values(["source", "afsc"]).reset_index(drop=True)
 
 def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
     if not items:
@@ -80,167 +72,116 @@ def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
             "esco_id": getattr(it, "esco_id", "") or "",
             "content_sig": getattr(it, "content_sig", ""),
         })
-    df = pd.DataFrame(rows)
-    return df.sort_values(["confidence", "text"], ascending=[False, True]).reset_index(drop=True)
+    return pd.DataFrame(rows).sort_values(["confidence","text"], ascending=[False, True]).reset_index(drop=True)
 
-def read_afsc_markdown_from_local(code: str) -> Optional[str]:
-    code = (code or "").strip()
-    if not code:
-        return None
-    for label, folder in DOC_FOLDERS:
-        p = folder / f"{code}.md"
-        if p.exists():
-            try:
-                return p.read_text(encoding="utf-8")
-            except Exception:
-                pass
-    return None
-
-def delete_afscs(codes: List[str]) -> int:
-    if not codes:
-        return 0
-    with get_driver().session(database=NEO4J_DATABASE) as s:
-        # Remove AFSC->Item rels & delete Items that become orphaned
-        q1 = """
-        MATCH (a:AFSC)
-        WHERE a.code IN $codes
-        OPTIONAL MATCH (a)-[r:HAS_ITEM|REQUIRES]->(i:Item)
-        DELETE r
-        WITH DISTINCT i
-        WHERE i IS NOT NULL AND NOT ( ()-[:HAS_ITEM|REQUIRES]->(i) )
-        DELETE i
-        """
-        s.run(q1, {"codes": codes})
-
-        # Delete AFSC nodes
-        q2 = """
-        MATCH (a:AFSC)
-        WHERE a.code IN $codes
-        DETACH DELETE a
-        """
-        s.run(q2, {"codes": codes})
-    return len(codes)
+def n_chars(s: Optional[str]) -> int:
+    return len(s or "")
 
 # ----------------------------
-# UI
+# UI: Header & guard
 # ----------------------------
 st.set_page_config(page_title=APP_TITLE, page_icon="🧩", layout="wide")
-st.title("Ingest & Manage")
-st.caption("Paste or load AFSC text → (optional) Dry-run → Write to Aura → Verify in Explore tab")
-st.markdown(connection_badge(), unsafe_allow_html=True)
-
-# Global refresh
-cols_top = st.columns([1, 1, 5])
-with cols_top[0]:
-    if st.button("🔄 Refresh app data (clear caches)", use_container_width=True):
-        clear_all_caches()
-        st.success("Caches cleared.")
-        st.rerun()
-with cols_top[1]:
-    if st.button("🧪 Test connection", use_container_width=True):
-        try:
-            _ = get_driver()
-            st.success("Neo4j connection OK")
-        except Exception as e:
-            st.error(f"Neo4j connection failed: {e}")
+st.title(APP_TITLE)
+st.caption("Find your AFSC text → (optional) dry-run preview → run pipeline to write KSAs to Aura → verify in the Explore page.")
 
 with st.expander("Connection", expanded=False):
     st.code(f"NEO4J_URI={NEO4J_URI}\nNEO4J_DATABASE={NEO4J_DATABASE}", language="bash")
 
-# Optional admin key check
 if ADMIN_KEY:
     entered = st.text_input("Admin key", type="password", placeholder="Required to run", help="Set ADMIN_KEY in environment or Streamlit Secrets.")
     if entered.strip() != ADMIN_KEY.strip():
         st.info("Enter the admin key to enable ingestion.")
         st.stop()
 
-with st.expander("What happens?", expanded=False):
-    st.markdown("""
-1) **Load** AFSC text (paste or use *Load from docs*).
-2) **Dry-run** (optional) to preview extracted items **without writing** to Aura.
-3) **Run pipeline** to write to Aura, then check the *Explore KSAs* tab.
-""")
+# ----------------------------
+# 1) Left: Find AFSC text (from local docs)
+# ----------------------------
+left, right = st.columns([1.2, 2.0], gap="large")
 
-# =========================
-# Single-AFSC ingest
-# =========================
-st.subheader("Single AFSC ingest")
+with left:
+    st.subheader("Find AFSC text")
+    df_idx = build_afsc_index()
+    if df_idx.empty:
+        st.warning("No docs found under /workspaces/docs_text/{AFECD,AFOCD}. Use the PDF tool to generate them first.")
+    else:
+        q = st.text_input("Search AFSC code or source (regex or plain contains)", placeholder="e.g., 1N1X1 or (?i)^11")
+        mode = st.radio("Match mode", ["Contains", "Regex"], horizontal=True)
+        filtered = df_idx
+        if q.strip():
+            if mode == "Regex":
+                try:
+                    pat = re.compile(q)
+                    mask = df_idx["afsc"].str.contains(pat) | df_idx["source"].str.contains(pat)
+                    filtered = df_idx[mask]
+                except re.error:
+                    st.error("Invalid regex pattern.")
+            else:
+                s = q.strip().lower()
+                mask = df_idx["afsc"].str.lower().str.contains(s) | df_idx["source"].str.lower().str.contains(s)
+                filtered = df_idx[mask]
 
-col1, col2 = st.columns([1, 3], gap="large")
-with col1:
-    afsc_code = st.text_input("AFSC code", value="1N1X1", help="Example: 1N1X1")
-    dry_run = st.checkbox("Dry-run (no write)", value=False, help="Preview items without writing to Aura")
-    st.caption("LAiSER env: USE_LAISER=true • LAISER_MODE=lib • LAISER_ALIGN_TOPK=25")
-    # Small quick delete for the typed code
-    st.markdown("---")
-    st.caption("Quick delete")
-    if st.button("🗑️ Delete this AFSC", use_container_width=True):
-        if not afsc_code.strip():
-            st.error("Enter an AFSC code.")
-        else:
-            n = delete_afscs([afsc_code.strip()])
-            clear_all_caches()
-            st.success(f"Deleted AFSC {afsc_code} (count={n}).")
-            st.rerun()
+        st.caption(f"Found {len(filtered)} / {len(df_idx)}")
+        pick = st.selectbox(
+            "Select AFSC doc",
+            options=[f"{r.afsc} ({r.source})" for r in filtered.itertuples()],
+            index=0 if len(filtered) else None
+        )
 
-    # Load from docs
-    st.markdown("---")
-    if st.button("📥 Load from docs", use_container_width=True, help="Loads /workspaces/docs_text/AFECD|AFOCD/<AFSC>.md into the text area"):
-        txt = read_afsc_markdown_from_local(afsc_code)
-        if txt:
-            st.session_state["afsc_loaded_text"] = txt
-            st.success("Loaded text from local docs.")
-        else:
-            st.warning("No matching local doc found for that AFSC.")
+        preview_md = ""
+        picked_code = ""
+        if pick:
+            picked_code = pick.split(" ", 1)[0]
+            row = filtered[filtered["afsc"] == picked_code].iloc[0]
+            try:
+                preview_md = pathlib.Path(row["path"]).read_text(encoding="utf-8")
+            except Exception as e:
+                st.error(f"Could not read file: {e}")
+                preview_md = ""
 
-with col2:
-    afsc_text = st.text_area(
-        "AFSC text",
-        height=330,
-        placeholder="Paste the AFSC (Duties / Knowledge / Skills / Abilities) text here…",
-        value=st.session_state.get("afsc_loaded_text", ""),
+        st.text_area("Preview (read-only)", preview_md, height=260)
+
+        if st.button("➡️ Use this text in ingest form", use_container_width=True, disabled=(not preview_md)):
+            st.session_state["afsc_loaded_text"] = preview_md
+            st.session_state["afsc_loaded_code"] = picked_code
+            st.success("Loaded into the ingest form (right panel).")
+
+# ----------------------------
+# 2) Right: Ingest form (single AFSC)
+# ----------------------------
+with right:
+    st.subheader("Single AFSC ingest")
+
+    afsc_code = st.text_input(
+        "AFSC code",
+        value=st.session_state.get("afsc_loaded_code", "1N1X1"),
+        help="Example: 1N1X1"
     )
 
-# Action buttons
-run_cols = st.columns([1, 1, 5])
-with run_cols[0]:
-    preview_btn = st.button("👀 Dry-run preview", disabled=not dry_run, use_container_width=True)
-with run_cols[1]:
-    run_btn = st.button("🚀 Run pipeline", type="primary", use_container_width=True)
+    afsc_text = st.text_area(
+        "AFSC text",
+        height=260,
+        value=st.session_state.get("afsc_loaded_text", ""),
+        placeholder="Paste or load AFSC (Duties / Knowledge / Skills / Abilities) text here…",
+    )
 
-def _render_items_table(items: List[ItemDraft], label: str):
-    df = summarize_items(items)
-    st.subheader(label)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    colA, colB, colC = st.columns([1,1,1])
+    with colA:
+        if st.button("👀 Dry-run preview", use_container_width=True, disabled=(n_chars(afsc_text) == 0)):
+            cleaned = clean_afsc_text(afsc_text or "")
+            st.info(f"Characters: raw={n_chars(afsc_text)} • cleaned={n_chars(cleaned)}")
+            with st.expander("Show cleaned text", expanded=False):
+                st.text_area("Cleaned", cleaned, height=220)
+    with colB:
+        min_conf = st.slider("Min confidence (post-filter)", 0.0, 1.0, 0.0, 0.05)
+    with colC:
+        run_now = st.button("🚀 Run pipeline → Aura", type="primary", use_container_width=True, disabled=(n_chars(afsc_text) == 0 or n_chars(afsc_code) == 0))
 
-if preview_btn:
-    if not afsc_code.strip() or not afsc_text.strip():
-        st.error("AFSC code and AFSC text are required.")
-    else:
-        st.info("Running dry-run (no write)…")
-        try:
-            # Call pipeline but don't write: pass neo4j_session=None to skip writing
-            summary: Dict[str, Any] = run_pipeline(
-                afsc_code=afsc_code.strip(),
-                afsc_raw_text=afsc_text,
-                neo4j_session=None,            # <— prevents writes
-            )
-            items = summary.get("items", [])
-            _render_items_table(items, "Preview items (dry-run)")
-            st.success("Dry-run complete. To save, turn off Dry-run and click 'Run pipeline'.")
-        except Exception as e:
-            st.error(f"Dry-run error: {e}")
-
-if run_btn:
-    if not afsc_code.strip() or not afsc_text.strip():
-        st.error("AFSC code and AFSC text are required.")
-    elif dry_run:
-        st.warning("Dry-run is enabled. Disable it to write to Aura.")
-    else:
+    if run_now:
         st.info("Starting pipeline…")
         with st.spinner("Extracting & writing to Neo4j…"):
             try:
-                with get_driver().session(database=NEO4J_DATABASE) as session:
+                driver = get_driver()
+                with driver.session(database=NEO4J_DATABASE) as session:
                     summary: Dict[str, Any] = run_pipeline(
                         afsc_code=afsc_code.strip(),
                         afsc_raw_text=afsc_text,
@@ -250,34 +191,50 @@ if run_btn:
                 st.error(f"Pipeline error: {e}")
             else:
                 st.success("Done.")
-                colA, colB, colC, colD = st.columns(4)
-                colA.metric("Items (raw)", summary.get("n_items_raw", 0))
-                colB.metric("After filters", summary.get("n_items_after_filters", 0))
-                colC.metric("After dedupe", summary.get("n_items_after_dedupe", 0))
-                colD.metric("Used fallback?", "Yes" if summary.get("used_fallback") else "No")
+                m1, m2, m3, m4 = st.columns(4)
+                m1.metric("Items (raw)", summary.get("n_items_raw", 0))
+                m2.metric("After filters", summary.get("n_items_after_filters", 0))
+                m3.metric("After dedupe", summary.get("n_items_after_dedupe", 0))
+                m4.metric("Used fallback?", "Yes" if summary.get("used_fallback") else "No")
 
                 items_written = summary.get("items")
                 if items_written and isinstance(items_written, list):
-                    _render_items_table(items_written, "Preview of items (from pipeline output)")
+                    df = summarize_items(items_written)
+                    st.subheader("Preview of items (from pipeline output)")
+                    st.dataframe(df, use_container_width=True, hide_index=True)
                 else:
-                    st.info("Items preview not returned by pipeline.")
-                # Recent activity
-                st.markdown("---")
-                st.info(f"Last action: **Wrote AFSC {afsc_code}**. Open the *Explore KSAs* tab to view.")
-                clear_all_caches()
+                    st.subheader("Preview of items (fresh from Aura)")
+                    try:
+                        with driver.session(database=NEO4J_DATABASE) as s:
+                            rows = list(s.run("""
+                                MATCH (a:AFSC {code: $code})-[:HAS_ITEM|:REQUIRES]->(i)
+                                RETURN i.text AS text, i.item_type AS item_type,
+                                       coalesce(i.confidence,0.0) AS confidence,
+                                       coalesce(i.source,'') AS source,
+                                       coalesce(i.esco_id,'') AS esco_id,
+                                       coalesce(i.content_sig,'') AS content_sig
+                                ORDER BY confidence DESC, text ASC
+                            """, {"code": afsc_code.strip()}))
+                        df = pd.DataFrame(rows)
+                        st.dataframe(df, use_container_width=True, hide_index=True)
+                    except Exception as e:
+                        st.warning(f"Could not fetch items for preview: {e}")
 
-# =========================
-# Bulk JSONL ingest (Claude output)
-# =========================
-st.markdown("---")
+    st.caption("Tip: After ingest, open **Explore KSAs** to see items with filtering & CSV export.")
+
+st.divider()
+
+# ----------------------------
+# 3) Bulk JSONL ingest (Claude output / your JSONL)
+# ----------------------------
 st.subheader("Bulk JSONL ingest")
-st.caption("Upload a JSONL with one AFSC per line (fields like: afsc, md, sections, source). Each line is processed via the pipeline.")
-
+st.caption("Upload a JSONL file with one AFSC per line. Expected fields: `afsc` and either `md` (markdown body) or `sections`.")
 jsonl_file = st.file_uploader("Upload JSONL (one AFSC per line)", type=["jsonl"])
+
 if jsonl_file is not None:
     if st.button("🚀 Ingest JSONL", use_container_width=True):
         try:
-            _ = get_driver()
+            driver = get_driver()
         except Exception as e:
             st.error(f"Neo4j connection error: {e}")
         else:
@@ -286,7 +243,7 @@ if jsonl_file is not None:
             ok = fail = 0
             pb = st.progress(0)
             log = st.empty()
-            with get_driver().session(database=NEO4J_DATABASE) as session:
+            with driver.session(database=NEO4J_DATABASE) as session:
                 for i, line in enumerate(lines, start=1):
                     try:
                         obj = json.loads(line)
@@ -295,37 +252,62 @@ if jsonl_file is not None:
                         if not code or not text:
                             fail += 1
                         else:
-                            run_pipeline(
-                                afsc_code=code,
-                                afsc_raw_text=text,
-                                neo4j_session=session,
-                            )
+                            run_pipeline(afsc_code=code, afsc_raw_text=text, neo4j_session=session)
                             ok += 1
                     except Exception:
                         fail += 1
                     pb.progress(min(i / total, 1.0))
                     log.text(f"Ingested {i}/{total} … success={ok}, fail={fail}")
                     time.sleep(0.01)
-            clear_all_caches()
-            st.success(f"Bulk ingest complete — success: {ok}, failed: {fail}. Open the Explore tab to verify.")
+            st.success(f"Bulk ingest complete — success: {ok}, failed: {fail}. Open Explore to verify.")
 
-# =========================
-# Danger zone
-# =========================
+st.divider()
+
+# ----------------------------
+# 4) Danger Zone: delete AFSCs + orphaned Items
+# ----------------------------
 with st.expander("Danger zone: delete AFSCs + their items", expanded=False):
     st.warning("This permanently deletes selected AFSC nodes and any now-orphaned Item nodes.")
-    codes_text = st.text_area("AFSC codes (comma/space/newline separated)", placeholder="e.g. 1N1X1, 17S3X, 1D7")
-    confirm_text = st.text_input("Type DELETE to enable the bulk delete")
-    disabled = confirm_text.strip().upper() != "DELETE"
-    if st.button("🧨 Delete selected AFSCs", disabled=disabled, use_container_width=True):
-        codes = [c.strip() for c in re.split(r"[,\s]+", codes_text or "") if c.strip()]
-        if not codes:
-            st.error("Enter at least one AFSC code.")
-        else:
-            try:
-                n = delete_afscs(codes)
-                clear_all_caches()
-                st.success(f"Deleted AFSCs: {', '.join(codes)} (count={n})")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Delete failed: {e}")
+    codes_text = st.text_area("AFSC codes (comma / space / newline separated)", placeholder="e.g. 1N1X1, 17S3X, 1D7")
+    confirm_phrase = st.text_input("Type DELETE to confirm")
+    delete_ok = (confirm_phrase.strip().upper() == "DELETE")
+    if st.button("🧨 Delete selected AFSCs", disabled=not delete_ok, use_container_width=True):
+        try:
+            codes = [c.strip() for c in re.split(r"[,\s]+", codes_text or "") if c.strip()]
+            if not codes:
+                st.error("Enter at least one AFSC code.")
+            else:
+                with get_driver().session(database=NEO4J_DATABASE) as s:
+                    q1 = """
+                    MATCH (a:AFSC)
+                    WHERE a.code IN $codes
+                    OPTIONAL MATCH (a)-[r:HAS_ITEM|REQUIRES]->(i:Item)
+                    DELETE r
+                    WITH DISTINCT i
+                    WHERE i IS NOT NULL AND NOT ( ()-[:HAS_ITEM|REQUIRES]->(i) )
+                    DELETE i
+                    """
+                    s.run(q1, {"codes": codes})
+
+                    q2 = """
+                    MATCH (a:AFSC)
+                    WHERE a.code IN $codes
+                    DETACH DELETE a
+                    """
+                    s.run(q2, {"codes": codes})
+                st.success(f"Deleted AFSCs: {', '.join(codes)}")
+                st.info("Use the refresh button below to clear app caches.")
+        except Exception as e:
+            st.error(f"Delete failed: {e}")
+
+# ----------------------------
+# 5) Maintenance: refresh caches
+# ----------------------------
+st.markdown("### Maintenance")
+if st.button("🔄 Refresh app caches (data + connections)"):
+    try:
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.success("Caches cleared. Use the sidebar to navigate or refresh your browser tab.")
+    except Exception as e:
+        st.error(f"Could not clear caches: {e}")
