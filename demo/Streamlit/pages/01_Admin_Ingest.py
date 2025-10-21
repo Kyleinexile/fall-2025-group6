@@ -61,6 +61,22 @@ with st.sidebar:
         driver.close()
     except Exception:
         st.error("❌ Connection failed")
+    
+    # Debug section
+    st.markdown("---")
+    with st.expander("🐛 Debug Session State"):
+        st.write("**All Keys:**", list(st.session_state.keys()))
+        if "admin_loaded_text" in st.session_state:
+            text = st.session_state.admin_loaded_text
+            st.write(f"✅ admin_loaded_text: {len(text)} chars")
+            st.text(text[:200] + "..." if len(text) > 200 else text)
+        else:
+            st.write("❌ admin_loaded_text: NOT SET")
+        
+        if "admin_loaded_code" in st.session_state:
+            st.write(f"✅ admin_loaded_code: {st.session_state.admin_loaded_code}")
+        else:
+            st.write("❌ admin_loaded_code: NOT SET")
 
 # Tabs for different ingest methods
 tab1, tab2, tab3 = st.tabs(["📝 Manual Entry", "📁 Bulk JSONL", "🗑️ Management"])
@@ -94,8 +110,8 @@ with tab1:
                 path = folder / f"{code}.md"
                 try:
                     text = path.read_text(encoding="utf-8")
-                    st.session_state["admin_loaded_code"] = code
-                    st.session_state["admin_loaded_text"] = text
+                    st.session_state.admin_loaded_code = code
+                    st.session_state.admin_loaded_text = text
                     st.success(f"✅ Loaded {code}")
                     st.rerun()
                 except Exception as e:
@@ -109,21 +125,27 @@ with tab1:
     with col_process:
         st.markdown("#### Process AFSC")
         
-        # Show indicator if data was loaded from View Docs
-        if st.session_state.get("admin_loaded_text"):
-            st.success("✅ Text loaded from View Docs page")
+        # Get values from session state
+        loaded_code = st.session_state.get("admin_loaded_code", "")
+        loaded_text = st.session_state.get("admin_loaded_text", "")
+        
+        # Show indicator if data was loaded
+        if loaded_text:
+            st.success(f"✅ Text loaded ({len(loaded_text)} characters)")
         
         code = st.text_input(
             "AFSC Code",
-            value=st.session_state.get("admin_loaded_code", ""),
-            placeholder="e.g., 1N1X1"
+            value=loaded_code,
+            placeholder="e.g., 1N1X1",
+            key="afsc_code_input"
         )
         
         text = st.text_area(
             "AFSC Text",
-            value=st.session_state.get("admin_loaded_text", ""),
+            value=loaded_text,
             height=300,
-            placeholder="Paste duties, knowledge, skills, and abilities..."
+            placeholder="Paste duties, knowledge, skills, and abilities...",
+            key="afsc_text_input"
         )
         
         col_btn1, col_btn2 = st.columns(2)
@@ -131,14 +153,16 @@ with tab1:
         with col_btn1:
             if st.button("👀 Preview Clean", use_container_width=True, disabled=not text):
                 cleaned = clean_afsc_text(text)
-                with st.expander("Cleaned Text Preview"):
+                with st.expander("Cleaned Text Preview", expanded=True):
                     st.text(cleaned[:1000] + "..." if len(cleaned) > 1000 else cleaned)
                     st.caption(f"Original: {len(text)} chars → Cleaned: {len(cleaned)} chars")
         
         with col_btn2:
             if st.button("🗑️ Clear Form", use_container_width=True):
-                st.session_state["admin_loaded_code"] = ""
-                st.session_state["admin_loaded_text"] = ""
+                st.session_state.admin_loaded_code = ""
+                st.session_state.admin_loaded_text = ""
+                if "data_sent" in st.session_state:
+                    st.session_state.data_sent = False
                 st.rerun()
         
         process = st.button("🚀 Process", type="primary", use_container_width=True, disabled=not (code and text))
@@ -189,8 +213,10 @@ with tab1:
                 
                 # Clear loaded data after successful processing
                 if st.button("✨ Process Another AFSC", use_container_width=True):
-                    st.session_state["admin_loaded_code"] = ""
-                    st.session_state["admin_loaded_text"] = ""
+                    st.session_state.admin_loaded_code = ""
+                    st.session_state.admin_loaded_text = ""
+                    if "data_sent" in st.session_state:
+                        st.session_state.data_sent = False
                     st.rerun()
                 
             except Exception as e:
