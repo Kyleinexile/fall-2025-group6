@@ -2,7 +2,7 @@ from __future__ import annotations
 import sys, pathlib, os, json, time, re
 from typing import Dict, Any, List
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
