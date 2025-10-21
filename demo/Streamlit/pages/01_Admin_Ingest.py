@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # --- repo path bootstrap (so imports work when run via streamlit) ---
-import sys, pathlib, os
+import sys, pathlib, os, json, time
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]  # repo root (…/fall-2025-group6)
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
@@ -65,7 +65,6 @@ def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     return df.sort_values(["confidence", "text"], ascending=[False, True]).reset_index(drop=True)
 
-
 # ----------------------------
 # UI
 # ----------------------------
@@ -83,7 +82,11 @@ if ADMIN_KEY:
         st.info("Enter the admin key to enable ingestion.")
         st.stop()
 
-# Inputs
+# =========================
+# Single-AFSC ingest
+# =========================
+st.subheader("Single AFSC ingest")
+
 col1, col2 = st.columns([1, 3], gap="large")
 with col1:
     afsc_code = st.text_input("AFSC code", value="1N1X1", help="Example: 1N1X1")
@@ -96,11 +99,10 @@ with col1:
 with col2:
     afsc_text = st.text_area(
         "AFSC text",
-        height=380,
+        height=300,
         placeholder="Paste the AFSC (Duties / Knowledge / Skills / Abilities) text here…",
     )
 
-# Action
 if run_btn:
     if not afsc_code.strip() or not afsc_text.strip():
         st.error("AFSC code and AFSC text are required.")
@@ -154,3 +156,48 @@ if run_btn:
 
     st.markdown("---")
     st.caption("Switch to the main viewer page to see these items with filters/CSV.")
+
+# =========================
+# Bulk JSONL ingest (Claude output)
+# =========================
+st.subheader("Bulk JSONL ingest")
+st.caption("Upload a JSONL with one AFSC per line (fields like: afsc, md, sections, source). Each line will be run through the same pipeline.")
+
+jsonl_file = st.file_uploader("Upload JSONL (one AFSC per line)", type=["jsonl"])
+if jsonl_file is not None:
+    if st.button("🚀 Ingest JSONL", use_container_width=True):
+        try:
+            driver = get_driver()
+        except Exception as e:
+            st.error(f"Neo4j connection error: {e}")
+            st.stop()
+
+        lines = jsonl_file.getvalue().decode("utf-8").splitlines()
+        total = len(lines)
+        ok = fail = 0
+        pb = st.progress(0)
+        log = st.empty()
+
+        with driver.session(database=NEO4J_DATABASE) as session:
+            for i, line in enumerate(lines, start=1):
+                try:
+                    obj = json.loads(line)
+                    afsc_code = (obj.get("afsc") or "").strip()
+                    # Prefer the Markdown body; fall back to structured sections
+                    afsc_text = obj.get("md") or json.dumps(obj.get("sections", {}), ensure_ascii=False)
+                    if not afsc_code or not afsc_text:
+                        fail += 1
+                    else:
+                        run_pipeline(
+                            afsc_code=afsc_code,
+                            afsc_raw_text=afsc_text,
+                            neo4j_session=session,
+                        )
+                        ok += 1
+                except Exception as e:
+                    fail += 1
+                pb.progress(min(i / total, 1.0))
+                log.text(f"Ingested {i}/{total} … success={ok}, fail={fail}")
+                time.sleep(0.01)
+
+        st.success(f"Bulk ingest complete — success: {ok}, failed: {fail}. Open the main tab to verify.")
