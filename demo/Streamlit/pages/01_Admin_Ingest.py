@@ -201,3 +201,52 @@ if jsonl_file is not None:
                 time.sleep(0.01)
 
         st.success(f"Bulk ingest complete — success: {ok}, failed: {fail}. Open the main tab to verify.")
+
+
+st.markdown("---")
+st.subheader("🛑 Danger Zone — Clear AFSC data")
+
+codes_text = st.text_area(
+    "AFSC codes to clear (comma/space/newline separated)",
+    placeholder="e.g., 1N1X1, 1N0X1",
+)
+mode = st.radio(
+    "Delete mode",
+    ["Delete AFSC(s) + orphaned Items", "Only remove relationships"],
+    index=0,
+    horizontal=False,
+)
+
+if st.button("Clear selected AFSCs", type="secondary"):
+    codes = [c.strip() for c in re.split(r"[,\s]+", codes_text or "") if c.strip()]
+    if not codes:
+        st.warning("Provide at least one AFSC code.")
+    else:
+        driver = get_driver()
+        with driver.session(database=NEO4J_DATABASE) as s:
+            if mode == "Only remove relationships":
+                q = """
+                WITH $codes AS codes
+                UNWIND codes AS code
+                MATCH (a:AFSC {code:code})-[r:HAS_ITEM|REQUIRES]->(:Item)
+                DELETE r
+                """
+                s.run(q, {"codes": codes})
+            else:
+                q = """
+                WITH $codes AS codes
+                UNWIND codes AS code
+                MATCH (a:AFSC {code:code})
+                WITH collect(DISTINCT a) AS afscs
+                UNWIND afscs AS a
+                OPTIONAL MATCH (a)-[:HAS_ITEM|REQUIRES]->(i:Item)
+                WITH collect(DISTINCT a) AS afscs, collect(DISTINCT i) AS wasItems
+                FOREACH (x IN afscs | DETACH DELETE x)
+                UNWIND wasItems AS i
+                WITH DISTINCT i
+                WHERE NOT ( (:AFSC)-[:HAS_ITEM|REQUIRES]->(i) )
+                DETACH DELETE i
+                """
+                s.run(q, {"codes": codes})
+        st.success(f"Cleared {len(codes)} AFSC(s). Check the viewer tab.")
+
