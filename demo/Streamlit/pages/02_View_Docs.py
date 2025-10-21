@@ -57,6 +57,13 @@ def build_markdown_index():
 st.title("📄 AFSC Documentation")
 st.caption("Search official PDFs or browse pre-split markdown files")
 
+# Show if something was sent (for debugging)
+if "data_sent" in st.session_state and st.session_state.data_sent:
+    st.success("✅ Data sent to Admin Ingest! Navigate there using the sidebar.")
+    if st.button("Clear this message"):
+        st.session_state.data_sent = False
+        st.rerun()
+
 # Mode selection
 mode = st.radio("", ["🔍 Search PDFs", "📁 Browse Markdown"], horizontal=True, label_visibility="collapsed")
 
@@ -148,9 +155,11 @@ if mode == "🔍 Search PDFs":
                                 )
                             with col_b:
                                 if st.button("📤 Send to Ingest", key=f"send_{i}", use_container_width=True):
-                                    st.session_state["admin_loaded_text"] = h["full"]
-                                    st.session_state["admin_loaded_code"] = ""
-                                    st.switch_page("pages/01_Admin_Ingest.py")
+                                    # Set the session state
+                                    st.session_state.admin_loaded_text = h["full"]
+                                    st.session_state.admin_loaded_code = ""
+                                    st.session_state.data_sent = True
+                                    st.success("✅ Data saved! Now go to **Admin Ingest** using the sidebar →")
                         
                         st.markdown("---")
 
@@ -208,9 +217,10 @@ else:  # Browse Markdown
                         )
                     with col_b:
                         if st.button("📤 Send to Ingest", use_container_width=True):
-                            st.session_state["admin_loaded_text"] = content
-                            st.session_state["admin_loaded_code"] = code
-                            st.switch_page("pages/01_Admin_Ingest.py")
+                            st.session_state.admin_loaded_text = content
+                            st.session_state.admin_loaded_code = code
+                            st.session_state.data_sent = True
+                            st.success("✅ Data saved! Now go to **Admin Ingest** using the sidebar →")
                     
                 except Exception as e:
                     st.error(f"Could not read file: {e}")
@@ -227,7 +237,15 @@ with st.sidebar:
         
         **Workflow**:
         1. Find your AFSC here
-        2. Send to Admin Ingest
-        3. Process through pipeline
-        4. Explore in main app
+        2. Click "Send to Ingest"
+        3. Go to Admin Ingest (sidebar)
+        4. Process through pipeline
+        5. Explore in main app
         """)
+    
+    # Debug info
+    with st.expander("🐛 Debug Info"):
+        st.write("Session State Keys:", list(st.session_state.keys()))
+        if "admin_loaded_text" in st.session_state:
+            text_len = len(st.session_state.admin_loaded_text)
+            st.write(f"Text loaded: {text_len} chars")
