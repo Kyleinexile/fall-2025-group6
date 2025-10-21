@@ -203,50 +203,39 @@ if jsonl_file is not None:
         st.success(f"Bulk ingest complete — success: {ok}, failed: {fail}. Open the main tab to verify.")
 
 
-st.markdown("---")
-st.subheader("🛑 Danger Zone — Clear AFSC data")
-
-codes_text = st.text_area(
-    "AFSC codes to clear (comma/space/newline separated)",
-    placeholder="e.g., 1N1X1, 1N0X1",
-)
-mode = st.radio(
-    "Delete mode",
-    ["Delete AFSC(s) + orphaned Items", "Only remove relationships"],
-    index=0,
-    horizontal=False,
-)
-
-if st.button("Clear selected AFSCs", type="secondary"):
-    codes = [c.strip() for c in re.split(r"[,\s]+", codes_text or "") if c.strip()]
-    if not codes:
-        st.warning("Provide at least one AFSC code.")
-    else:
-        driver = get_driver()
-        with driver.session(database=NEO4J_DATABASE) as s:
-            if mode == "Only remove relationships":
-                q = """
-                WITH $codes AS codes
-                UNWIND codes AS code
-                MATCH (a:AFSC {code:code})-[r:HAS_ITEM|REQUIRES]->(:Item)
-                DELETE r
-                """
-                s.run(q, {"codes": codes})
+with st.expander("Danger zone: delete AFSCs + their items", expanded=False):
+    st.warning("This permanently deletes selected AFSC nodes and any now-orphaned Item nodes.")
+    codes_text = st.text_area("AFSC codes (comma/space/newline separated)", placeholder="e.g. 1N1X1, 17S3X, 1D7")
+    confirm = st.checkbox("I understand this will permanently delete data.")
+    if st.button("🧨 Delete selected AFSCs", disabled=not confirm):
+        try:
+            codes = [c.strip() for c in re.split(r"[,\s]+", codes_text or "") if c.strip()]
+            if not codes:
+                st.error("Enter at least one AFSC code.")
             else:
-                q = """
-                WITH $codes AS codes
-                UNWIND codes AS code
-                MATCH (a:AFSC {code:code})
-                WITH collect(DISTINCT a) AS afscs
-                UNWIND afscs AS a
-                OPTIONAL MATCH (a)-[:HAS_ITEM|REQUIRES]->(i:Item)
-                WITH collect(DISTINCT a) AS afscs, collect(DISTINCT i) AS wasItems
-                FOREACH (x IN afscs | DETACH DELETE x)
-                UNWIND wasItems AS i
-                WITH DISTINCT i
-                WHERE NOT ( (:AFSC)-[:HAS_ITEM|REQUIRES]->(i) )
-                DETACH DELETE i
-                """
-                s.run(q, {"codes": codes})
-        st.success(f"Cleared {len(codes)} AFSC(s). Check the viewer tab.")
+                with get_driver().session(database=NEO4J_DATABASE) as s:
+                    # 1) Remove AFSC→Item rels and delete Items that become orphaned
+                    q1 = """
+                    MATCH (a:AFSC)
+                    WHERE a.code IN $codes
+                    OPTIONAL MATCH (a)-[r:HAS_ITEM|REQUIRES]->(i:Item)
+                    DELETE r
+                    WITH DISTINCT i
+                    WHERE i IS NOT NULL AND NOT ( ()-[:HAS_ITEM|REQUIRES]->(i) )
+                    DELETE i
+                    """
+                    s.run(q1, {"codes": codes})
+
+                    # 2) Delete the AFSC nodes themselves
+                    q2 = """
+                    MATCH (a:AFSC)
+                    WHERE a.code IN $codes
+                    DETACH DELETE a
+                    """
+                    s.run(q2, {"codes": codes})
+
+                st.success(f"Deleted AFSCs: {', '.join(codes)}")
+        except Exception as e:
+            st.error(f"Delete failed: {e}")
+
 
