@@ -1,14 +1,14 @@
+# demo/Streamlit/pages/01_Admin_Ingest.py
+from __future__ import annotations
+
 # --- repo path bootstrap (so imports work when run via streamlit) ---
-import sys, pathlib
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]  # repo root
+import sys, pathlib, os
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]  # repo root (…/fall-2025-group6)
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 # -------------------------------------------------------------------
 
-# demo/Streamlit/pages/01_Admin_Ingest.py
-from __future__ import annotations
-import os
 from typing import Dict, Any, List
 
 import pandas as pd
@@ -17,9 +17,8 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
 # --- Import your pipeline pieces ---
-# These imports assume PYTHONPATH points to your repo/src (same as your viewer app).
-from afsc_pipeline.preprocess import clean_afsc_text
-from afsc_pipeline.pipeline import run_pipeline, ItemDraft, ItemType
+from afsc_pipeline.preprocess import clean_afsc_text  # noqa: F401 (import ensures module is reachable)
+from afsc_pipeline.pipeline import run_pipeline, ItemDraft, ItemType  # noqa: F401
 
 # ----------------------------
 # Env / Config
@@ -49,9 +48,10 @@ def get_driver():
         raise RuntimeError(f"Neo4j connection failed: {e}") from e
     return driver
 
+
 def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
     if not items:
-        return pd.DataFrame(columns=["text","item_type","confidence","source","esco_id","content_sig"])
+        return pd.DataFrame(columns=["text", "item_type", "confidence", "source", "esco_id", "content_sig"])
     rows = []
     for it in items:
         rows.append({
@@ -63,8 +63,8 @@ def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
             "content_sig": getattr(it, "content_sig", ""),
         })
     df = pd.DataFrame(rows)
-    # Sort for a nicer demo look
-    return df.sort_values(["confidence","text"], ascending=[False, True]).reset_index(drop=True)
+    return df.sort_values(["confidence", "text"], ascending=[False, True]).reset_index(drop=True)
+
 
 # ----------------------------
 # UI
@@ -128,14 +128,13 @@ if run_btn:
     colC.metric("After dedupe", summary.get("n_items_after_dedupe", 0))
     colD.metric("Used fallback?", "Yes" if summary.get("used_fallback") else "No")
 
-    # Items preview (re-derive from what we wrote by re-query or show the computed items if present)
-    items_written = summary.get("items")  # present only if pipeline returns them; else we can re-query
+    # Items preview (from pipeline output if present; else query Aura)
+    items_written = summary.get("items")
     if items_written and isinstance(items_written, list):
         df = summarize_items(items_written)
         st.subheader("Preview of items (from pipeline output)")
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
-        # Fall back to fetch items via Cypher
         st.subheader("Preview of items (fresh from Aura)")
         try:
             with driver.session(database=NEO4J_DATABASE) as s:
