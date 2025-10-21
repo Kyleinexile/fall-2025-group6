@@ -1,5 +1,5 @@
 import sys, pathlib, io, re, textwrap
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
@@ -148,9 +148,9 @@ if mode == "🔍 Search PDFs":
                                 )
                             with col_b:
                                 if st.button("📤 Send to Ingest", key=f"send_{i}", use_container_width=True):
-                                    st.session_state.loaded_text = h["full"]
-                                    st.session_state.loaded_code = ""
-                                    st.success("Sent! Go to Admin Ingest page")
+                                    st.session_state["admin_loaded_text"] = h["full"]
+                                    st.session_state["admin_loaded_code"] = ""
+                                    st.switch_page("pages/01_Admin_Ingest.py")
                         
                         st.markdown("---")
 
@@ -208,9 +208,9 @@ else:  # Browse Markdown
                         )
                     with col_b:
                         if st.button("📤 Send to Ingest", use_container_width=True):
-                            st.session_state.loaded_text = content
-                            st.session_state.loaded_code = code
-                            st.success(f"Loaded {code}! Go to Admin Ingest")
+                            st.session_state["admin_loaded_text"] = content
+                            st.session_state["admin_loaded_code"] = code
+                            st.switch_page("pages/01_Admin_Ingest.py")
                     
                 except Exception as e:
                     st.error(f"Could not read file: {e}")
