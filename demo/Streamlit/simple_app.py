@@ -1,13 +1,13 @@
+# demo/Streamlit/simple_app.py
+from __future__ import annotations
+
 # --- repo path bootstrap (so imports work when run via streamlit) ---
 import sys, pathlib
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]  # repo root
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # repo root (…/fall-2025-group6)
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 # -------------------------------------------------------------------
-
-# demo/Streamlit/simple_app.py
-from __future__ import annotations
 
 import os
 import re
