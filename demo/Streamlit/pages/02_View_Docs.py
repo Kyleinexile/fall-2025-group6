@@ -20,6 +20,12 @@ SOURCES = {
 DOCS_ROOT = pathlib.Path("/workspaces/docs_text")
 DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
 
+# Initialize session state for search results
+if "search_results" not in st.session_state:
+    st.session_state.search_results = None
+if "search_info" not in st.session_state:
+    st.session_state.search_info = {}
+
 # Helper functions
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_pdf_pages(url: str):
@@ -57,13 +63,6 @@ def build_markdown_index():
 st.title("📄 AFSC Documentation")
 st.caption("Search official PDFs or browse pre-split markdown files")
 
-# Show if something was sent (for debugging)
-if "data_sent" in st.session_state and st.session_state.data_sent:
-    st.success("✅ Data sent to Admin Ingest! Navigate there using the sidebar.")
-    if st.button("Clear this message"):
-        st.session_state.data_sent = False
-        st.rerun()
-
 # Mode selection
 mode = st.radio("", ["🔍 Search PDFs", "📁 Browse Markdown"], horizontal=True, label_visibility="collapsed")
 
@@ -85,8 +84,14 @@ if mode == "🔍 Search PDFs":
             max_results = st.slider("Max results", 5, 30, 10)
         
         search_btn = st.button("🔍 Search", use_container_width=True, type="primary")
+        
+        if st.button("🗑️ Clear Results", use_container_width=True):
+            st.session_state.search_results = None
+            st.session_state.search_info = {}
+            st.rerun()
     
     with col2:
+        # Perform new search if button clicked
         if search_btn:
             if not query.strip():
                 st.warning("Enter a search term")
@@ -130,8 +135,20 @@ if mode == "🔍 Search PDFs":
                 st.error(f"Search error: {e}")
                 st.stop()
             
-            # Display results
-            st.markdown(f"**Found {len(hits)} match(es)** in {source}")
+            # Store results in session state
+            st.session_state.search_results = hits
+            st.session_state.search_info = {
+                "source": source,
+                "pattern": pattern,
+                "query": query
+            }
+        
+        # Display results from session state
+        if st.session_state.search_results is not None:
+            hits = st.session_state.search_results
+            info = st.session_state.search_info
+            
+            st.markdown(f"**Found {len(hits)} match(es)** in {info.get('source', 'unknown')}")
             
             if not hits:
                 st.info("No matches found. Try different keywords or switch sources.")
@@ -139,7 +156,7 @@ if mode == "🔍 Search PDFs":
                 for i, h in enumerate(hits, 1):
                     with st.container():
                         st.markdown(f"**Result {i}** • Page {h['page']}")
-                        st.markdown(highlight_matches(h["snippet"], pattern))
+                        st.markdown(highlight_matches(h["snippet"], info.get("pattern", "")))
                         
                         with st.expander("View full page"):
                             st.text(h["full"])
@@ -155,11 +172,10 @@ if mode == "🔍 Search PDFs":
                                 )
                             with col_b:
                                 if st.button("📤 Send to Ingest", key=f"send_{i}", use_container_width=True):
-                                    # Set the session state
                                     st.session_state.admin_loaded_text = h["full"]
                                     st.session_state.admin_loaded_code = ""
-                                    st.session_state.data_sent = True
-                                    st.success("✅ Data saved! Now go to **Admin Ingest** using the sidebar →")
+                                    st.success("✅ Data sent! Go to **Admin Ingest** in the sidebar →")
+                                    st.balloons()
                         
                         st.markdown("---")
 
@@ -219,8 +235,8 @@ else:  # Browse Markdown
                         if st.button("📤 Send to Ingest", use_container_width=True):
                             st.session_state.admin_loaded_text = content
                             st.session_state.admin_loaded_code = code
-                            st.session_state.data_sent = True
-                            st.success("✅ Data saved! Now go to **Admin Ingest** using the sidebar →")
+                            st.success("✅ Data sent! Go to **Admin Ingest** in the sidebar →")
+                            st.balloons()
                     
                 except Exception as e:
                     st.error(f"Could not read file: {e}")
@@ -239,13 +255,6 @@ with st.sidebar:
         1. Find your AFSC here
         2. Click "Send to Ingest"
         3. Go to Admin Ingest (sidebar)
-        4. Process through pipeline
-        5. Explore in main app
+        4. The text will be pre-loaded
+        5. Process through pipeline
         """)
-    
-    # Debug info
-    with st.expander("🐛 Debug Info"):
-        st.write("Session State Keys:", list(st.session_state.keys()))
-        if "admin_loaded_text" in st.session_state:
-            text_len = len(st.session_state.admin_loaded_text)
-            st.write(f"Text loaded: {text_len} chars")
