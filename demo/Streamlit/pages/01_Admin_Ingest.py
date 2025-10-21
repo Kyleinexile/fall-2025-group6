@@ -51,13 +51,23 @@ def get_driver():
 
 @st.cache_data(show_spinner=False, ttl=30)
 def build_afsc_index() -> pd.DataFrame:
+    """Build an index of pre-split AFSC markdowns. Always returns a DF with afsc/source/path columns."""
+    cols = ["afsc", "source", "path"]
     rows = []
     for source, folder in DOC_FOLDERS:
-        if not folder.exists():
-            continue
-        for p in folder.glob("*.md"):
-            rows.append({"afsc": p.stem, "source": source, "path": str(p)})
-    return pd.DataFrame(rows).sort_values(["source", "afsc"]).reset_index(drop=True)
+        if folder.exists():
+            for p in folder.glob("*.md"):
+                rows.append({"afsc": p.stem, "source": source, "path": str(p)})
+
+    # Always construct with the expected columns
+    df = pd.DataFrame(rows, columns=cols)
+
+    # If empty, return the empty frame with correct schema
+    if df.empty:
+        return df
+
+    # Defensive sort: only on columns that exist (they will, due to `columns=cols`)
+    return df.sort_values(["source", "afsc"]).reset_index(drop=True)
 
 def summarize_items(items: List[ItemDraft]) -> pd.DataFrame:
     if not items:
