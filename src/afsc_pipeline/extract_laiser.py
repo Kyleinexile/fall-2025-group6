@@ -54,7 +54,7 @@ def _build_extractor():
             use_gpu=False
         )
         _EXTRACTOR_CACHE = extractor
-        print("[LAISER] Extractor cached successfully")
+        print("[LAISER] Extractor cached")
         return extractor
     except Exception as e:
         print(f"[LAISER] Init failed: {e}")
@@ -79,7 +79,8 @@ def _fallback_extract(clean_text: str) -> List[ItemDraft]:
 
 def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     """
-    Extract skills using LAiSER's align_skills method (CPU-friendly, ESCO-aware).
+    Extract skills using LAiSER's align_skills (CPU-only, ESCO-aware).
+    Set USE_LAISER=true to enable.
     """
     use_laiser = (os.getenv("USE_LAISER") or "false").strip().lower() in {"1","true","yes"}
     top_k = int(os.getenv("LAISER_ALIGN_TOPK", "25"))
@@ -95,44 +96,54 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         print("[LAISER] Could not build extractor, using fallback")
         return _fallback_extract(clean_text)
 
-    # Extract candidate phrases
+    # Extract candidate phrases - split on punctuation/bullets
     raw_candidates = []
-    for seg in re.split(r"[;\n\.\u2022\-]", clean_text):
+    for seg in re.split(r"[;\n\.\u2022,]", clean_text):  # Added comma split
         c = seg.strip()
-        if len(c) >= 4:
+        # Skip section headers
+        if c.lower().startswith(("duties", "knowledge", "skills", "abilities")):
+            continue
+        if len(c) >= 4 and len(c) < 100:  # Reasonable length
             raw_candidates.append(c)
     
     if not raw_candidates:
         print("[LAISER] No candidates, using defaults")
         raw_candidates = [
             "imagery exploitation",
-            "geospatial intelligence",
+            "geospatial intelligence", 
             "target development",
-            "intelligence briefing",
         ]
     
+    # Deduplicate and limit
+    raw_candidates = list(dict.fromkeys(raw_candidates))[:50]
     print(f"[LAISER] Generated {len(raw_candidates)} candidate phrases")
+    
+    # Show first few
+    for i, cand in enumerate(raw_candidates[:5], 1):
+        print(f"  {i}. {cand[:50]}")
 
-    # Call align_skills
+    # Call align_skills directly (skip broken LLM path)
     try:
+        print("[LAISER] Calling align_skills...")
         result_df = extractor.align_skills(
             raw_skills=raw_candidates,
             document_id="AFSC-0",
-            description="AFSC narrative"
+            description="AFSC text"
         )
         print(f"[LAISER] align_skills returned {len(result_df)} results")
     except Exception as e:
         print(f"[LAISER] align_skills error: {e}")
+        import traceback
+        traceback.print_exc()
         return _fallback_extract(clean_text)
 
-    # Parse results - CRITICAL: Use correct column names!
+    if result_df.empty:
+        print("[LAISER] Empty results, using fallback")
+        return _fallback_extract(clean_text)
+
+    # Parse results - use correct LAiSER column names
     items = []
     for idx, row in result_df.iterrows():
-        # LAiSER returns:
-        # - "Taxonomy Skill" = the matched skill text
-        # - "Correlation Coefficient" = confidence score
-        # - "Skill Tag" = ESCO ID (may be empty string)
-        
         txt = str(row.get("Taxonomy Skill") or "").strip()
         if not txt:
             continue
@@ -141,23 +152,25 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         esco_id = str(row.get("Skill Tag") or "").strip() or None
         
         if esco_id:
-            print(f"[LAISER] ✓ Mapped '{txt[:40]}' -> ESCO: {esco_id} (conf={conf:.2f})")
+            print(f"[LAISER] ✓ '{txt[:40]}' -> ESCO: {esco_id} (conf={conf:.2f})")
         
         items.append(ItemDraft(
             text=txt,
             item_type=ItemType.SKILL,
             confidence=conf,
-            source="laiser:align",
+            source="laiser",
             esco_id=esco_id
         ))
 
-    # Limit to top_k by confidence
-    if len(items) > top_k:
+    # Sort by confidence and limit to top_k
+    if items:
         items.sort(key=lambda x: x.confidence, reverse=True)
         items = items[:top_k]
     
-    print(f"[LAISER] Returning {len(items)} skills, {sum(1 for i in items if i.esco_id)} with ESCO")
-    return items or _fallback_extract(clean_text)
+    esco_count = sum(1 for i in items if i.esco_id)
+    print(f"[LAISER] Returning {len(items)} skills, {esco_count} with ESCO")
+    
+    return items if items else _fallback_extract(clean_text)
 ENDOFFILE
 
-echo "✅ Updated extract_laiser.py with correct column mappings!"
+echo "✅ Updated extract_laiser.py!"
