@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 import re
-import hashlib
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
@@ -21,62 +20,111 @@ class ItemDraft:
     source: str = "unknown"
     esco_id: Optional[str] = None
 
-    @property
-    def content_sig(self) -> str:
-        h = hashlib.sha1()
-        h.update(f"{self.item_type.value}::{self.text.strip()}".encode("utf-8"))
-        return h.hexdigest()
-
-_EXTRACTOR_CACHE = None
-
 def _build_extractor():
-    global _EXTRACTOR_CACHE
-    if _EXTRACTOR_CACHE is not None:
-        print("[LAISER] Using cached extractor")
-        return _EXTRACTOR_CACHE
-    
     try:
-        from laiser.skill_extractor_refactored import SkillExtractorRefactored
+        from laiser.align import SkillExtractorAlign
+        return SkillExtractorAlign()
     except Exception as e:
-        print(f"[LAISER] Import failed: {e}")
-        return None
-
-    try:
-        print(f"[LAISER] Initializing...")
-        extractor = SkillExtractorRefactored(model_id="google/flan-t5-base", use_gpu=False)
-        _EXTRACTOR_CACHE = extractor
-        print("[LAISER] Cached")
-        return extractor
-    except Exception as e:
-        print(f"[LAISER] Init failed: {e}")
+        print(f"[LAISER] Could not init: {e}")
         return None
 
 def _fallback_extract(clean_text: str) -> List[ItemDraft]:
-    out = []
-    lc = clean_text.lower()
-    if "knowledge" in lc:
-        out.append(ItemDraft(text="knowledge of intelligence cycle", item_type=ItemType.KNOWLEDGE, confidence=0.2, source="fallback"))
-    if "skill" in lc:
-        out.append(ItemDraft(text="imagery exploitation", item_type=ItemType.SKILL, confidence=0.2, source="fallback"))
-    if "abilit" in lc:
-        out.append(ItemDraft(text="brief intelligence findings", item_type=ItemType.ABILITY, confidence=0.2, source="fallback"))
-    if not out:
-        out.append(ItemDraft(text="general intelligence", item_type=ItemType.SKILL, confidence=0.1, source="fallback"))
-    return out
+    """
+    Intelligent fallback: Extract skills using pattern matching when LAiSER unavailable.
+    """
+    items = []
+    
+    # Common action verbs indicating skills
+    action_verbs = [
+        "perform", "conduct", "analyze", "develop", "manage", "coordinate",
+        "evaluate", "assess", "prepare", "produce", "execute", "direct",
+        "integrate", "synthesize", "collect", "process", "disseminate",
+        "target", "exploit", "brief", "maintain", "establish", "implement",
+        "monitor", "support", "plan", "organize", "identify", "determine"
+    ]
+    
+    # Extract verb + object phrases - improved
+    for verb in action_verbs:
+        # Look for verb + 2-4 word phrases
+        pattern = rf"\b{verb}(?:s|es|ing)?\s+([a-z]+\s+[a-z]+(?:\s+[a-z]+){{0,2}})\b"
+        matches = re.findall(pattern, clean_text.lower())
+        
+        for phrase in matches:
+            phrase = phrase.strip()
+            # Skip common filler phrases
+            if any(skip in phrase for skip in ["and the", "or the", "of the", "to the"]):
+                continue
+            if len(phrase) > 15:
+                skill_text = f"{verb} {phrase}"
+                # Remove trailing conjunctions/prepositions
+                skill_text = re.sub(r"\s+(and|or|the|for|with|from)$", "", skill_text)
+                items.append(ItemDraft(
+                    text=skill_text,
+                    item_type=ItemType.SKILL,
+                    confidence=0.55,
+                    source="fallback-pattern",
+                    esco_id=None
+                ))
+                if len(items) >= 8:
+                    break
+        if len(items) >= 8:
+            break
+    
+    # Extract phrases with domain keywords
+    domain_keywords = [
+        "intelligence", "analysis", "targeting", "collection", "exploitation",
+        "assessment", "planning", "operations", "coordination", "management",
+        "briefing", "reporting", "evaluation", "integration", "production"
+    ]
+    
+    # Only add domain patterns if we have fewer than 4 verb-based skills
+    if len(items) < 4:
+        for keyword in domain_keywords:
+            pattern = rf"\b([a-z]+\s+){keyword}(\s+[a-z]+)?\b"
+            matches = re.findall(pattern, clean_text.lower())
+            for match in matches[:1]:
+                phrase = "".join([m for m in match if m]).strip()
+                if 15 <= len(phrase) <= 60 and "  " not in phrase:
+                    items.append(ItemDraft(
+                        text=phrase,
+                        item_type=ItemType.SKILL,
+                        confidence=0.50,
+                        source="fallback-domain",
+                        esco_id=None
+                    ))
+    
+    # Deduplicate
+    seen = set()
+    unique_items = []
+    for item in items:
+        key = item.text.lower().strip()
+        if key not in seen and len(key) > 8:
+            seen.add(key)
+            unique_items.append(item)
+            if len(unique_items) >= 6:
+                break
+    
+    # Generic fallback if nothing found
+    if not unique_items:
+        unique_items = [
+            ItemDraft(text="intelligence analysis", item_type=ItemType.SKILL, confidence=0.3, source="fallback-generic", esco_id=None),
+            ItemDraft(text="data processing", item_type=ItemType.SKILL, confidence=0.3, source="fallback-generic", esco_id=None),
+        ]
+    
+    return unique_items
 
 def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     use_laiser = (os.getenv("USE_LAISER") or "false").strip().lower() in {"1","true","yes"}
     top_k = int(os.getenv("LAISER_ALIGN_TOPK", "25"))
-
     print(f"[LAISER] Enabled={use_laiser}, TopK={top_k}")
-
+    
     if not use_laiser:
         return _fallback_extract(clean_text)
-
+    
     extractor = _build_extractor()
     if not extractor:
         return _fallback_extract(clean_text)
-
+    
     # Split text into phrases
     raw_candidates = []
     for seg in re.split(r"[;\n\.\u2022,]", clean_text):
@@ -91,7 +139,7 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     
     raw_candidates = list(dict.fromkeys(raw_candidates))[:50]
     print(f"[LAISER] {len(raw_candidates)} phrases")
-
+    
     # Call align_skills
     try:
         result_df = extractor.align_skills(raw_skills=raw_candidates, document_id="AFSC-0", description="AFSC")
@@ -99,10 +147,10 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     except Exception as e:
         print(f"[LAISER] Error: {e}")
         return _fallback_extract(clean_text)
-
+    
     if result_df.empty:
         return _fallback_extract(clean_text)
-
+    
     # Parse results
     items = []
     for idx, row in result_df.iterrows():
@@ -117,7 +165,7 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             print(f"[LAISER] ✓ {txt[:40]} -> {esco_id}")
         
         items.append(ItemDraft(text=txt, item_type=ItemType.SKILL, confidence=conf, source="laiser", esco_id=esco_id))
-
+    
     if items:
         items.sort(key=lambda x: x.confidence, reverse=True)
         items = items[:top_k]
