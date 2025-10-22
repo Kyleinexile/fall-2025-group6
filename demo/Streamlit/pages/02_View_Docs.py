@@ -17,7 +17,19 @@ SOURCES = {
     "AFOCD (Officer)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFOCD%202025%20Split.pdf",
 }
 
-DOCS_ROOT = pathlib.Path("/workspaces/docs_text")
+# Path fallback for both Codespaces and Streamlit Cloud
+DOCS_ROOTS = [
+    pathlib.Path("/workspaces/docs_text"),  # Codespaces
+    SRC / "docs_text",  # Fallback to repo
+]
+
+def _first_existing(*paths):
+    for p in paths:
+        if p.exists():
+            return p
+    return paths[-1]
+
+DOCS_ROOT = _first_existing(*DOCS_ROOTS)
 DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
 
 # Initialize session state for search results
@@ -76,7 +88,8 @@ if mode == "🔍 Search PDFs":
         search_mode = st.radio("Search by", ["AFSC Code", "Keywords"], label_visibility="collapsed")
         query = st.text_input(
             "Search",
-            placeholder="1N1X1" if search_mode == "AFSC Code" else "cable antenna systems"
+            placeholder="1N1X1" if search_mode == "AFSC Code" else "cable antenna systems",
+            help="Examples: 1N1X1, (?i)^1D7, or keywords like 'intelligence analyst'"
         )
         
         with st.expander("⚙️ Options"):
@@ -159,12 +172,15 @@ if mode == "🔍 Search PDFs":
                         st.markdown(highlight_matches(h["snippet"], info.get("pattern", "")))
                         
                         with st.expander("View full page"):
-                            st.text(h["full"])
+                            # Truncate very long pages for display
+                            full_text = h["full"]
+                            display_text = full_text[:10000] + "\n\n... (truncated, download for full text)" if len(full_text) > 10000 else full_text
+                            st.text(display_text)
                             
                             col_a, col_b = st.columns(2)
                             with col_a:
                                 st.download_button(
-                                    "⬇️ Download",
+                                    "⬇️ Download Full Page",
                                     h["full"],
                                     f"page_{h['page']}.txt",
                                     use_container_width=True,
@@ -174,6 +190,7 @@ if mode == "🔍 Search PDFs":
                                 if st.button("📤 Send to Ingest", key=f"send_{i}", use_container_width=True):
                                     st.session_state.admin_loaded_text = h["full"]
                                     st.session_state.admin_loaded_code = ""
+                                    st.session_state.data_sent = True
                                     st.success("✅ Data sent! Go to **Admin Ingest** in the sidebar →")
                                     st.balloons()
                         
@@ -235,6 +252,7 @@ else:  # Browse Markdown
                         if st.button("📤 Send to Ingest", use_container_width=True):
                             st.session_state.admin_loaded_text = content
                             st.session_state.admin_loaded_code = code
+                            st.session_state.data_sent = True
                             st.success("✅ Data sent! Go to **Admin Ingest** in the sidebar →")
                             st.balloons()
                     
@@ -243,8 +261,12 @@ else:  # Browse Markdown
             else:
                 st.info("👈 Select an AFSC from the sidebar")
 
-# Help section
+# Sidebar helpers
 with st.sidebar:
+    if st.button("🔄 Refresh Index/Cache"):
+        st.cache_data.clear()
+        st.rerun()
+    
     with st.expander("💡 Help"):
         st.markdown("""
         **PDF Search**: Find AFSCs or keywords in official documents
