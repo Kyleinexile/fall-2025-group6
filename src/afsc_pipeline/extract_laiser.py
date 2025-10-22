@@ -32,12 +32,20 @@ class ItemDraft:
 
 # ---------- LAiSER loader helpers ----------
 
+# Module-level cache for LAiSER extractor (CRITICAL FIX)
+_EXTRACTOR_CACHE = None
+
 def _build_extractor():
     """
     Try to load LAiSER's refactored extractor. Returns None if unavailable.
-    NOTE: The library constructor may still try to initialize transformer bits;
-          we won't *use* them if LAISER_NO_LLM=true, but the import/init can emit warnings.
+    Uses module-level cache to avoid reloading on every call.
     """
+    global _EXTRACTOR_CACHE
+    
+    if _EXTRACTOR_CACHE is not None:
+        print("[LAISER/lib] using cached extractor")
+        return _EXTRACTOR_CACHE
+    
     try:
         from laiser.skill_extractor_refactored import SkillExtractorRefactored  # type: ignore
     except Exception as e:
@@ -51,7 +59,8 @@ def _build_extractor():
     try:
         print(f"[LAISER/lib] init SkillExtractorRefactored(model_id={model_id}, use_gpu={use_gpu})")
         extractor = SkillExtractorRefactored(model_id=model_id, hf_token=hf_token, use_gpu=use_gpu)
-        # Best-effort switches (if attributes exist) to ensure we don't call LLM later
+        
+        # Best-effort switches to ensure we don't call LLM later
         for attr in ("use_llm", "llm_enabled"):
             if hasattr(extractor, attr):
                 try:
@@ -63,7 +72,12 @@ def _build_extractor():
                 setattr(extractor, "llm", None)
             except Exception:
                 pass
+        
+        # Cache the extractor (CRITICAL FIX)
+        _EXTRACTOR_CACHE = extractor
+        print("[LAISER/lib] extractor cached successfully")
         return extractor
+        
     except Exception as e:
         print(f"[LAISER/lib] init failed: {e}")
         return None
@@ -96,11 +110,15 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     no_llm = (os.getenv("LAISER_NO_LLM") or "false").strip().lower() in {"1","true","yes"}
     top_k = int(os.getenv("LAISER_ALIGN_TOPK", "25"))
 
+    print(f"[LAISER] USE_LAISER={use_laiser}, NO_LLM={no_llm}, TOP_K={top_k}")
+
     if not use_laiser:
+        print("[LAISER] Disabled, using fallback")
         return _fallback_extract(clean_text)
 
     extractor = _build_extractor()
     if extractor is None:
+        print("[LAISER] Could not build extractor, using fallback")
         return _fallback_extract(clean_text)
 
     # Sentence-ish/phrase splits from the narrative (used by align_skills path)
@@ -109,7 +127,9 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         c = seg.strip(" \t\r")
         if len(c) >= 4:
             raw_candidates.append(c)
+    
     if not raw_candidates:
+        print("[LAISER] No candidates extracted from text, using defaults")
         raw_candidates = [
             "imagery exploitation",
             "geospatial intelligence",
@@ -117,38 +137,56 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             "mensuration",
             "intelligence briefing",
         ]
+    
+    print(f"[LAISER] Generated {len(raw_candidates)} candidate phrases")
 
     # ---------------------------
-    # CPU-first: align_skills only
+    # CPU-first: align_skills only (RECOMMENDED FOR DEMO)
     # ---------------------------
     if no_llm:
+        print("[LAISER] Using CPU-only align_skills path")
         try:
             df2 = extractor.align_skills(
                 raw_skills=raw_candidates,
                 document_id="AFSC-0",
                 description="AFSC narrative",
             )
+            print(f"[LAISER] align_skills returned {len(df2)} results")
         except Exception as e:
-            print(f"[LAISER/lib] align_skills error: {e}")
+            print(f"[LAISER] align_skills error: {e}")
             return _fallback_extract(clean_text)
 
         items2: List[ItemDraft] = []
-        for _, row in df2.iterrows():
+        for idx, row in df2.iterrows():
             txt = str(row.get("label") or row.get("text") or "").strip()
             if not txt:
                 continue
             conf = float(row.get("confidence") or 0.5)
             esco_id = (row.get("esco_id") or "").strip() or None
-            items2.append(ItemDraft(text=txt, item_type=ItemType.SKILL, confidence=conf, source="laiser:align", esco_id=esco_id))
+            
+            # Debug: print ESCO mapping
+            if esco_id:
+                print(f"[LAISER] Mapped '{txt[:40]}' -> ESCO: {esco_id}")
+            
+            items2.append(ItemDraft(
+                text=txt, 
+                item_type=ItemType.SKILL, 
+                confidence=conf, 
+                source="laiser:align", 
+                esco_id=esco_id
+            ))
 
         if len(items2) > top_k:
             items2.sort(key=lambda x: (x.confidence or 0.0), reverse=True)
             items2 = items2[:top_k]
+        
+        print(f"[LAISER] Returning {len(items2)} skills, {sum(1 for i in items2 if i.esco_id)} with ESCO")
         return items2 or _fallback_extract(clean_text)
 
     # ---------------------------
-    # Full path (if enabled)
+    # Full path (if enabled) - for Knowledge/Abilities
     # ---------------------------
+    print("[LAISER] Using full extract_and_align path (includes LLM for K/A)")
     items: List[ItemDraft] = []
     try:
         import pandas as pd
@@ -163,7 +201,9 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             batch_size=32,
             warnings=False,
         )
-        for _, row in df_out.iterrows():
+        print(f"[LAISER] extract_and_align returned {len(df_out)} items")
+        
+        for idx, row in df_out.iterrows():
             txt = str(row.get("label") or row.get("cleaned_text") or "").strip()
             if not txt:
                 continue
@@ -176,14 +216,26 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
                 itype = ItemType.SKILL
             conf = float(row.get("confidence") or 0.5)
             esco_id = (row.get("esco_id") or "").strip() or None
-            items.append(ItemDraft(text=txt, item_type=itype, confidence=conf, source="laiser:df", esco_id=esco_id))
+            
+            if esco_id:
+                print(f"[LAISER] Mapped '{txt[:40]}' ({itype.value}) -> ESCO: {esco_id}")
+            
+            items.append(ItemDraft(
+                text=txt, 
+                item_type=itype, 
+                confidence=conf, 
+                source="laiser:full", 
+                esco_id=esco_id
+            ))
     except Exception as e:
-        print(f"[LAISER/lib] extract_and_align error: {e}")
+        print(f"[LAISER] extract_and_align error: {e}")
 
     if items:
+        print(f"[LAISER] Full path returned {len(items)} items")
         return items
 
     # fallback to align_skills if generative returned nothing
+    print("[LAISER] Full path returned nothing, falling back to align_skills")
     try:
         df2 = extractor.align_skills(
             raw_skills=raw_candidates,
@@ -191,17 +243,23 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             description="AFSC narrative",
         )
     except Exception as e:
-        print(f"[LAISER/lib] align_skills error: {e}")
+        print(f"[LAISER] align_skills fallback error: {e}")
         return _fallback_extract(clean_text)
 
     items2: List[ItemDraft] = []
-    for _, row in df2.iterrows():
+    for idx, row in df2.iterrows():
         txt = str(row.get("label") or row.get("text") or "").strip()
         if not txt:
             continue
         conf = float(row.get("confidence") or 0.5)
         esco_id = (row.get("esco_id") or "").strip() or None
-        items2.append(ItemDraft(text=txt, item_type=ItemType.SKILL, confidence=conf, source="laiser:align", esco_id=esco_id))
+        items2.append(ItemDraft(
+            text=txt, 
+            item_type=ItemType.SKILL, 
+            confidence=conf, 
+            source="laiser:align", 
+            esco_id=esco_id
+        ))
 
     if len(items2) > top_k:
         items2.sort(key=lambda x: (x.confidence or 0.0), reverse=True)
