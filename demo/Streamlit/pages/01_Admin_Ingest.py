@@ -254,7 +254,7 @@ with tab1:
                         # Create KSA nodes and relationships
                         for item in all_items:
                             session.run("""
-                                MERGE (k:Item {text: $text, type: $type})
+                                MERGE (k:Item {text: $text, item_type: $item_type})
                                 ON CREATE SET 
                                     k.confidence = $confidence,
                                     k.source = $source,
@@ -265,7 +265,7 @@ with tab1:
                                 MERGE (a)-[:HAS_ITEM]->(k)
                             """, {
                                 "text": item.text,
-                                "type": item.item_type.value if hasattr(item.item_type, 'value') else str(item.item_type),
+                                "item_type": item.item_type.value if hasattr(item.item_type, 'value') else str(item.item_type),
                                 "confidence": float(getattr(item, 'confidence', 0)),
                                 "source": getattr(item, 'source', 'unknown'),
                                 "esco_id": getattr(item, 'esco_id', None),
