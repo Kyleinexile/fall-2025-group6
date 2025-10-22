@@ -23,7 +23,7 @@ with col1:
     st.markdown("## 📋 Project Overview")
     st.markdown("""
     This capstone project develops an **automated pipeline** for extracting Knowledge, Skills, and Abilities (KSAs) 
-    from U.S. Air Force Specialty Code (AFSC) descriptions. The system combines LAiSER (Labor AI Skill Extraction and Recommendation) 
+    from U.S. Air Force Specialty Code (AFSC) descriptions. The system combines LAiSER (Leveraging AI for Skills Extraction & Research) 
     with modern Large Language Models to create a comprehensive KSA database stored in a Neo4j graph database.
     
     **Problem Statement:**
