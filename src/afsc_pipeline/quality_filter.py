@@ -48,7 +48,7 @@ CANON_MAP = {
     "intelligence briefing": "brief intelligence findings",
 }
 
-PUNCT_STRIP = " .,:;()[]{}\"'`“”‘’|/\\"
+PUNCT_STRIP = " .,:;()[]{}\"'`""''|/\\"
 
 def _itype_str(t) -> str:
     if hasattr(t, "value"):
