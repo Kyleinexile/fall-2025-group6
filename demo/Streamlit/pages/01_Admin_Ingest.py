@@ -22,7 +22,19 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "")
 
-DOCS_ROOT = pathlib.Path("/workspaces/docs_text")
+# Path fallback for both Codespaces and Streamlit Cloud
+DOCS_ROOTS = [
+    pathlib.Path("/workspaces/docs_text"),  # Codespaces
+    SRC / "docs_text",  # Fallback to repo
+]
+
+def _first_existing(*paths):
+    for p in paths:
+        if p.exists():
+            return p
+    return paths[-1]
+
+DOCS_ROOT = _first_existing(*DOCS_ROOTS)
 DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
 
 st.set_page_config(page_title="Admin Ingest", page_icon="🔧", layout="wide")
@@ -47,7 +59,8 @@ if ADMIN_KEY:
 st.title("🔧 Admin: AFSC Ingest")
 st.caption("Process AFSC documentation through the extraction pipeline")
 
-# Connection status in sidebar
+# Connection status check
+db_connected = False
 with st.sidebar:
     st.markdown("### Connection")
     st.code(f"URI: {NEO4J_URI[:30]}...")
@@ -58,25 +71,11 @@ with st.sidebar:
         with driver.session(database=NEO4J_DATABASE) as s:
             s.run("RETURN 1").single()
         st.success("✅ Connected")
+        db_connected = True
         driver.close()
-    except Exception:
+    except Exception as e:
         st.error("❌ Connection failed")
-    
-    # Debug section
-    st.markdown("---")
-    with st.expander("🐛 Debug Session State"):
-        st.write("**All Keys:**", list(st.session_state.keys()))
-        if "admin_loaded_text" in st.session_state:
-            text = st.session_state.admin_loaded_text
-            st.write(f"✅ admin_loaded_text: {len(text)} chars")
-            st.text(text[:200] + "..." if len(text) > 200 else text)
-        else:
-            st.write("❌ admin_loaded_text: NOT SET")
-        
-        if "admin_loaded_code" in st.session_state:
-            st.write(f"✅ admin_loaded_code: {st.session_state.admin_loaded_code}")
-        else:
-            st.write("❌ admin_loaded_code: NOT SET")
+        st.caption(str(e)[:100])
 
 # Tabs for different ingest methods
 tab1, tab2, tab3 = st.tabs(["📝 Manual Entry", "📁 Bulk JSONL", "🗑️ Management"])
@@ -112,12 +111,14 @@ with tab1:
                     text = path.read_text(encoding="utf-8")
                     st.session_state.admin_loaded_code = code
                     st.session_state.admin_loaded_text = text
+                    st.session_state.data_sent = True
                     st.success(f"✅ Loaded {code}")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Error: {e}")
         else:
             st.info("No pre-split docs found")
+            st.caption(f"Looking in: {DOCS_ROOT}")
             
         st.markdown("---")
         st.caption("Or use the form →")
@@ -129,9 +130,10 @@ with tab1:
         loaded_code = st.session_state.get("admin_loaded_code", "")
         loaded_text = st.session_state.get("admin_loaded_text", "")
         
-        # Show indicator if data was loaded
-        if loaded_text:
-            st.success(f"✅ Text loaded ({len(loaded_text)} characters)")
+        # Show indicator if data was loaded from View Docs
+        if st.session_state.get("data_sent") and loaded_text:
+            st.info("📄 Text preloaded from Docs Viewer")
+            st.session_state.data_sent = False  # Clear flag
         
         code = st.text_input(
             "AFSC Code",
@@ -153,19 +155,28 @@ with tab1:
         with col_btn1:
             if st.button("👀 Preview Clean", use_container_width=True, disabled=not text):
                 cleaned = clean_afsc_text(text)
+                # Count sections/lines
+                lines = [l for l in cleaned.split('\n') if l.strip()]
                 with st.expander("Cleaned Text Preview", expanded=True):
                     st.text(cleaned[:1000] + "..." if len(cleaned) > 1000 else cleaned)
-                    st.caption(f"Original: {len(text)} chars → Cleaned: {len(cleaned)} chars")
+                    st.caption(f"Original: {len(text)} chars → Cleaned: {len(cleaned)} chars • {len(lines)} lines")
         
         with col_btn2:
             if st.button("🗑️ Clear Form", use_container_width=True):
                 st.session_state.admin_loaded_code = ""
                 st.session_state.admin_loaded_text = ""
-                if "data_sent" in st.session_state:
-                    st.session_state.data_sent = False
                 st.rerun()
         
-        process = st.button("🚀 Process", type="primary", use_container_width=True, disabled=not (code and text))
+        # Disable process button if DB not connected
+        process = st.button(
+            "🚀 Process", 
+            type="primary", 
+            use_container_width=True, 
+            disabled=not (code and text and db_connected)
+        )
+        
+        if not db_connected:
+            st.warning("⚠️ Database not connected - fix connection to enable processing")
         
         if process:
             try:
@@ -215,8 +226,6 @@ with tab1:
                 if st.button("✨ Process Another AFSC", use_container_width=True):
                     st.session_state.admin_loaded_code = ""
                     st.session_state.admin_loaded_text = ""
-                    if "data_sent" in st.session_state:
-                        st.session_state.data_sent = False
                     st.rerun()
                 
             except Exception as e:
@@ -233,11 +242,12 @@ with tab2:
         lines = file.getvalue().decode("utf-8").splitlines()
         st.info(f"Found {len(lines)} records")
         
-        if st.button("🚀 Process All", type="primary"):
+        if st.button("🚀 Process All", type="primary", disabled=not db_connected):
             try:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 
                 success = fail = 0
+                failed_lines = []
                 progress_bar = st.progress(0)
                 status_text = st.empty()
                 
@@ -253,14 +263,26 @@ with tab2:
                                 success += 1
                             else:
                                 fail += 1
-                        except:
+                                failed_lines.append(f"Line {i}: missing afsc or text")
+                        except Exception as e:
                             fail += 1
+                            failed_lines.append(f"Line {i}: {str(e)[:50]}")
                         
                         progress_bar.progress(i / len(lines))
                         status_text.text(f"Processing {i}/{len(lines)} • ✓ {success} • ✗ {fail}")
                 
                 driver.close()
                 st.success(f"Complete! Success: {success}, Failed: {fail}")
+                
+                # Show failed lines if any
+                if failed_lines and len(failed_lines) <= 10:
+                    with st.expander("Failed Records"):
+                        for err in failed_lines:
+                            st.text(err)
+                elif len(failed_lines) > 10:
+                    with st.expander(f"Failed Records ({len(failed_lines)} total, showing first 10)"):
+                        for err in failed_lines[:10]:
+                            st.text(err)
                 
             except Exception as e:
                 st.error(f"Bulk processing failed: {e}")
@@ -278,7 +300,7 @@ with tab3:
     
     confirm = st.text_input("Type DELETE to confirm")
     
-    if st.button("🗑️ Delete AFSCs", disabled=(confirm != "DELETE"), type="secondary"):
+    if st.button("🗑️ Delete AFSCs", disabled=(confirm != "DELETE" or not db_connected), type="secondary"):
         try:
             afsc_list = [c.strip() for c in re.split(r"[,\s]+", codes) if c.strip()]
             
@@ -288,21 +310,30 @@ with tab3:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
                     # Delete relationships and orphaned items
-                    s.run("""
+                    result1 = s.run("""
                         MATCH (a:AFSC)-[r:HAS_ITEM|REQUIRES]->(i:Item)
                         WHERE a.code IN $codes
                         DELETE r
                         WITH i
                         WHERE NOT ()-[:HAS_ITEM|REQUIRES]->(i)
                         DELETE i
+                        RETURN count(i) as items_deleted
                     """, {"codes": afsc_list})
                     
+                    items_deleted = result1.single()["items_deleted"]
+                    
                     # Delete AFSCs
-                    s.run("MATCH (a:AFSC) WHERE a.code IN $codes DETACH DELETE a", 
-                          {"codes": afsc_list})
+                    result2 = s.run("""
+                        MATCH (a:AFSC) 
+                        WHERE a.code IN $codes 
+                        DELETE a
+                        RETURN count(a) as afscs_deleted
+                    """, {"codes": afsc_list})
+                    
+                    afscs_deleted = result2.single()["afscs_deleted"]
                 
                 driver.close()
-                st.success(f"Deleted: {', '.join(afsc_list)}")
+                st.success(f"Deleted {afscs_deleted} AFSCs and {items_deleted} orphaned items")
                 st.cache_data.clear()
                 
         except Exception as e:
