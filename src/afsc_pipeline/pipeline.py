@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import re
 import time
 from typing import Any, Dict, List
 
@@ -14,7 +13,6 @@ from afsc_pipeline.audit import log_extract_event
 from afsc_pipeline.quality_filter import apply_quality_filter
 
 # Optional: fuzzy/near-duplicate canonicalization.
-# If your dedupe stage isn't implemented yet, we no-op gracefully.
 try:
     from afsc_pipeline.dedupe import canonicalize_items  # type: ignore
 except Exception:
@@ -27,90 +25,7 @@ if _USE_LLM_ENHANCER:
     try:
         from afsc_pipeline.enhance_llm import enhance_items_with_llm  # type: ignore
     except Exception:
-        _USE_LLM_ENHANCER = False  # fail closed if import not available
-
-
-# ----------------------------
-# Quality filter utilities
-# ----------------------------
-_GEOINT_HINT = re.compile(
-    r"\b(imagery|geospatial|geoint|gis|remote sensing|target|mensurat|terrain|annotation|coordinates|azimuth|order of battle|brief|ipoe|aoc)\b",
-    re.I,
-)
-
-# things we’ve seen slip in that aren’t helpful for GEOINT demo
-_BANNED = {
-    "business intelligence",
-    "perform cleaning duties",
-    "source (digital game creation systems)",
-    "operation of transport equipment",
-    "develop defence policies",
-}
-
-# light canonical mapping of frequent variants
-_CANON_MAP = {
-    "imagery analysis": "imagery exploitation",
-    "mensuration": "geoint mensuration",
-    "intelligence briefing": "brief intelligence findings",
-}
-
-def _itype_str(t) -> str:
-    # ItemType Enum -> "skill"/"knowledge"/"ability"
-    if hasattr(t, "value"):
-        return str(t.value).lower()
-    return str(t).lower()
-
-def _canon_text(txt: str) -> str:
-    t = " ".join((txt or "").strip().lower().split())
-    return t.strip(" .,:;()[]{}")
-
-def quality_filter(
-    items: List[ItemDraft],
-    *,
-    need_esco_for_low: bool = False,
-    geoint_bias: bool = False,
-    min_len: int = 3,
-    max_len: int = 80,
-) -> List[ItemDraft]:
-    """Prune noisy/out-of-domain items, lightly canonicalize, and exact-dedupe."""
-    out: List[ItemDraft] = []
-    seen: set[tuple[str, str]] = set()
-    for it in items:
-        if not getattr(it, "text", None):
-            continue
-
-        txt0 = it.text
-        txt = _canon_text(txt0)
-        if not txt or len(txt) < min_len or len(txt) > max_len:
-            continue
-        if txt in _BANNED:
-            continue
-
-        itype = _itype_str(getattr(it, "item_type", ""))
-        conf = float(getattr(it, "confidence", 0.0) or 0.0)
-        esco = (getattr(it, "esco_id", "") or "").strip()
-
-        # Prefer GEOINT-ish skills; trim weak off-topic ones
-        if geoint_bias and itype == "skill":
-            if not _GEOINT_HINT.search(txt) and conf < 0.60:
-                continue
-
-        # Require ESCO for low-confidence skills (keeps AF terms if high conf)
-        if need_esco_for_low and itype == "skill":
-            if conf < 0.60 and not esco:
-                continue
-
-        # canonical text normalization
-        txt = _CANON_MAP.get(txt, txt)
-        it.text = txt
-
-        sig = (itype, txt)
-        if sig in seen:
-            continue
-        seen.add(sig)
-        out.append(it)
-
-    return out
+        _USE_LLM_ENHANCER = False
 
 
 def _fallback_items(clean_text: str) -> List[ItemDraft]:
@@ -159,6 +74,7 @@ def run_pipeline(
     errors: List[str] = []
 
     clean_text = clean_afsc_text(afsc_raw_text or "")
+    print(f"[PIPELINE] Processing AFSC {afsc_code}, cleaned text length: {len(clean_text)}")
 
     # ---- Extraction (LAiSER or fallback) ----
     try:
@@ -169,48 +85,61 @@ def run_pipeline(
             if isinstance(extract_result, list)
             else list(getattr(extract_result, "items", []))
         )
+        print(f"[PIPELINE] Extracted {len(items)} raw items")
     except Exception as e:
+        print(f"[PIPELINE] Extraction error: {e}")
         errors.append(f"extract_error:{type(e).__name__}")
         items = []
 
     if not items:
         items = _fallback_items(clean_text)
         used_fallback = True
+        print(f"[PIPELINE] Used fallback, got {len(items)} items")
 
     n_items_raw = len(items)
 
     # ---- Filter by confidence / item types (if requested) ----
     if min_confidence > 0:
         items = [it for it in items if (it.confidence or 0.0) >= min_confidence]
+        print(f"[PIPELINE] After confidence filter (>={min_confidence}): {len(items)} items")
 
     if not keep_types:
         # If KEEP_TYPES=false, coerce everything to 'skill' (simple UX mode)
         for it in items:
             it.item_type = ItemType.SKILL
+        print(f"[PIPELINE] Coerced all types to SKILL")
 
     # ---- Optional LLM enhancement ----
     if _USE_LLM_ENHANCER and items:
         try:
+            print(f"[PIPELINE] Running LLM enhancement...")
             items = enhance_items_with_llm(items, context=clean_text)
+            print(f"[PIPELINE] After LLM enhancement: {len(items)} items")
         except Exception as e:
+            print(f"[PIPELINE] LLM enhancement error: {e}")
             errors.append(f"llm_enhance_error:{type(e).__name__}")
 
-    # ---- Quality filter (before near-dup canonicalization) ----
+    # ---- Quality filter (using imported module version) ----
     try:
-        items = quality_filter(
+        items = apply_quality_filter(
             items,
-            need_esco_for_low=strict_skill_filter,
+            strict_skill_filter=strict_skill_filter,
             geoint_bias=geoint_bias,
         )
+        print(f"[PIPELINE] After quality filter: {len(items)} items")
     except Exception as e:
+        print(f"[PIPELINE] Quality filter error: {e}")
         errors.append(f"quality_filter_error:{type(e).__name__}")
 
     n_items_after_filters = len(items)
 
     # ---- Optional canonicalization / near-dup dedupe ----
     try:
-        items = canonicalize_items(items) if aggressive_dedupe else items
+        if aggressive_dedupe:
+            items = canonicalize_items(items)
+            print(f"[PIPELINE] After dedupe: {len(items)} items")
     except Exception as e:
+        print(f"[PIPELINE] Dedupe error: {e}")
         errors.append(f"dedupe_error:{type(e).__name__}")
 
     n_items_after_dedupe = len(items)
@@ -223,7 +152,9 @@ def run_pipeline(
             afsc_code=afsc_code,
             items=items,
         )
+        print(f"[PIPELINE] Wrote to Neo4j: {write_stats}")
     except Exception as e:
+        print(f"[PIPELINE] Write error: {e}")
         errors.append(f"write_error:{type(e).__name__}")
 
     duration_ms = int((time.time() - t0) * 1000)
@@ -244,7 +175,22 @@ def run_pipeline(
 
     # ---- Return a compact summary for CLI/debug ----
     esco_tagged_count = sum(1 for it in items if (it.esco_id or "").strip())
-    return {
+    
+    # Show sample items with ESCO
+    sample_items = []
+    for it in items[:5]:  # First 5 items
+        sample_items.append({
+            "text": it.text[:60],
+            "type": it.item_type.value,
+            "conf": round(it.confidence, 2),
+            "esco": it.esco_id or "none"
+        })
+    
+    print(f"[PIPELINE] Sample items with ESCO tags:")
+    for s in sample_items:
+        print(f"  - {s['type']}: {s['text']} (conf={s['conf']}, esco={s['esco']})")
+    
+    summary = {
         "afsc": afsc_code,
         "n_items_raw": n_items_raw,
         "n_items_after_filters": n_items_after_filters,
@@ -254,4 +200,8 @@ def run_pipeline(
         "errors": errors,
         "duration_ms": duration_ms,
         "write_stats": write_stats,
+        "items": items,  # Include full items for inspection
     }
+    
+    print(f"[PIPELINE] Complete: {n_items_after_dedupe} items, {esco_tagged_count} with ESCO, {duration_ms}ms")
+    return summary
