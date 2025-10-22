@@ -1,3 +1,4 @@
+# src/afsc_pipeline/graph_writer_v2.py
 from __future__ import annotations
 from typing import Dict, List
 from neo4j import Session  # type: ignore
@@ -15,11 +16,13 @@ def _items_to_param(items: List[ItemDraft]) -> List[Dict]:
 
 def upsert_afsc_and_items(session: Session, afsc_code: str, items: List[ItemDraft]) -> Dict[str, int]:
     params = {"afsc_code": afsc_code, "items": _items_to_param(items)}
+    
     cypher_afsc = """
     MERGE (a:AFSC {code: $afsc_code})
     ON CREATE SET a.created_at = timestamp()
     SET a.updated_at = timestamp()
     """
+    
     cypher_items = """
     UNWIND $items AS it
     MERGE (i:Item {content_sig: it.content_sig})
@@ -40,6 +43,8 @@ def upsert_afsc_and_items(session: Session, afsc_code: str, items: List[ItemDraf
                        END,
         i.last_seen  = timestamp()
     """
+    
+    # FIXED: Use only :REQUIRES relationship
     cypher_rels = """
     MATCH (a:AFSC {code: $afsc_code})
     UNWIND $items AS it
@@ -48,10 +53,20 @@ def upsert_afsc_and_items(session: Session, afsc_code: str, items: List[ItemDraf
       ON CREATE SET r.first_seen = timestamp()
     SET r.last_seen = timestamp()
     """
+    
     def _tx(tx):
-        r1 = tx.run(cypher_afsc, {"afsc_code": params["afsc_code"]}); list(r1); s1 = r1.consume().counters
-        r2 = tx.run(cypher_items, {"items": params["items"]});       list(r2); s2 = r2.consume().counters
-        r3 = tx.run(cypher_rels, {"afsc_code": params["afsc_code"], "items": params["items"]}); list(r3); s3 = r3.consume().counters
+        r1 = tx.run(cypher_afsc, {"afsc_code": params["afsc_code"]})
+        list(r1)
+        s1 = r1.consume().counters
+        
+        r2 = tx.run(cypher_items, {"items": params["items"]})
+        list(r2)
+        s2 = r2.consume().counters
+        
+        r3 = tx.run(cypher_rels, {"afsc_code": params["afsc_code"], "items": params["items"]})
+        list(r3)
+        s3 = r3.consume().counters
+        
         return {
             "nodes_created": s1.nodes_created + s2.nodes_created + s3.nodes_created,
             "nodes_deleted": s1.nodes_deleted + s2.nodes_deleted + s3.nodes_deleted,
@@ -61,6 +76,7 @@ def upsert_afsc_and_items(session: Session, afsc_code: str, items: List[ItemDraf
             "labels_added": s1.labels_added + s2.labels_added + s3.labels_added,
             "labels_removed": s1.labels_removed + s2.labels_removed + s3.labels_removed,
         }
+    
     return session.execute_write(_tx)
 
 def ensure_constraints(session: Session) -> Dict[str, int]:
@@ -80,14 +96,21 @@ def ensure_constraints(session: Session) -> Dict[str, int]:
         REQUIRE i.content_sig IS UNIQUE
         """,
     ]
+    
     def _tx(tx):
         nonlocal added
         for stmt in statements:
-            res = tx.run(stmt); list(res)
-            added += 1
+            try:
+                res = tx.run(stmt)
+                list(res)
+                added += 1
+            except Exception as e:
+                print(f"[WARN] Constraint already exists or failed: {e}")
         return True
+    
     try:
         session.execute_write(_tx)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[ERROR] Could not create constraints: {e}")
+    
     return {"constraints_added_attempted": added}
