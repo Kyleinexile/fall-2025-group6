@@ -1,40 +1,123 @@
+# src/afsc_pipeline/quality_filter.py
 from __future__ import annotations
+
 import os
-from typing import List
+import re
+from typing import List, Tuple
+
 from afsc_pipeline.extract_laiser import ItemDraft, ItemType
 
-MIN_CONF = float(os.getenv("MIN_CONFIDENCE", "0.15"))  # bump default a bit
-STRICT_SKILL_FILTER = (os.getenv("STRICT_SKILL_FILTER","false").lower() in {"1","true","yes"})
+# ----------------------------
+# Environment-backed knobs
+# ----------------------------
+def _get_bool(name: str, default: bool) -> bool:
+    return (os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes"})
 
-def keep_item(it: ItemDraft) -> bool:
-    conf = float(it.confidence or 0.0)
+def _get_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except Exception:
+        return default
 
-    # Always allow high confidence
-    if conf >= MIN_CONF:
-        return True
+MIN_LEN = int(os.getenv("QUALITY_MIN_LEN", "3"))
+MAX_LEN = int(os.getenv("QUALITY_MAX_LEN", "80"))
 
-    # For low confidence: keep if we have an ESCO hit (good anchor)
-    has_esco = bool((it.esco_id or "").strip())
+# If a SKILL's confidence is below this, we may require ESCO (strict mode) or GEOINT hint.
+LOW_CONF_SKILL = _get_float("LOW_CONF_SKILL_THRESHOLD", 0.60)
 
-    if STRICT_SKILL_FILTER:
-        # If strict, only keep low-conf SKILL when ESCO is present
-        if it.item_type == ItemType.SKILL:
-            return has_esco
-        # Knowledge/Ability: allow low-conf if they have ESCO or conf just below threshold
-        return has_esco or conf >= (MIN_CONF - 0.05)
+# ----------------------------
+# Domain hints / canonicalization
+# ----------------------------
+GEOINT_HINT = re.compile(
+    r"\b(imagery|geospatial|geoint|gis|remote sensing|target(ing)?|mensurat|terrain|"
+    r"annotation|coordinates?|azimuth|order of battle|brief(ing)?|ipoe|aoc)\b",
+    re.I,
+)
 
-    # Not strict: allow near-threshold, or ESCO-anchored
-    return has_esco or conf >= (MIN_CONF - 0.05)
+BANNED = {
+    "business intelligence",
+    "perform cleaning duties",
+    "source (digital game creation systems)",
+    "operation of transport equipment",
+    "develop defence policies",
+}
 
-def apply_quality_filter(items: List[ItemDraft]) -> List[ItemDraft]:
-    # de-dup basic text noise early (exact text)
-    seen = set()
-    filtered = []
+CANON_MAP = {
+    "imagery analysis": "imagery exploitation",
+    "mensuration": "geoint mensuration",
+    "intelligence briefing": "brief intelligence findings",
+}
+
+PUNCT_STRIP = " .,:;()[]{}\"'`“”‘’|/\\"
+
+def _itype_str(t) -> str:
+    if hasattr(t, "value"):
+        return str(t.value).lower()
+    return str(t).lower()
+
+def _canon_text(txt: str) -> str:
+    t = " ".join((txt or "").strip().lower().split())
+    t = t.strip(PUNCT_STRIP)
+    return CANON_MAP.get(t, t)
+
+def _has_esco(it: ItemDraft) -> bool:
+    return bool((getattr(it, "esco_id", "") or "").strip())
+
+# ----------------------------
+# Public API
+# ----------------------------
+def apply_quality_filter(
+    items: List[ItemDraft],
+    *,
+    strict_skill_filter: bool = _get_bool("STRICT_SKILL_FILTER", False),
+    geoint_bias: bool = _get_bool("GEOINT_BIAS", False),
+) -> List[ItemDraft]:
+    """
+    Prune noisy/out-of-domain items, normalize text, and exact-dedupe.
+
+    Rules (summarized):
+      - Drop empty/very short/very long items (QUALITY_MIN_LEN/QUALITY_MAX_LEN).
+      - Drop known-bad phrases (BANNED).
+      - If KEEP_TYPES coerced everything to SKILL upstream, we still apply SKILL rules below.
+      - If geoint_bias: SKILLs with conf < LOW_CONF_SKILL must show a GEOINT_HINT.
+      - If strict_skill_filter: SKILLs with conf < LOW_CONF_SKILL must have ESCO.
+      - Canonicalize text via CANON_MAP (lowercased, trimmed, punctuation-stripped).
+      - Exact dedupe on (item_type, text).
+    """
+    out: List[ItemDraft] = []
+    seen: set[Tuple[str, str]] = set()
+
     for it in items:
-        key = (it.item_type, (it.text or "").strip().lower())
-        if key in seen:
+        txt0 = getattr(it, "text", None)
+        if not txt0:
             continue
-        seen.add(key)
-        if keep_item(it):
-            filtered.append(it)
-    return filtered
+
+        txt = _canon_text(txt0)
+        if not txt or len(txt) < MIN_LEN or len(txt) > MAX_LEN:
+            continue
+        if txt in BANNED:
+            continue
+
+        itype = _itype_str(getattr(it, "item_type", ""))
+        conf = float(getattr(it, "confidence", 0.0) or 0.0)
+
+        # GEOINT bias prefers on-topic skills when confidence is low
+        if geoint_bias and itype == "skill":
+            if conf < LOW_CONF_SKILL and not GEOINT_HINT.search(txt):
+                continue
+
+        # When strict, require ESCO for low-confidence skills
+        if strict_skill_filter and itype == "skill":
+            if conf < LOW_CONF_SKILL and not _has_esco(it):
+                continue
+
+        # Update the normalized text back onto the object
+        it.text = txt
+
+        sig = (itype, txt)
+        if sig in seen:
+            continue
+        seen.add(sig)
+        out.append(it)
+
+    return out
