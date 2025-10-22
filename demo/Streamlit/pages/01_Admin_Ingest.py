@@ -15,12 +15,21 @@ from neo4j.exceptions import ServiceUnavailable, AuthError
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.pipeline import run_pipeline, ItemDraft
 
+# NEW: Import LAiSER and LLM enhancement
+from afsc_pipeline.extract_laiser import extract_ksa_items
+from afsc_pipeline.enhance_llm import enhance_items_with_llm
+
 # Config
 NEO4J_URI = os.getenv("NEO4J_URI", "")
 NEO4J_USER = os.getenv("NEO4J_USER", "")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "")
+
+# NEW: LLM Config
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "disabled").lower()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 # Path fallback for both Codespaces and Streamlit Cloud
 DOCS_ROOTS = [
@@ -57,12 +66,15 @@ if ADMIN_KEY:
 
 # Main UI
 st.title("🔧 Admin: AFSC Ingest")
-st.caption("Process AFSC documentation through the extraction pipeline")
+st.caption("Process AFSC documentation through the LAiSER + LLM extraction pipeline")
 
 # Connection status check
 db_connected = False
 with st.sidebar:
-    st.markdown("### Connection")
+    st.markdown("### 🔌 Connections")
+    
+    # Neo4j Status
+    st.markdown("**Neo4j Database**")
     st.code(f"URI: {NEO4J_URI[:30]}...")
     st.code(f"DB: {NEO4J_DATABASE}")
     
@@ -76,6 +88,28 @@ with st.sidebar:
     except Exception as e:
         st.error("❌ Connection failed")
         st.caption(str(e)[:100])
+    
+    st.markdown("---")
+    
+    # NEW: LLM Enhancement Status
+    st.markdown("**🤖 LLM Enhancement**")
+    if LLM_PROVIDER == "disabled":
+        st.warning("⚠️ Disabled (using heuristics)")
+        st.caption("Set GOOGLE_API_KEY for better K/A extraction")
+    elif LLM_PROVIDER == "gemini":
+        if GOOGLE_API_KEY:
+            st.success("✅ Gemini Active")
+            if ANTHROPIC_API_KEY:
+                st.caption("Anthropic fallback available")
+        else:
+            st.error("❌ Key not set")
+    elif LLM_PROVIDER == "anthropic":
+        if ANTHROPIC_API_KEY:
+            st.success("✅ Anthropic Active")
+        else:
+            st.error("❌ Key not set")
+    else:
+        st.info(f"Provider: {LLM_PROVIDER}")
 
 # Tabs for different ingest methods
 tab1, tab2, tab3 = st.tabs(["📝 Manual Entry", "📁 Bulk JSONL", "🗑️ Management"])
@@ -155,7 +189,6 @@ with tab1:
         with col_btn1:
             if st.button("👀 Preview Clean", use_container_width=True, disabled=not text):
                 cleaned = clean_afsc_text(text)
-                # Count sections/lines
                 lines = [l for l in cleaned.split('\n') if l.strip()]
                 with st.expander("Cleaned Text Preview", expanded=True):
                     st.text(cleaned[:1000] + "..." if len(cleaned) > 1000 else cleaned)
@@ -169,7 +202,7 @@ with tab1:
         
         # Disable process button if DB not connected
         process = st.button(
-            "🚀 Process", 
+            "🚀 Process with LAiSER + LLM", 
             type="primary", 
             use_container_width=True, 
             disabled=not (code and text and db_connected)
@@ -182,45 +215,101 @@ with tab1:
             try:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 
-                with st.status("Processing...", expanded=True) as status:
+                with st.status("Processing with LAiSER + LLM...", expanded=True) as status:
+                    # Step 1: Clean text
                     st.write("🧹 Cleaning text...")
-                    time.sleep(0.5)
-                    st.write("🔍 Extracting items...")
+                    cleaned_text = clean_afsc_text(text)
+                    time.sleep(0.3)
                     
+                    # Step 2: LAiSER extraction
+                    st.write("🔍 LAiSER: Extracting skills...")
+                    laiser_items = extract_ksa_items(cleaned_text)
+                    st.write(f"   ✓ Found {len(laiser_items)} items from LAiSER")
+                    time.sleep(0.3)
+                    
+                    # Step 3: LLM enhancement
+                    st.write(f"🤖 LLM ({LLM_PROVIDER}): Adding Knowledge/Abilities...")
+                    enhanced_items = enhance_items_with_llm(
+                        afsc_code=code.strip(),
+                        afsc_text=cleaned_text,
+                        items=laiser_items,
+                        max_new=6
+                    )
+                    st.write(f"   ✓ Generated {len(enhanced_items)} K/A items")
+                    time.sleep(0.3)
+                    
+                    # Combine items
+                    all_items = laiser_items + enhanced_items
+                    
+                    # Step 4: Write to Neo4j
+                    st.write("💾 Writing to Neo4j...")
                     with driver.session(database=NEO4J_DATABASE) as session:
-                        summary = run_pipeline(
-                            afsc_code=code.strip(),
-                            afsc_raw_text=text,
-                            neo4j_session=session
-                        )
+                        # Create AFSC node
+                        session.run("""
+                            MERGE (a:AFSC {code: $code})
+                            ON CREATE SET a.created_at = datetime()
+                            SET a.updated_at = datetime()
+                        """, {"code": code.strip()})
+                        
+                        # Create KSA nodes and relationships
+                        for item in all_items:
+                            session.run("""
+                                MERGE (k:Item {text: $text, type: $type})
+                                ON CREATE SET 
+                                    k.confidence = $confidence,
+                                    k.source = $source,
+                                    k.esco_id = $esco_id,
+                                    k.created_at = datetime()
+                                WITH k
+                                MATCH (a:AFSC {code: $code})
+                                MERGE (a)-[:HAS_ITEM]->(k)
+                            """, {
+                                "text": item.text,
+                                "type": item.item_type.value if hasattr(item.item_type, 'value') else str(item.item_type),
+                                "confidence": float(getattr(item, 'confidence', 0)),
+                                "source": getattr(item, 'source', 'unknown'),
+                                "esco_id": getattr(item, 'esco_id', None),
+                                "code": code.strip()
+                            })
                     
-                    st.write("✅ Writing to Neo4j...")
-                    status.update(label="Complete!", state="complete")
+                    status.update(label="✅ Complete!", state="complete")
                 
                 driver.close()
                 
-                # Results
-                st.success(f"Processed {code}")
+                # Results Summary
+                st.success(f"✅ Processed {code}")
+                st.balloons()
                 
-                m1, m2, m3, m4 = st.columns(4)
-                m1.metric("Raw Items", summary.get("n_items_raw", 0))
-                m2.metric("After Filters", summary.get("n_items_after_filters", 0))
-                m3.metric("After Dedupe", summary.get("n_items_after_dedupe", 0))
-                m4.metric("Fallback Used", "Yes" if summary.get("used_fallback") else "No")
+                # Count by type
+                k_count = sum(1 for i in all_items if getattr(i.item_type, 'value', str(i.item_type)) == 'knowledge')
+                s_count = sum(1 for i in all_items if getattr(i.item_type, 'value', str(i.item_type)) == 'skill')
+                a_count = sum(1 for i in all_items if getattr(i.item_type, 'value', str(i.item_type)) == 'ability')
+                esco_count = sum(1 for i in all_items if getattr(i, 'esco_id', None))
+                
+                # Metrics
+                col1, col2, col3, col4, col5 = st.columns(5)
+                col1.metric("Total KSAs", len(all_items))
+                col2.metric("Knowledge", k_count)
+                col3.metric("Skills", s_count)
+                col4.metric("Abilities", a_count)
+                col5.metric("ESCO IDs", esco_count)
+                
+                # Show contribution breakdown
+                st.caption(f"💡 LAiSER: {len(laiser_items)} items ({len(laiser_items)/len(all_items)*100:.0f}%) • LLM: {len(enhanced_items)} items ({len(enhanced_items)/len(all_items)*100:.0f}%)")
                 
                 # Show items
-                items = summary.get("items", [])
-                if items:
-                    with st.expander(f"📊 View {len(items)} Items", expanded=True):
+                if all_items:
+                    with st.expander(f"📊 View {len(all_items)} Extracted Items", expanded=False):
                         df = pd.DataFrame([{
-                            "text": i.text[:80] + "..." if len(i.text) > 80 else i.text,
-                            "type": i.item_type.value if hasattr(i.item_type, "value") else str(i.item_type),
-                            "conf": f"{float(getattr(i, 'confidence', 0)):.2f}",
-                            "esco": getattr(i, "esco_id", "")[:20]
-                        } for i in items])
+                            "Type": getattr(i.item_type, 'value', str(i.item_type)).upper(),
+                            "Text": i.text[:80] + "..." if len(i.text) > 80 else i.text,
+                            "Confidence": f"{float(getattr(i, 'confidence', 0)):.2f}",
+                            "Source": getattr(i, 'source', 'unknown'),
+                            "ESCO": getattr(i, 'esco_id', "")[:20]
+                        } for i in all_items])
                         st.dataframe(df, use_container_width=True, hide_index=True)
                 
-                st.info("💡 View results in the Explore page")
+                st.info("💡 View results in the **Explore KSAs** page")
                 
                 # Clear loaded data after successful processing
                 if st.button("✨ Process Another AFSC", use_container_width=True):
@@ -229,7 +318,10 @@ with tab1:
                     st.rerun()
                 
             except Exception as e:
-                st.error(f"Processing failed: {e}")
+                st.error(f"❌ Processing failed: {e}")
+                import traceback
+                with st.expander("Error Details"):
+                    st.code(traceback.format_exc())
 
 # ============ TAB 2: Bulk JSONL ============
 with tab2:
