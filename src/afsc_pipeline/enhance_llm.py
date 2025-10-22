@@ -12,21 +12,20 @@ Purpose
 
 Environment (all optional)
 --------------------------
-LLM_PROVIDER=gemini|openai|anthropic|disabled   (default: disabled)
-LLM_MODEL_GEMINI=gemini-1.5-pro                 (example)
-LLM_MODEL_OPENAI=gpt-4o-mini                    (example)
-LLM_MODEL_ANTHROPIC=claude-3-5-sonnet-20241022  (example)
+LLM_PROVIDER=gemini|anthropic|disabled   (default: disabled)
+LLM_MODEL_GEMINI=gemini-1.5-flash        (free tier: 15 RPM)
+LLM_MODEL_ANTHROPIC=claude-3-5-sonnet-20241022
 
-# Keys (only if you actually wire an SDK or HTTP call in your project):
-GOOGLE_API_KEY=<key>
-OPENAI_API_KEY=<key>
-ANTHROPIC_API_KEY=<key>
+# API Keys (required if provider is enabled):
+GOOGLE_API_KEY=<your-key>
+ANTHROPIC_API_KEY=<your-key>
 
-Notes
+Usage
 -----
-- This file ships WITHOUT external SDK calls for portability.
-- The call sites are stubbed; you can drop in your preferred client code.
-- Output type is ItemDraft (same as extractor) to keep graph_writer idempotent.
+1. Set LLM_PROVIDER=gemini (or anthropic)
+2. Set corresponding API key
+3. Pipeline will automatically enhance with K/A
+4. Falls back to heuristics if API fails or quota exceeded
 """
 
 from __future__ import annotations
@@ -34,6 +33,7 @@ from __future__ import annotations
 import os
 import re
 import hashlib
+import time
 from typing import Iterable, List, Tuple
 
 from afsc_pipeline.extract_laiser import ItemDraft, ItemType
@@ -43,9 +43,12 @@ from afsc_pipeline.extract_laiser import ItemDraft, ItemType
 # Config
 # -------------------------
 LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "disabled").strip().lower()
-LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-1.5-pro")
-LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
+LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-1.5-flash")  # Free tier!
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
+
+# API Keys
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 
 def _sig(text: str, t: ItemType, tag: str = "llm-v1") -> str:
@@ -99,8 +102,8 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
     - Derive Abilities from imperative Skill verbs ('analyze' -> 'Ability to analyze ...').
     - Derive Knowledge from detected 'noun-y' topics in the AFSC text.
     """
-    have_k = any(it.item_type == ItemType.knowledge for it in items)
-    have_a = any(it.item_type == ItemType.ability for it in items)
+    have_k = any(it.item_type == ItemType.KNOWLEDGE for it in items)
+    have_a = any(it.item_type == ItemType.ABILITY for it in items)
 
     new_items: List[ItemDraft] = []
 
@@ -109,7 +112,7 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
         # find 1-2 good verbs from existing skills
         verbs = []
         for it in items:
-            if it.item_type != ItemType.skill:
+            if it.item_type != ItemType.SKILL:
                 continue
             first = it.text.split()[0].lower() if it.text else ""
             # simple verb-ish whitelist
@@ -120,11 +123,10 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
             text = f"Ability to {v[0].lower() + v[1:]}" if v else "Ability to perform core tasks"
             new_items.append(ItemDraft(
                 text=text,
-                item_type=ItemType.ability,
+                item_type=ItemType.ABILITY,
                 confidence=0.55,
                 source="llm-heuristic",
                 esco_id=None,
-                content_sig=_sig(text, ItemType.ability, tag="llm-heuristic-v1"),
             ))
 
     # Knowledge from topical candidates
@@ -134,42 +136,102 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
             text = f"Knowledge of {t}"
             new_items.append(ItemDraft(
                 text=text,
-                item_type=ItemType.knowledge,
+                item_type=ItemType.KNOWLEDGE,
                 confidence=0.55,
                 source="llm-heuristic",
                 esco_id=None,
-                content_sig=_sig(text, ItemType.knowledge, tag="llm-heuristic-v1"),
             ))
 
     return new_items
 
 
 # -------------------------
-# LLM call stubs (replace with your SDK of choice, if desired)
+# LLM Implementations
 # -------------------------
 def _call_llm_gemini(prompt: str) -> str:
     """
-    Stub. Replace with google.generativeai or HTTP call in your project.
-    Return a plain text list of bullet lines to parse into items.
+    Call Google Gemini API (free tier: gemini-1.5-flash with 15 RPM).
     """
-    raise NotImplementedError("Gemini call not wired. Set LLM_PROVIDER=disabled to use heuristics.")
+    if not GOOGLE_API_KEY:
+        raise ValueError("GOOGLE_API_KEY not set")
+    
+    try:
+        import google.generativeai as genai
+        
+        genai.configure(api_key=GOOGLE_API_KEY)
+        model = genai.GenerativeModel(LLM_MODEL_GEMINI)
+        
+        # Generate with safety settings relaxed for military content
+        response = model.generate_content(
+            prompt,
+            safety_settings={
+                'HARASSMENT': 'BLOCK_NONE',
+                'HATE_SPEECH': 'BLOCK_NONE',
+                'SEXUALLY_EXPLICIT': 'BLOCK_NONE',
+                'DANGEROUS_CONTENT': 'BLOCK_NONE',
+            }
+        )
+        
+        return response.text
+        
+    except ImportError:
+        raise ImportError("google-generativeai not installed. Run: pip install google-generativeai")
+    except Exception as e:
+        raise RuntimeError(f"Gemini API error: {e}")
 
-def _call_llm_openai(prompt: str) -> str:
-    """Stub for OpenAI."""
-    raise NotImplementedError("OpenAI call not wired. Set LLM_PROVIDER=disabled to use heuristics.")
 
 def _call_llm_anthropic(prompt: str) -> str:
-    """Stub for Anthropic."""
-    raise NotImplementedError("Anthropic call not wired. Set LLM_PROVIDER=disabled to use heuristics.")
+    """
+    Call Anthropic Claude API as fallback.
+    """
+    if not ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+    
+    try:
+        import anthropic
+        
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        
+        message = client.messages.create(
+            model=LLM_MODEL_ANTHROPIC,
+            max_tokens=1024,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        return message.content[0].text
+        
+    except ImportError:
+        raise ImportError("anthropic not installed. Run: pip install anthropic")
+    except Exception as e:
+        raise RuntimeError(f"Anthropic API error: {e}")
 
 
 def _provider_call(prompt: str) -> str:
+    """
+    Call configured LLM provider with automatic fallback.
+    """
     if LLM_PROVIDER == "gemini":
-        return _call_llm_gemini(prompt)
-    if LLM_PROVIDER == "openai":
-        return _call_llm_openai(prompt)
-    if LLM_PROVIDER == "anthropic":
-        return _call_llm_anthropic(prompt)
+        try:
+            return _call_llm_gemini(prompt)
+        except Exception as e:
+            print(f"⚠️ Gemini failed ({e}), trying Anthropic fallback...")
+            if ANTHROPIC_API_KEY:
+                try:
+                    return _call_llm_anthropic(prompt)
+                except Exception as e2:
+                    print(f"⚠️ Anthropic also failed ({e2}), using heuristics")
+                    return ""
+            return ""
+    
+    elif LLM_PROVIDER == "anthropic":
+        try:
+            return _call_llm_anthropic(prompt)
+        except Exception as e:
+            print(f"⚠️ Anthropic failed ({e}), using heuristics")
+            return ""
+    
     # disabled -> no call
     return ""
 
@@ -190,7 +252,7 @@ EXISTING ITEMS:
 FORMAT EXAMPLE:
 - Knowledge of intelligence cycle fundamentals
 - Ability to synthesize multi-source findings under time constraints
-"""
+- Knowledge of geospatial analysis techniques"""
 
 def _format_existing(items: List[ItemDraft]) -> str:
     lines = []
@@ -217,16 +279,16 @@ def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
         # explicit tag?
         m = re.match(r"\[(knowledge|skill|ability)\]\s+(.*)$", line, re.IGNORECASE)
         if m:
-            t = ItemType(m.group(1).lower())
+            t = ItemType(m.group(1).upper())
             text = m.group(2).strip().rstrip(".")
         else:
             txt = line.rstrip(".")
             low = txt.lower()
             if low.startswith("knowledge of "):
-                t = ItemType.knowledge
+                t = ItemType.KNOWLEDGE
                 text = txt
             elif low.startswith("ability to "):
-                t = ItemType.ability
+                t = ItemType.ABILITY
                 text = txt
             else:
                 # skip ambiguous lines to avoid polluting graph
@@ -250,17 +312,100 @@ def enhance_items_with_llm(
     Optionally enrich the set with K/A from an LLM; fall back to deterministic heuristics.
 
     Returns only the NEW items; caller should extend and then dedupe.
+    
+    Args:
+        afsc_code: AFSC identifier (e.g., "1N0X1")
+        afsc_text: Full AFSC description text
+        items: Existing ItemDraft objects (usually from LAiSER)
+        max_new: Maximum new items to generate
+        
+    Returns:
+        List of NEW ItemDraft objects to add to the collection
     """
     # If provider disabled, do heuristic only
     if LLM_PROVIDER in {"", "disabled", "off", "false", "0"}:
+        print(f"[LLM] Provider disabled, using heuristics for {afsc_code}")
         return _heuristic_enhance(afsc_text, items)
 
     prompt = _PROMPT.format(
-        afsc_text=afsc_text.strip(),
+        afsc_text=afsc_text.strip()[:2000],  # Limit context to avoid token issues
         existing=_format_existing(items),
     )
 
     try:
+        print(f"[LLM] Calling {LLM_PROVIDER} for {afsc_code}...")
         raw = _provider_call(prompt)
-    except NotImplementedError:
-        # Provider not wired; safe fallb
+        
+        if not raw:
+            # Fallback to heuristics if LLM returns nothing
+            print(f"[LLM] No response, using heuristics for {afsc_code}")
+            return _heuristic_enhance(afsc_text, items)
+        
+        # Parse LLM response
+        parsed = _parse_llm_lines(raw)
+        new_items = []
+        
+        for item_type, text in parsed[:max_new]:
+            new_items.append(ItemDraft(
+                text=text,
+                item_type=item_type,
+                confidence=0.70,  # LLM-generated gets higher confidence than heuristics
+                source=f"llm-{LLM_PROVIDER}",
+                esco_id=None,
+            ))
+        
+        print(f"[LLM] Generated {len(new_items)} new items for {afsc_code}")
+        return new_items
+        
+    except Exception as e:
+        print(f"[LLM] Error for {afsc_code}: {e}")
+        print(f"[LLM] Falling back to heuristics")
+        return _heuristic_enhance(afsc_text, items)
+
+
+# -------------------------
+# Test function
+# -------------------------
+if __name__ == "__main__":
+    # Test with sample data
+    sample_text = """
+    Performs and manages intelligence targeting operations and training.
+    Performs intelligence data analysis. Determines intelligence
+    information requirements. Analyzes data from multiple sources.
+    Identifies targets. Prepares intelligence assessments and reports.
+    """
+    
+    # Simulate LAiSER output (skills only)
+    sample_items = [
+        ItemDraft(
+            text="intelligence data analysis",
+            item_type=ItemType.SKILL,
+            confidence=0.65,
+            source="laiser",
+            esco_id="ESCO.1234"
+        ),
+        ItemDraft(
+            text="prepare intelligence reports",
+            item_type=ItemType.SKILL,
+            confidence=0.58,
+            source="laiser",
+            esco_id=None
+        ),
+    ]
+    
+    print("=" * 60)
+    print("Testing LLM Enhancement")
+    print("=" * 60)
+    print(f"Provider: {LLM_PROVIDER}")
+    print(f"Existing items: {len(sample_items)}")
+    print()
+    
+    new_items = enhance_items_with_llm(
+        afsc_code="1N0X1",
+        afsc_text=sample_text,
+        items=sample_items,
+    )
+    
+    print(f"\n✅ Generated {len(new_items)} new items:")
+    for item in new_items:
+        print(f"  [{item.item_type.value:10}] {item.text} (conf={item.confidence:.2f}, src={item.source})")
