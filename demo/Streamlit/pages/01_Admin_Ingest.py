@@ -305,7 +305,7 @@ with tab1:
                             "Text": i.text[:80] + "..." if len(i.text) > 80 else i.text,
                             "Confidence": f"{float(getattr(i, 'confidence', 0)):.2f}",
                             "Source": getattr(i, 'source', 'unknown'),
-                            "ESCO": getattr(i, 'esco_id', "")[:20]
+                            "ESCO": (getattr(i, 'esco_id', "") or "")[:20]
                         } for i in all_items])
                         st.dataframe(df, use_container_width=True, hide_index=True)
                 
