@@ -21,11 +21,25 @@ class ItemDraft:
     esco_id: Optional[str] = None
 
 def _build_extractor():
+    """Build LAiSER extractor with Gemini API"""
     try:
-        from laiser.align import SkillExtractorAlign
-        return SkillExtractorAlign()
+        from laiser.skill_extractor_refactored import SkillExtractorRefactored
+        
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        if not gemini_key:
+            print("[LAISER] No GEMINI_API_KEY found")
+            return None
+        
+        print("[LAISER] Initializing with Gemini API...")
+        return SkillExtractorRefactored(
+            model_id="gemini",
+            api_key=gemini_key,
+            use_gpu=False
+        )
     except Exception as e:
         print(f"[LAISER] Could not init: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def _fallback_extract(clean_text: str) -> List[ItemDraft]:
@@ -119,10 +133,12 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     print(f"[LAISER] Enabled={use_laiser}, TopK={top_k}")
     
     if not use_laiser:
+        print("[LAISER] Using fallback extraction (USE_LAISER=false)")
         return _fallback_extract(clean_text)
     
     extractor = _build_extractor()
     if not extractor:
+        print("[LAISER] Extractor failed to initialize, using fallback")
         return _fallback_extract(clean_text)
     
     # Split text into phrases
@@ -138,23 +154,30 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         raw_candidates = ["imagery exploitation", "geospatial intelligence", "target development"]
     
     raw_candidates = list(dict.fromkeys(raw_candidates))[:50]
-    print(f"[LAISER] {len(raw_candidates)} phrases")
+    print(f"[LAISER] Extracted {len(raw_candidates)} candidate phrases")
     
-    # Call align_skills
+    # Call align_skills with Gemini
     try:
-        result_df = extractor.align_skills(raw_skills=raw_candidates, document_id="AFSC-0", description="AFSC")
-        print(f"[LAISER] Got {len(result_df)} results")
+        print("[LAISER] Calling align_skills...")
+        result_df = extractor.align_skills(
+            raw_skills=raw_candidates, 
+            document_id="AFSC-0"
+        )
+        print(f"[LAISER] Got {len(result_df)} results from align_skills")
     except Exception as e:
-        print(f"[LAISER] Error: {e}")
+        print(f"[LAISER] Error during align_skills: {e}")
+        import traceback
+        traceback.print_exc()
         return _fallback_extract(clean_text)
     
     if result_df.empty:
+        print("[LAISER] Empty results, using fallback")
         return _fallback_extract(clean_text)
     
     # Parse results
     items = []
     for idx, row in result_df.iterrows():
-        txt = str(row.get("Taxonomy Skill") or "").strip()
+        txt = str(row.get("Taxonomy Skill") or row.get("Description") or "").strip()
         if not txt:
             continue
         
@@ -162,15 +185,21 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         esco_id = str(row.get("Skill Tag") or "").strip() or None
         
         if esco_id:
-            print(f"[LAISER] ✓ {txt[:40]} -> {esco_id}")
+            print(f"[LAISER] ✓ {txt[:50]} -> {esco_id} (conf={conf:.3f})")
         
-        items.append(ItemDraft(text=txt, item_type=ItemType.SKILL, confidence=conf, source="laiser", esco_id=esco_id))
+        items.append(ItemDraft(
+            text=txt, 
+            item_type=ItemType.SKILL, 
+            confidence=conf, 
+            source="laiser-gemini", 
+            esco_id=esco_id
+        ))
     
     if items:
         items.sort(key=lambda x: x.confidence, reverse=True)
         items = items[:top_k]
     
     esco_count = sum(1 for i in items if i.esco_id)
-    print(f"[LAISER] Returning {len(items)} ({esco_count} with ESCO)")
+    print(f"[LAISER] Returning {len(items)} skills ({esco_count} with ESCO IDs)")
     
     return items if items else _fallback_extract(clean_text)

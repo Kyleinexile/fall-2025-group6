@@ -11,6 +11,8 @@ import pandas as pd
 import streamlit as st
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
+from dotenv import load_dotenv
+load_dotenv()
 
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.pipeline import run_pipeline, ItemDraft

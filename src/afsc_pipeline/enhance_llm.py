@@ -16,13 +16,15 @@ from afsc_pipeline.extract_laiser import ItemDraft, ItemType
 # -------------------------
 # Config
 # -------------------------
-LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "disabled").strip().lower()
-LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-1.5-flash")
-LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
+LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()  # Default to OpenAI
+LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
+LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-sonnet-20240229")
+LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
 
 # API Keys
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 
 # -------------------------
@@ -103,24 +105,27 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
 # LLM Implementations
 # -------------------------
 def _call_llm_gemini(prompt: str) -> str:
-    """Call Google Gemini API."""
+    """Call Google Gemini API with proper safety settings."""
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not set")
     
     try:
         import google.generativeai as genai
+        from google.generativeai.types import HarmCategory, HarmBlockThreshold
         
         genai.configure(api_key=GOOGLE_API_KEY)
         model = genai.GenerativeModel(LLM_MODEL_GEMINI)
         
+        safety_settings = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        }
+        
         response = model.generate_content(
             prompt,
-            safety_settings={
-                'HARASSMENT': 'BLOCK_NONE',
-                'HATE_SPEECH': 'BLOCK_NONE',
-                'SEXUALLY_EXPLICIT': 'BLOCK_NONE',
-                'DANGEROUS_CONTENT': 'BLOCK_NONE',
-            }
+            safety_settings=safety_settings
         )
         
         return response.text
@@ -157,18 +162,58 @@ def _call_llm_anthropic(prompt: str) -> str:
         raise RuntimeError(f"Anthropic API error: {e}")
 
 
+def _call_llm_openai(prompt: str) -> str:
+    """Call OpenAI API."""
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY not set")
+    
+    try:
+        from openai import OpenAI
+        
+        client = OpenAI(api_key=OPENAI_API_KEY)
+        
+        response = client.chat.completions.create(
+            model=LLM_MODEL_OPENAI,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=512,
+            temperature=0.3
+        )
+        
+        return response.choices[0].message.content
+        
+    except ImportError:
+        raise ImportError("openai not installed")
+    except Exception as e:
+        raise RuntimeError(f"OpenAI API error: {e}")
+
+
 def _provider_call(prompt: str) -> str:
     """Call LLM with automatic fallback."""
-    if LLM_PROVIDER == "gemini":
+    if LLM_PROVIDER == "openai":
+        try:
+            return _call_llm_openai(prompt)
+        except Exception as e:
+            print(f"[WARNING] OpenAI failed ({e}), trying Gemini...")
+            if GOOGLE_API_KEY:
+                try:
+                    return _call_llm_gemini(prompt)
+                except Exception as e2:
+                    print(f"[WARNING] Gemini also failed ({e2}), using heuristics")
+                    return ""
+            return ""
+    
+    elif LLM_PROVIDER == "gemini":
         try:
             return _call_llm_gemini(prompt)
         except Exception as e:
-            print(f"⚠️ Gemini failed ({e}), trying Anthropic...")
-            if ANTHROPIC_API_KEY:
+            print(f"[WARNING] Gemini failed ({e}), trying OpenAI...")
+            if OPENAI_API_KEY:
                 try:
-                    return _call_llm_anthropic(prompt)
+                    return _call_llm_openai(prompt)
                 except Exception as e2:
-                    print(f"⚠️ Anthropic also failed ({e2}), using heuristics")
+                    print(f"[WARNING] OpenAI also failed ({e2}), using heuristics")
                     return ""
             return ""
     
@@ -176,7 +221,7 @@ def _provider_call(prompt: str) -> str:
         try:
             return _call_llm_anthropic(prompt)
         except Exception as e:
-            print(f"⚠️ Anthropic failed ({e}), using heuristics")
+            print(f"[WARNING] Anthropic failed ({e}), using heuristics")
             return ""
     
     return ""
@@ -338,6 +383,4 @@ if __name__ == "__main__":
         items=sample_items,
     )
     
-    print(f"\n✅ Generated {len(new_items)} new items:")
-    for item in new_items:
-        print(f"  [{item.item_type.value:10}] {item.text} (conf={item.confidence:.2f}, src={item.source})")
+    print(f"\nGenerated {len(new_items)} new items:")
