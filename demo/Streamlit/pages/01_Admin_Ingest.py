@@ -389,52 +389,50 @@ with tab2:
 # ============ TAB 3: Management ============
 with tab3:
     st.markdown("### Database Management")
-    
     st.warning("⚠️ Destructive operations - use with caution")
-    
+
     codes = st.text_area(
         "AFSC codes to delete (comma/space/newline separated)",
         placeholder="1N1X1, 17S3X, 1D7"
     )
-    
+
     confirm = st.text_input("Type DELETE to confirm")
-    
+
     if st.button("🗑️ Delete AFSCs", disabled=(confirm != "DELETE" or not db_connected), type="secondary"):
         try:
             afsc_list = [c.strip() for c in re.split(r"[,\s]+", codes) if c.strip()]
-            
+
             if not afsc_list:
                 st.error("No AFSCs specified")
             else:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
-                    # Delete everything in one transaction
+                    # Updated deletion logic: safely remove AFSCs and orphan KSAs
                     result = s.run("""
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
-                        OPTIONAL MATCH (a)-[r:REQUIRES]->(k:KSA)
-                        WITH a, collect(DISTINCT k) as ksa_nodes
+                        OPTIONAL MATCH (a)-[:REQUIRES|HAS_ITEM]->(k:KSA)
+                        WITH a, collect(DISTINCT k) AS ksa_nodes
                         DETACH DELETE a
-                        WITH ksa_nodes
-                        UNWIND ksa_nodes as k
-                        WITH k WHERE k IS NOT NULL AND NOT ()-[:REQUIRES]->(k)
-                        DELETE k
-                        RETURN count(k) as ksas_deleted
+                        UNWIND ksa_nodes AS k
+                        WITH k WHERE k IS NOT NULL AND NOT (k)<-[:REQUIRES|HAS_ITEM]-(:AFSC)
+                        DETACH DELETE k
+                        RETURN count(k) AS ksas_deleted
                     """, {"codes": afsc_list})
-                    
+
                     rec = result.single()
                     ksas_deleted = rec["ksas_deleted"] if rec else 0
                     afscs_deleted = len(afsc_list)
-                
+
                 driver.close()
                 st.success(f"Deleted {afscs_deleted} AFSCs and {ksas_deleted} orphaned KSAs")
                 st.cache_data.clear()
-                
+
         except Exception as e:
             st.error(f"Delete failed: {e}")
-    
+
     st.markdown("---")
-    
+
     if st.button("🔄 Clear All Caches"):
         st.cache_data.clear()
         st.cache_resource.clear()
