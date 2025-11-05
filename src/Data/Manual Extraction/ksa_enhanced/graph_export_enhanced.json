@@ -1,0 +1,3991 @@
+{
+  "nodes": [
+    {
+      "id": "11F3",
+      "type": "AFSC",
+      "properties": {
+        "title": "FIGHTER PILOT",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "12B",
+      "type": "AFSC",
+      "properties": {
+        "title": "BOMBER COMBAT SYSTEMS OFFICER",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "14F",
+      "type": "AFSC",
+      "properties": {
+        "title": "INFORMATION OPERATIONS",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "14N",
+      "type": "AFSC",
+      "properties": {
+        "title": "INTELLIGENCE",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "1A3X1",
+      "type": "AFSC",
+      "properties": {
+        "title": "MOBILITY FORCE AVIATOR",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "1C3",
+      "type": "AFSC",
+      "properties": {
+        "title": "ALL-DOMAIN COMMAND AND CONTROL OPERATIONS",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "1N0",
+      "type": "AFSC",
+      "properties": {
+        "title": "ALL SOURCE INTELLIGENCE ANALYST",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "1N4",
+      "type": "AFSC",
+      "properties": {
+        "title": "CYBER INTELLIGENCE",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "21A",
+      "type": "AFSC",
+      "properties": {
+        "title": "AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "21M",
+      "type": "AFSC",
+      "properties": {
+        "title": "MUNITIONS AND MISSILE MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "2A3",
+      "type": "AFSC",
+      "properties": {
+        "title": "TACTICAL AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "2A5",
+      "type": "AFSC",
+      "properties": {
+        "title": "AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "knowledge_f53bc0dab17f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft operating procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_de9474b14aa0",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flying directives",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_affcf6329481",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flight operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b7a2e395acf0",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "theory of flight",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_66bf44409c73",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "mission tactics",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e3e2367252d2",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air navigation",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_d7b61d56c989",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "meteorology",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_ef361166703f",
+      "type": "SKILL",
+      "properties": {
+        "text": "train air force crew",
+        "confidence": 0.5931535363197327,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2859"
+      }
+    },
+    {
+      "id": "skill_149172f14ed1",
+      "type": "SKILL",
+      "properties": {
+        "text": "military aviation",
+        "confidence": 0.5884260535240173,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6338"
+      }
+    },
+    {
+      "id": "skill_f3f51564d4ce",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5530112981796265,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "knowledge_971be5d7c617",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft operating procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_9c552564cacc",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flying directives",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_4bcec41b17ae",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flight operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f1e7714f52c4",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "theory of flight",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_c6d745d477b8",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "mission tactics",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_490ffb9dacd8",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air navigation",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_d706350299a9",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "meteorology",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_76d4f2d4964b",
+      "type": "SKILL",
+      "properties": {
+        "text": "military aviation",
+        "confidence": 0.5680825710296631,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6338"
+      }
+    },
+    {
+      "id": "knowledge_1640f41f7a20",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "information capabilities synchronization",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_891a8dd4fa98",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "information capabilities application",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_4d09479fb2b2",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "information capabilities integration",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7596ca303872",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "deception activities knowledge",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_92e35bc6ff34",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "mildec knowledge",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b30005db5639",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "opsec knowledge",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_18114b7b9e4b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "miso knowledge",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_0e4649acd057",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "io knowledge",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_b1bfcbbb619e",
+      "type": "SKILL",
+      "properties": {
+        "text": "advise superiors on military operations",
+        "confidence": 0.6204969882965088,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.4940"
+      }
+    },
+    {
+      "id": "skill_749a97c00fb4",
+      "type": "SKILL",
+      "properties": {
+        "text": "develop military intelligence records",
+        "confidence": 0.6065314412117004,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2993"
+      }
+    },
+    {
+      "id": "skill_97f4105f2c1a",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform military operations",
+        "confidence": 0.5936249494552612,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.1906"
+      }
+    },
+    {
+      "id": "skill_76790971d27d",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5852580070495605,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "skill_76494b28d8f6",
+      "type": "SKILL",
+      "properties": {
+        "text": "instruct in military duties",
+        "confidence": 0.5832948684692383,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9700"
+      }
+    },
+    {
+      "id": "skill_8703fe082105",
+      "type": "SKILL",
+      "properties": {
+        "text": "conduct threat intelligence",
+        "confidence": 0.5652889013290405,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6640"
+      }
+    },
+    {
+      "id": "knowledge_f9fc5d36b886",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "research sources and methods",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_515e7eb9e0df",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "friendly forces presentation",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_c04531550eec",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence fundamentals",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_ecaa47aa6a51",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence disciplines",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_2c6dbb91c998",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "isr information systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_ec1453f476ff",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence community",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_aff571f18221",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "adversary capabilities",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_14aa7af0fea9",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "communications skills",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_8d5917ec0ae8",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "isr operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_47f310283429",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "security",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_63fa9346d7cd",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "analysis",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_ca8df0ac0150",
+      "type": "SKILL",
+      "properties": {
+        "text": "develop military intelligence records",
+        "confidence": 0.5832751393318176,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2993"
+      }
+    },
+    {
+      "id": "skill_81a042ca81e1",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5505449771881104,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "ability_4bc0095e1b34",
+      "type": "ABILITY",
+      "properties": {
+        "text": "air traffic management",
+        "confidence": 0.5952107906341553,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2884"
+      }
+    },
+    {
+      "id": "knowledge_8c3bae6c2eaa",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "dispensing food aboard aircraft",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_0c24f52d5eaa",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "preserving food aboard aircraft",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_af7281f27f2a",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft emergency procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_57aef48da08d",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "personnel airdrop techniques",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_84ff6e0fbcae",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "personnel airdrop equipment",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_dde182498985",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "in-flight refueling system",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_452a915fc7c5",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "cargo restraint techniques",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7571f862f552",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "cargo airdrop techniques",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b8ce311c41c0",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "cargo airdrop equipment",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_129bddd9cb3f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "communication systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_5f97c8a9bd5f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "electrical systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_1edbc8afc122",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "arithmetic systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_74efe9464057",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "mechanical systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e29cb2112607",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "navigation systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_9bf0e0188e9b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "hydraulic systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_fb358d4c1360",
+      "type": "SKILL",
+      "properties": {
+        "text": "military aviation",
+        "confidence": 0.6108384132385254,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6338"
+      }
+    },
+    {
+      "id": "skill_58ddc2d7e6f6",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.6007327437400818,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "skill_9d9e71a2c889",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.5843087434768677,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_6c05e45ca627",
+      "type": "SKILL",
+      "properties": {
+        "text": "train air force crew",
+        "confidence": 0.5835489630699158,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2859"
+      }
+    },
+    {
+      "id": "skill_6596bb74a8f7",
+      "type": "SKILL",
+      "properties": {
+        "text": "air traffic control operations",
+        "confidence": 0.5735561847686768,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9770"
+      }
+    },
+    {
+      "id": "skill_25d45712993c",
+      "type": "SKILL",
+      "properties": {
+        "text": "apply military aviation regulations",
+        "confidence": 0.5718212127685547,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7586"
+      }
+    },
+    {
+      "id": "skill_0e58482fe97a",
+      "type": "SKILL",
+      "properties": {
+        "text": "teach air cabin crew procedures",
+        "confidence": 0.5609347820281982,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12180"
+      }
+    },
+    {
+      "id": "skill_6cfd11cb973c",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in military logistics",
+        "confidence": 0.558692455291748,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12199"
+      }
+    },
+    {
+      "id": "skill_adc7dfb19d27",
+      "type": "SKILL",
+      "properties": {
+        "text": "instruct in military duties",
+        "confidence": 0.557281494140625,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9700"
+      }
+    },
+    {
+      "id": "skill_61a06280eb25",
+      "type": "SKILL",
+      "properties": {
+        "text": "aircraft mechanics",
+        "confidence": 0.5558533668518066,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.4569"
+      }
+    },
+    {
+      "id": "knowledge_f362c7671065",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "command weapon systems movement procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_47460215f240",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air force organization and administration",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_0bc7ee45a6c3",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "automated data processing equipment use",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_24fc8c880cdf",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "encode decode authorization procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_17641a442d02",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air force incident management system",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_83c0d69ae33b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "national incident management system",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7558247731b6",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "automated data processing equipment",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_ee53ea0b1d62",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "emergency actions and directives",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f45acdf964d7",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "command and control data systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7a0bb760e678",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "command weapon systems movement",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_5051465b705c",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "c2 data systems and reporting",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7a8093f9dfa5",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "encode and decode procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_20eea8dd7dc9",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "data collection procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_530d969da3de",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "command post operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_d753c903bdde",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5986218452453613,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "skill_e42ba823281b",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.5856939554214478,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_062f13d952bf",
+      "type": "SKILL",
+      "properties": {
+        "text": "air traffic control operations",
+        "confidence": 0.5693976879119873,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9770"
+      }
+    },
+    {
+      "id": "skill_59c1800301c5",
+      "type": "SKILL",
+      "properties": {
+        "text": "instruct in military duties",
+        "confidence": 0.5621429681777954,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9700"
+      }
+    },
+    {
+      "id": "knowledge_9bad5a685715",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence documents maintenance procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e30d4b8657bd",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence organizations and systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_c055cffe5b21",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "foreign countries geographical aspects",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_dc3fc245cb7e",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "foreign countries cultural aspects",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_67069c09b3d6",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "special operations forces tactics",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e2c0976d6ff8",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "collection and reporting systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_178c8ca0266c",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence information sources",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_71d1b3be6a68",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "enemy offensive weapon systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_5faff5c33ffd",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "enemy defensive weapon systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_8dbd229d188b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "us sensor systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_bbc6e343c845",
+      "type": "SKILL",
+      "properties": {
+        "text": "conduct threat intelligence",
+        "confidence": 0.5967926383018494,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6640"
+      }
+    },
+    {
+      "id": "skill_8c06064231d8",
+      "type": "SKILL",
+      "properties": {
+        "text": "develop military intelligence records",
+        "confidence": 0.5949185490608215,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2993"
+      }
+    },
+    {
+      "id": "knowledge_06ee43c64359",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "classified information handling directives",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b097eeaa1fbf",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "designated military forces organization",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_82e1410a75ee",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "intelligence organizations and systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f30fcb352ef3",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "global communications procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_d48119b337c4",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "collection and reporting systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_8e6aea1fb656",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "national intelligence structure",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_625858588602",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "effective writing principles",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f7285842d095",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "information operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_4731a2a26f1c",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "analytical techniques",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e2f452a3ec7b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "geography",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_0812d27efbf3",
+      "type": "SKILL",
+      "properties": {
+        "text": "conduct threat intelligence",
+        "confidence": 0.5885803699493408,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.6640"
+      }
+    },
+    {
+      "id": "ability_d1b682178907",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage aircraft support systems",
+        "confidence": 0.5821669101715088,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10364"
+      }
+    },
+    {
+      "id": "ability_2bce28d008f7",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage maintenance operations",
+        "confidence": 0.555893063545227,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10755"
+      }
+    },
+    {
+      "id": "knowledge_a689f0443e2b",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "maintenance and personnel management procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_de3b0d022001",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft systems capabilities and limitations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f698f28331b8",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "organizational and mission requirements",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_35fffda831db",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft systems operating principles",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_3bbd5a34ad91",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "supply transportation logistics plans",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_9a14b6907b68",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft maintenance unit operations",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_99dbc2a41a53",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flight and airframe construction",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b0df736ade78",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "life cycle sustainment",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_420ba8d45c23",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "airframe construction",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_a1cb9c0f438a",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft components",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_65cedb2431f2",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "quality assurance",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_871ae6b74e53",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "theory of flight",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_41a913971e9e",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "aircraft systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_9cfe279059cb",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "contracting",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_b66fa76b483e",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.7277299165725708,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_7782ec9949c0",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform aircraft maintenance",
+        "confidence": 0.6620861291885376,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12474"
+      }
+    },
+    {
+      "id": "skill_2b4daac6ad87",
+      "type": "SKILL",
+      "properties": {
+        "text": "organise aircraft maintenance",
+        "confidence": 0.6301000118255615,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7192"
+      }
+    },
+    {
+      "id": "skill_3e171c7fa6b9",
+      "type": "SKILL",
+      "properties": {
+        "text": "aircraft mechanics",
+        "confidence": 0.595760703086853,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.4569"
+      }
+    },
+    {
+      "id": "skill_405998842639",
+      "type": "SKILL",
+      "properties": {
+        "text": "maintenance operations",
+        "confidence": 0.5851489305496216,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5990"
+      }
+    },
+    {
+      "id": "skill_2b9ab706e118",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise maintenance activities in airports",
+        "confidence": 0.5816568732261658,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8854"
+      }
+    },
+    {
+      "id": "skill_8d6a0e1b067a",
+      "type": "SKILL",
+      "properties": {
+        "text": "apply military aviation regulations",
+        "confidence": 0.5632179379463196,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7586"
+      }
+    },
+    {
+      "id": "skill_e0c9360b24ea",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee maintenance work",
+        "confidence": 0.555894672870636,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5188"
+      }
+    },
+    {
+      "id": "ability_8188bda1b52e",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage military logistics",
+        "confidence": 0.5895761251449585,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12541"
+      }
+    },
+    {
+      "id": "knowledge_26c13ae133d6",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "Military maintenance procedures and standards",
+        "confidence": 0.45,
+        "source_method": "skill_inferred",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_55322ae6cfdf",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "Logistics planning and coordination principles",
+        "confidence": 0.45,
+        "source_method": "skill_inferred",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_2fb64546e388",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "Air Force operational doctrine",
+        "confidence": 0.45,
+        "source_method": "skill_inferred",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_ab76015fd8c7",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.7243605256080627,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_0f15bfa65aef",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in military logistics",
+        "confidence": 0.597975492477417,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12199"
+      }
+    },
+    {
+      "id": "skill_ea5bf2d049ee",
+      "type": "SKILL",
+      "properties": {
+        "text": "military logistics",
+        "confidence": 0.5968084335327148,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.2469"
+      }
+    },
+    {
+      "id": "skill_339a09eabf3e",
+      "type": "SKILL",
+      "properties": {
+        "text": "instruct in military duties",
+        "confidence": 0.5847635269165039,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9700"
+      }
+    },
+    {
+      "id": "skill_19b242f0e133",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5589534044265747,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9897"
+      }
+    },
+    {
+      "id": "ability_89788a3e7b02",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage aircraft support systems",
+        "confidence": 0.5685244798660278,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10364"
+      }
+    },
+    {
+      "id": "ability_fabd3638cbe6",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage maintenance operations",
+        "confidence": 0.556107223033905,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10755"
+      }
+    },
+    {
+      "id": "knowledge_1b85cb4a979c",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "maintenance directives principles concepts application",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_2e0993293693",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "data reporting principles concepts application",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e96f548a0f10",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "principles applying to aircraft systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f3877d3d5a6e",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "hazardous waste handling use disposal",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_f74f8080ddd9",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "deficiency reporting procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e66db7ea9c0e",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air force supply procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_228a9658d443",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "hydraulic principles",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_94780e682cdf",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "technical data usage",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7640209baf15",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "technical data using",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_0b0222743f0f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "technical order use",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_230b57df46be",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "electrical theory",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_864486bb1352",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flight theory",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_4d9ebe9e3da4",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.7668882608413696,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_e4b87c54a441",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform aircraft maintenance",
+        "confidence": 0.6993632912635803,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12474"
+      }
+    },
+    {
+      "id": "skill_c97195f7faaa",
+      "type": "SKILL",
+      "properties": {
+        "text": "aircraft mechanics",
+        "confidence": 0.6624455451965332,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.4569"
+      }
+    },
+    {
+      "id": "skill_696546191ebd",
+      "type": "SKILL",
+      "properties": {
+        "text": "organise aircraft maintenance",
+        "confidence": 0.6360499858856201,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7192"
+      }
+    },
+    {
+      "id": "skill_8565dc95273a",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in ship maintenance",
+        "confidence": 0.6240840554237366,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8929"
+      }
+    },
+    {
+      "id": "skill_4dc5e419daf5",
+      "type": "SKILL",
+      "properties": {
+        "text": "maintenance operations",
+        "confidence": 0.6072608232498169,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5990"
+      }
+    },
+    {
+      "id": "skill_d7701d5b3163",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise maintenance activities in airports",
+        "confidence": 0.6012698411941528,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8854"
+      }
+    },
+    {
+      "id": "skill_630f9d96afd8",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee maintenance work",
+        "confidence": 0.5952968597412109,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5188"
+      }
+    },
+    {
+      "id": "skill_678d14056212",
+      "type": "SKILL",
+      "properties": {
+        "text": "carry out repairs and maintenance of vehicle bodies",
+        "confidence": 0.5855627059936523,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9646"
+      }
+    },
+    {
+      "id": "skill_bc6c5f4bc779",
+      "type": "SKILL",
+      "properties": {
+        "text": "inspect cabin service equipment",
+        "confidence": 0.5770492553710938,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8217"
+      }
+    },
+    {
+      "id": "ability_4d93c4a3fb54",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage aircraft support systems",
+        "confidence": 0.5730355381965637,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10364"
+      }
+    },
+    {
+      "id": "ability_73295eab8ead",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage maintenance operations",
+        "confidence": 0.570759654045105,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.10755"
+      }
+    },
+    {
+      "id": "knowledge_572991bf728f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "maintenance directives principles concepts application",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_6f801bd3a39a",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "data reporting principles concepts application",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_c23faf00a299",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "principles applying to aircraft systems",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_894d61119c36",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "hazardous waste handling use disposal",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_7833a360fe3c",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "deficiency reporting procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_9e672980e7eb",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "air force supply procedures",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_477e355b4f46",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "hydraulic principles",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_301501ac1fae",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "using technical data",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_e3fd9c96ed03",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "electrical theory",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "knowledge_b66e4ae6a06f",
+      "type": "KNOWLEDGE",
+      "properties": {
+        "text": "flight theory",
+        "confidence": 0.82,
+        "source_method": "document_explicit",
+        "esco_tag": NaN
+      }
+    },
+    {
+      "id": "skill_e81c79d24b6e",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.7367058992385864,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7470"
+      }
+    },
+    {
+      "id": "skill_f9f83064d447",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform aircraft maintenance",
+        "confidence": 0.7315247654914856,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.12474"
+      }
+    },
+    {
+      "id": "skill_6fbe1698ce95",
+      "type": "SKILL",
+      "properties": {
+        "text": "aircraft mechanics",
+        "confidence": 0.6732499599456787,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.4569"
+      }
+    },
+    {
+      "id": "skill_a4d174f2347b",
+      "type": "SKILL",
+      "properties": {
+        "text": "organise aircraft maintenance",
+        "confidence": 0.6606305241584778,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.7192"
+      }
+    },
+    {
+      "id": "skill_a9877946d43b",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise maintenance activities in airports",
+        "confidence": 0.6293840408325195,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8854"
+      }
+    },
+    {
+      "id": "skill_1873888ec308",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in ship maintenance",
+        "confidence": 0.6211857795715332,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8929"
+      }
+    },
+    {
+      "id": "skill_149953dc8dd4",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee maintenance work",
+        "confidence": 0.6159816980361938,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5188"
+      }
+    },
+    {
+      "id": "skill_94dd907b04a9",
+      "type": "SKILL",
+      "properties": {
+        "text": "maintenance operations",
+        "confidence": 0.6072996854782104,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5990"
+      }
+    },
+    {
+      "id": "skill_b4c554f7a05a",
+      "type": "SKILL",
+      "properties": {
+        "text": "carry out repairs and maintenance of vehicle bodies",
+        "confidence": 0.5869937539100647,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.9646"
+      }
+    },
+    {
+      "id": "skill_8719de582cb2",
+      "type": "SKILL",
+      "properties": {
+        "text": "inspect cabin service equipment",
+        "confidence": 0.5736016035079956,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8217"
+      }
+    },
+    {
+      "id": "skill_7f371edb1268",
+      "type": "SKILL",
+      "properties": {
+        "text": "execute vehicle maintenance",
+        "confidence": 0.5570502281188965,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.787"
+      }
+    },
+    {
+      "id": "skill_47c722ea9930",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee equipment cleaning",
+        "confidence": 0.5553168058395386,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.8883"
+      }
+    },
+    {
+      "id": "skill_e94823d172f3",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee assembly operations",
+        "confidence": 0.5518349409103394,
+        "source_method": "laiser",
+        "esco_tag": "ESCO.5916"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "11F3",
+      "target": "knowledge_f53bc0dab17f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_de9474b14aa0",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_affcf6329481",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...flight, air navigation, meteorology, flying directives, aircraft operating...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_b7a2e395acf0",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_66bf44409c73",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_e3e2367252d2",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics....",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "knowledge_d7b61d56c989",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics....",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "skill_ef361166703f",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5931535363197327,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "skill_149172f14ed1",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5884260535240173,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "skill_f3f51564d4ce",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5530112981796265,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_971be5d7c617",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_9c552564cacc",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_4bcec41b17ae",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...flight, air navigation, meteorology, flying directives, aircraft operating...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_f1e7714f52c4",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_c6d745d477b8",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_490ffb9dacd8",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics....",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "knowledge_d706350299a9",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating \nprocedures, and mission tactics....",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "12B",
+      "target": "skill_76d4f2d4964b",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5680825710296631,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_1640f41f7a20",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_891a8dd4fa98",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_4d09479fb2b2",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_7596ca303872",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_92e35bc6ff34",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_b30005db5639",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_18114b7b9e4b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \nsynchronization of information capabilities to influence, disrupt, corrupt or usurp the deci",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "knowledge_0e4649acd057",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...Knowledge of IO, MISO, Deception Activities, MILDEC, and OPSEC, including the application, integration and \ns...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_b1bfcbbb619e",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6204969882965088,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_749a97c00fb4",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6065314412117004,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_97f4105f2c1a",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5936249494552612,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_76790971d27d",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5852580070495605,
+        "evidence": "...n Support Operations (IIC-MISO) or Psychological Operations Qualification Course (POQC); and 3.3.4. Air Force Operations Security Course (AFOC); or 3.3.5. Similar courses as approved by the 14F Car",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_76494b28d8f6",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5832948684692383,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_8703fe082105",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5652889013290405,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_f9fc5d36b886",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_515e7eb9e0df",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_c04531550eec",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_ecaa47aa6a51",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_2c6dbb91c998",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_ec1453f476ff",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_aff571f18221",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_14aa7af0fea9",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information systems, research sources and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_8d5917ec0ae8",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...ndly weapons systems, adversary capabilities, ISR operations, targeting, integration, and sensing grid activities....",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_47f310283429",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...wledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR in...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "knowledge_63fa9346d7cd",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence \ndisciplines, the intelligence community, ISR information...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "skill_ca8df0ac0150",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5832751393318176,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "14N",
+      "target": "skill_81a042ca81e1",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5505449771881104,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "ability_4bc0095e1b34",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5952107906341553,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_8c3bae6c2eaa",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_0c24f52d5eaa",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_af7281f27f2a",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_57aef48da08d",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_84ff6e0fbcae",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_dde182498985",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_452a915fc7c5",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo restraint techniques.",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_7571f862f552",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_b8ce311c41c0",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "dispensing and preserving food aboard aircraft; and cargo and personnel airdrop techniques and equipment; certify and",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_129bddd9cb3f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_5f97c8a9bd5f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_1edbc8afc122",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_74efe9464057",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_e29cb2112607",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "knowledge_9bf0e0188e9b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic \nsystems applying to aircraft and related systems; flight theory; minor in-flight mainte",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_fb358d4c1360",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6108384132385254,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_58ddc2d7e6f6",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6007327437400818,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_9d9e71a2c889",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5843087434768677,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_6c05e45ca627",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5835489630699158,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_6596bb74a8f7",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5735561847686768,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_25d45712993c",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5718212127685547,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_0e58482fe97a",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5609347820281982,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_6cfd11cb973c",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.558692455291748,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_adc7dfb19d27",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.557281494140625,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_61a06280eb25",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5558533668518066,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_f362c7671065",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_47460215f240",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_0bc7ee45a6c3",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_24fc8c880cdf",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_17641a442d02",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_83c0d69ae33b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_7558247731b6",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data \npro",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_ee53ea0b1d62",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_f45acdf964d7",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data \npro",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_7a0bb760e678",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data \npro",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_5051465b705c",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_7a8093f9dfa5",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data \npro",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_20eea8dd7dc9",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and rep",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "knowledge_530d969da3de",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Air Force organization and administration; JADO; EM the National Incident \nManagement System (NIMS) and Air Force Incident Management System (AFIMS); C2 data systems and reporting; automated data \npro",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_d753c903bdde",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5986218452453613,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_e42ba823281b",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5856939554214478,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_062f13d952bf",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5693976879119873,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_59c1800301c5",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5621429681777954,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_9bad5a685715",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_e30d4b8657bd",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_c055cffe5b21",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_dc3fc245cb7e",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_67069c09b3d6",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_e2c0976d6ff8",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_178c8ca0266c",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_71d1b3be6a68",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_5faff5c33ffd",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "knowledge_8dbd229d188b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: intelligence organizations and systems; collection and reporting systems, procedures, and \nmethods; intelligence information sources; techniques of identifying, collating, e",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "skill_bbc6e343c845",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5967926383018494,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "skill_8c06064231d8",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5949185490608215,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_06ee43c64359",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_b097eeaa1fbf",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_82e1410a75ee",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_f30fcb352ef3",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_d48119b337c4",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_8e6aea1fb656",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_625858588602",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_f7285842d095",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_4731a2a26f1c",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the \nnational intelligence structure; intelligence organizations and systems; Information O",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "knowledge_e2f452a3ec7b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...ons; organization of designated military forces; \ngeography; collection and reporting, systems, principles, methods, and procedures; effective writing principl...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "skill_0812d27efbf3",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5885803699493408,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "ability_d1b682178907",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5821669101715088,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "ability_2bce28d008f7",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.555893063545227,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_a689f0443e2b",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_de3b0d022001",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_f698f28331b8",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_35fffda831db",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_3bbd5a34ad91",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_9a14b6907b68",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_99dbc2a41a53",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "flight and airframe construction; life cycle sustainment, quality assurance; supply, transportation, logistics plans, contracting,",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_b0df736ade78",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_420ba8d45c23",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_a1cb9c0f438a",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "aircraft systems and components;",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_65cedb2431f2",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_871ae6b74e53",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, \nand organizational and mission requirements; capabilities, limitations, and basic operatin",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_41a913971e9e",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "aircraft systems and components;",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "knowledge_9cfe279059cb",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "...surance; supply, transportation, logistics plans, contracting,...",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_b66fa76b483e",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7277299165725708,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_7782ec9949c0",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6620861291885376,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_2b4daac6ad87",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6301000118255615,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_3e171c7fa6b9",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.595760703086853,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_405998842639",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5851489305496216,
+        "evidence": "...ergency or contingency situations. 2.6. Coordinates core logistics requirements supporting aircraft maintenance operations. Establishes support requirements for supply requisition, repair cycle, de",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_2b9ab706e118",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5816568732261658,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_8d6a0e1b067a",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5632179379463196,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_e0c9360b24ea",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.555894672870636,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "ability_8188bda1b52e",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5895761251449585,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "knowledge_26c13ae133d6",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.45,
+        "evidence": "Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",
+        "source_method": "skill_inferred"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "knowledge_55322ae6cfdf",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.45,
+        "evidence": "Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",
+        "source_method": "skill_inferred"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "knowledge_2fb64546e388",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.45,
+        "evidence": "Inferred from skills: supervise the maintenance of military equipment, assist in military logistics",
+        "source_method": "skill_inferred"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_ab76015fd8c7",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7243605256080627,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_0f15bfa65aef",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.597975492477417,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_ea5bf2d049ee",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5968084335327148,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_339a09eabf3e",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5847635269165039,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_19b242f0e133",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5589534044265747,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "ability_89788a3e7b02",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5685244798660278,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "ability_fabd3638cbe6",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.556107223033905,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_1b85cb4a979c",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_2e0993293693",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_e96f548a0f10",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_f3877d3d5a6e",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_f74f8080ddd9",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data reporting; using technical da",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_e66db7ea9c0e",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_228a9658d443",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_94780e682cdf",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_7640209baf15",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data reporting; using technical da",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_0b0222743f0f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_230b57df46be",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "knowledge_864486bb1352",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_4d9ebe9e3da4",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7668882608413696,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_e4b87c54a441",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6993632912635803,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_c97195f7faaa",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6624455451965332,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_696546191ebd",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6360499858856201,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_8565dc95273a",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6240840554237366,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_4dc5e419daf5",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6072608232498169,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_d7701d5b3163",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6012698411941528,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_630f9d96afd8",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5952968597412109,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_678d14056212",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5855627059936523,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_bc6c5f4bc779",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5770492553710938,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "ability_4d93c4a3fb54",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5730355381965637,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "ability_73295eab8ead",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.570759654045105,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_572991bf728f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_6f801bd3a39a",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_c23faf00a299",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_894d61119c36",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_7833a360fe3c",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_9e672980e7eb",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_477e355b4f46",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_301501ac1fae",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_e3fd9c96ed03",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "knowledge_b66e4ae6a06f",
+      "relationship": "REQUIRES_KNOWLEDGE",
+      "properties": {
+        "confidence": 0.82,
+        "evidence": "Knowledge is mandatory of: principles applying to aircraft systems; flight theory; hydraulic principles; electrical \ntheory; principles, concepts, and application of maintenance directives and data re",
+        "source_method": "document_explicit"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_e81c79d24b6e",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7367058992385864,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_f9f83064d447",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7315247654914856,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_6fbe1698ce95",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6732499599456787,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_a4d174f2347b",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6606305241584778,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_a9877946d43b",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6293840408325195,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_1873888ec308",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6211857795715332,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_149953dc8dd4",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6159816980361938,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_94dd907b04a9",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6072996854782104,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_b4c554f7a05a",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5869937539100647,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_8719de582cb2",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5736016035079956,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_7f371edb1268",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5570502281188965,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_47c722ea9930",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5553168058395386,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_e94823d172f3",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5518349409103394,
+        "evidence": "",
+        "source_method": "laiser"
+      }
+    }
+  ],
+  "metadata": {
+    "created": "2025-10-01T11:58:12.756555",
+    "total_nodes": 206,
+    "total_edges": 194,
+    "afsc_count": 12,
+    "knowledge_count": 121,
+    "skill_count": 65,
+    "ability_count": 8
+  }
+}

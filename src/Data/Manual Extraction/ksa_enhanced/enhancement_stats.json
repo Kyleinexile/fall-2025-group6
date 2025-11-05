@@ -1,0 +1,30 @@
+{
+  "enhancement_date": "2025-10-01T11:58:12.761556",
+  "provider": "claude",
+  "model": "claude-opus-4-1-20250805",
+  "original_items": 73,
+  "enhanced_items": 194,
+  "knowledge_added": 121,
+  "explicit_knowledge": 118,
+  "inferred_knowledge": 3,
+  "type_distribution": {
+    "knowledge": 121,
+    "skill": 65,
+    "ability": 8
+  },
+  "source_distribution": {
+    "document_explicit": 118,
+    "laiser": 73,
+    "skill_inferred": 3
+  },
+  "avg_confidence": {
+    "overall": 0.7317859059633669,
+    "explicit": 0.8199999999999998,
+    "inferred": 0.45,
+    "laiser": 0.6007735035190843
+  },
+  "graph_stats": {
+    "nodes": 206,
+    "edges": 194
+  }
+}

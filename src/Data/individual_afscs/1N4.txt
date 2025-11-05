@@ -1,0 +1,113 @@
+AFSC: 1N4
+Title: CYBER INTELLIGENCE
+Category: Intelligence
+Pages: 82-83
+Notes: None
+==================================================
+
+AFSC 1N471*, Craftsman 
+AFSC 1N451*, Journeyman 
+AFSC 1N431*, Apprentice 
+AFSC 1N411*, Helper 
+CYBER INTELLIGENCE 
+(Changed 31 Oct 23) 
+1. Specialty Summary: Responsible for discovering and analyzing computer network data, recognizing and assessing usable intelligence 
+from a variety of sources, and influencing offensive and defensive cyber operations. Conducts research and analysis on potential cyber 
+targets, including foreign nations, terrorist groups, and other entities that pose a threat to the United States. Develops offensive cyber 
+operations to deny, degrade, disrupt, or destroy enemy networks and systems, including identifying vulnerabilities and developing exploit 
+strategies. Ensures that all offensive cyber operations are conducted in accordance with applicable laws, regulations, and military rules of 
+engagement. Conducts penetration testing and vulnerability assessments to identify potential weaknesses in Air Force networks and 
+information or weapons systems. Cyber Intelligence Analysts assist and advise leaders across the Air Force, United States Cyber 
+Command, the National Security Agency, and other partners within the Intelligence Community to plan, initiate, guide, and execute cyber 
+operations. Related DoD Occupational Subgroups: 123200 and 124300. 
+2. Duties and Responsibilities: 
+2.1. 
+General duties: Provides cyber intelligence planning and operations support to cyberspace and computer network operations. 
+Supports analytical aspects of various Air Force and Joint intelligence, surveillance, and reconnaissance operations by collating, analyzing, 
+evaluating, and disseminating cyber intelligence information. Produces cyber technical products to include target assessments, adversary 
+studies of the cyberspace operational environment, situation reports, and other intelligence products as required. Utilizes all- source 
+intelligence information to produce and present topical high-interest technical and operational intelligence briefings to all levels of 
+command. Creates and maintains technical and operational databases using diverse computer hardware and software applications. 
+2.2. 
+Computer Network Operations: Conducts global collection, exploitation, and signals analysis critical to cryptologic and cyber 
+operations missions. Counters emerging target technologies and gains new access to adversary communications. Exploits and maintains 
+access to worldwide networks. Delivers information in compliance with legal, policy, formatting, and timeliness requirements. Utilizes 
+digital network analysis to conduct computer network exploitation operations on foreign targets that directly enable computer network 
+defense of critical US systems and infrastructure. Provides projection of power capabilities to commanders across US major commands. 
+2.3. 
+Cyberspace Operations: Provides key intelligence enabling offensive and defensive cyberspace operations for US Cyber 
+Command. Conducts analysis of metadata, target analysis, and target research. Identifies target communications within global networks 
+and conducts target technology trends research. Performs global network analysis and mapping, to include technology, activities, and 
+communications, in order to determine target traffic behavior patterns. Analyzes exploitation opportunities for information systems and 
+infrastructure. Utilizes methods and applications of tools used for exploitation and analysis of computer systems and network 
+vulnerabilities. Provides intelligence planning and operations support for target delivery, development, and reporting for cyberspace 
+operations. 
+2.4. 
+Intelligence Training Supporting Cyber Operations: Instructs military personnel on cyber intelligence collection, analysis, and 
+reporting requirements and procedures. Collates intelligence and operations materials to impart proper tradecraft supporting air, space, and 
+cyberspace signals intelligence analysis. Drives development of discovery and tradecraft to broadly enable cryptologic, DoD, and Air 
+Force missions. Integrates information assurance, cyber, cryptologic authorities, and data to evolve development of tradecraft and generate 
+measurable mission outcomes. 
+2.5. 
+Processes, exploits, and disseminates intelligence products and conducts analysis concerning threat countries or targets of interest 
+via written and/or verbal means. These products provide specificity and knowledge to commanders and national leaders to impact tactical 
+through strategic level decision making processes. 
+2.6. 
+Cyber Network Defense and Malware Analysis: Utilizes various analytical tools and techniques to identify and track potential 
+cyber threats, malware, and malicious cyber actors. Collaborates with intelligence analysts, network defenders, and information 
+technology professionals to ensure timely and accurate discovery and reporting of cyber threats to Department of Defense and Intelligence 
+Community stakeholders 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizations and systems; Information Operations; organization of designated military forces; 
+geography; collection and reporting, systems, principles, methods, and procedures; effective writing principles; oral and written 
+intelligence information presentation; and directives for handling, disseminating, and safeguarding classified information. 
+3.2. 
+Education. For entry into this specialty, completion of high school with courses in composition, speech, English, geography, world 
+history, statistics, algebra, geometry, and computer applications is desirable. 
+3.3. Training. The following training is mandatory for award of the AFSC indicated: 
+3.3.1. 1N431A. Completion of the Digital Network Analysis Fundamentals course and Joint Cyber Analysis course. 
+3.3.1.1. 
+For U.S. Space Force, completion of the Digital Network Analysis Fundamentals course, Joint Cyber Analysis course and 
+Space Warfighter Intelligence Formal Training Unit is mandatory until replaced by new courses as determined by US Space Force. 
+82 
+3.4. 
+DAFECD, 31 Oct 24 
+Experience. The following experience is mandatory for award and retention of the AFSC indicated: 
+3.4.1. 1N451A. Qualification in and possession of AFSC 1N431A and experience performing cryptologic activities. 
+3.4.2. 1N471A. Qualification in and possession of AFSC 1N451A and experience performing or supervising cryptologic activities. 
+3.5. Other. The following are mandatory as indicated: 
+3.5.1. For entry into this specialty: 
+3.5.1.1. 
+No speech disorders or noticeable communications deficiencies as defined by AFI 48-123, Medical Examinations and 
+Standards. 
+3.5.1.2. 
+Must obtain a minimum score of 46 required on the Tailored Adaptive Personality Assessment System (TAPAS)/ Armed 
+Services Vocational Aptitude Battery (ASVAB) selection model. 
+3.5.1.3. 
+See attachment 4 for additional entry requirements. 
+3.5.2. For award and retention of AFSC 1N4X1X, the following are mandatory: 
+3.5.2.1. 
+When required for a current or pending assignment, must successfully complete and pass a Counter-Intelligence (CI) polygraph 
+test and meet all customer access eligibility requirements. Airmen unable to access mission, systems and/or facilities after 12 months of 
+investigation/security screening will be considered for retraining or separation. 
+3.5.2.2. 
+Security. 
+3.5.2.3. 
+Maintain local network access IAW AFI 17-130, Cybersecurity Program Management and AFMAN 17-1301, Computer 
+1N451A and 1N471A. Completion of the Joint Cyber Analysis course for RegAF (effective 1 Aug 2019 for Air Force Reserve 
+component) airmen is mandatory for those in grades TSgt (E-6) and below with less than 15 years of time in service. 
+3.5.2.4. 
+Specialty requires routine access to Tier 5 (T5) information, systems, or similar classified environment. 
+3.5.2.5. 
+Completion and favorable adjudication of a current T5 Investigation IAW DoDM 5200.02, AFMAN 16-1405, Air Force 
+Personnel Security Program, is mandatory. 
+NOTE: Initial attendance in 1N4X1A AFSC awarding course without a completed T5 clearance is authorized provided an interim T5 
+clearance eligibility has been granted IAW Intelligence Community Directive (ICD) 704. Airmen who cannot obtain at least an Interim T5 
+clearance for programmed class-start are not eligible for entry into the AFSC. 
+4. Specialty Shredouts: 
+Suffix 
+Portion of AFS to Which Related 
+A 
+Analyst

@@ -1,0 +1,64 @@
+AFSC: 21A
+Title: AIRCRAFT MAINTENANCE
+Category: Maintenance
+Pages: 110-110
+Notes: None
+==================================================
+
+AFSC 21A4, Staff 
+AFSC 21A3, Qualified  
+AFSC 21A1, Entry 
+AIRCRAFT MAINTENANCE 
+(Changed 31 Oct 15, Effective 26 Feb 15) 
+1. Specialty Summary. Leads, trains, and equips personnel supporting aerospace equipment sustainment and operations. Manages 
+maintenance and modification of aircraft and associated equipment. Administers aircraft maintenance programs and resources. Directs 
+aircraft maintenance production, staff activity, and related materiel programs. Assesses unit capability and advises senior leadership. 
+Related DoD Occupational Groups: 240400. 
+2. Duties and Responsibilities: 
+2.1. 
+Directs aircraft maintenance mission generation and repair network activities. Maintains workforce discipline and responds to 
+personnel issues while balancing workforce availability and skill levels with operational requirements. Works with functional managers to 
+develop, formulate, and manage fiscal resources. Instills maintenance discipline, security awareness and force protection concepts. 
+Ensures accuracy of documentation, i.e., aircraft forms and automated systems. Ensures adherence to technical data, policy, procedures, 
+and safe maintenance practices. 
+2.2. 
+Develops, coordinates, and executes flying and maintenance schedules. Manages aircraft configuration; daily aircraft servicing, 
+weapons loading, launch, recovery, and repair; periodic aircraft maintenance inspections; and flightline safety and foreign object damage 
+(FOD) prevention and dropped object programs (DOP). Manages overall aircraft fleet health and ensures aircraft availability to execute 
+mission requirements. Analyzes aircraft maintenance indicators to identify trends and initiates corrective actions. 
+2.3. 
+Directs maintenance activities that may include aircraft propulsion, pneudraulics, egress, fuel systems, electro-environmental, 
+Precision Measurement Equipment Laboratory (PMEL) and avionics systems. Also, may include management of aerospace ground 
+equipment, structural repair, low-observable repair, corrosion control, machine, welding, inspection, aero-repair, crash, damaged, disabled 
+aircraft recovery, non-destructive inspection, and off-equipment munitions and armament suspension equipment. 
+2.4. 
+Manages quality assurance, maintenance training, budget and resource management, analysis, facilities, shared resources to 
+include end-of-runway and weapons load training. Manages plans and programs, modifications, and modernizations requirements. 
+2.5. 
+Formulates maintenance plans and policies to meet unit tasking. Assesses unit maintenance capability in support of combat related 
+operational plans and provides inputs for capability assessments for each plan. Defines aircraft maintenance procedures and requirements 
+in response to emergency or contingency situations. 
+2.6. 
+Coordinates core logistics requirements supporting aircraft maintenance operations. Establishes support requirements for supply 
+requisition, repair cycle, delivery, combat support, ground and aerial port transportation, base support plans, and munitions requirements. 
+2.7. 
+Directs and manages wholesale logistics life cycle sustainment support. Coordinates production schedules to include induction and 
+selling systems. Defines technical problems and economic factors related to research and development, and system operational data to 
+evaluate programs, assess trends, and identify improvements and deficiencies. Manages weapons system programs, funding of depot 
+maintenance workloads, and transportation distribution systems. Manages logistics tests and evaluation on new acquisition programs and 
+aircraft modifications. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. The following knowledge is mandatory for award of the AFSC: maintenance and personnel management procedures, 
+and organizational and mission requirements; capabilities, limitations, and basic operating principles of aircraft systems and components; 
+theory of flight and airframe construction; life cycle sustainment, quality assurance; supply, transportation, logistics plans, contracting, 
+flying operations, munitions, and other unit operations related to aircraft maintenance units. 
+3.2. 
+Education. For entry education requirements see Appendix A, 21A CIP Education Matrix. 
+3.3. Training. For award of the 21A3, completion of a formal AETC entry-level training course; minimum of 24 months assigned to a 
+21A position (Group Commanders may extend this requirement), and completion of the education and training requirements specified in 
+the Aircraft Maintenance Officer Training Task List. 
+3.4. 
+Experience. For award of AFSC 21A3, a minimum of 24 months of experience managing aircraft maintenance activities is 
+mandatory. 
+3.5. Other. Not used.

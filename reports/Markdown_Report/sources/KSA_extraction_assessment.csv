@@ -1,0 +1,100 @@
+afsc,label,text_norm,evidence,source_doc,page,chunk_idx,extractor_version,reviewer_label,notes
+11F3,K,"theory of flight, air navigation, meteorology, flying directives, aircraft operating procedures,","erforms staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics. 
+3.2. 
+Education. For entry into this specialty, an undergraduate degree specializi",pattern,,,pattern_v0,,
+11F3,S,staff functions related to this specialty,". 
+Develops plans and policies, monitors operations, and advises commanders. Assists commanders and performs staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air nav",pattern,,,pattern_v0,,
+12B,K,"theory of flight, air navigation, meteorology, flying directives, aircraft operating procedures,","erforms staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air navigation, meteorology, flying directives, aircraft operating 
+procedures, and mission tactics. 
+3.2. 
+Education. For entry into this specialty, an undergraduate degree specializi",pattern,,,pattern_v0,,
+12B,S,staff functions related to this specialty,". 
+Develops plans and policies, monitors operations, and advises commanders. Assists commanders and performs staff functions 
+related to this specialty. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of theory of flight, air nav",pattern,,,pattern_v0,,
+14F,K,"Identification of decision makers, factors that guide decision-making, and supporting infrastructure in the information environment","Provides considerations for targets that are 
+vulnerable and susceptible to operations in the IE, capabilities that can be applied to achieve the desired effects of those operations, and 
+how to asses",AFOCD,,2,anthropic_v0,,
+14F,S,Leading and developing kinetic and non-kinetic capability requirements,"Provides considerations for targets that are 
+vulnerable and susceptible to operations in the IE, capabilities that can be applied to achieve the desired effects of those operations, and 
+how to asses",AFOCD,,2,anthropic_v0,,
+14F,A,Identify targets vulnerable and susceptible to operations in the information environment,"Provides considerations for targets that are 
+vulnerable and susceptible to operations in the IE, capabilities that can be applied to achieve the desired effects of those operations, and 
+how to asses",AFOCD,,2,anthropic_v0,,
+14N,K,"intelligence fundamentals, security, analysis, communications skills, the intelligence disciplines, the intelligence community, isr information systems, research sources","rt accomplishment 
+of the commander’s objectives. 
+ 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Knowledge is mandatory of intelligence fundamentals, security, analysis, communications skills, the intelligence 
+disciplines, the intelligence community, ISR information systems, research sources and methods, the presentation of friendly forces, 
+friendly weapons systems, adversary capabilities, ISR",pattern,,,pattern_v0,,
+14N,S,"analysis of enemy personnel, units, disposition, facilities, systems,","ired effects that achieve objectives, taking account of operational 
+requirements and capabilities. Conducts analysis of enemy personnel, units, disposition, facilities, systems, and nodes relative to the 
+mission, objectives, and the capabilities at the Joint Force Commander’s disp",pattern,,,pattern_v0,,
+1A3X1,K,"electrical, arithmetic, mechanical, navigation, communication, hydraulic,","o and paratroopers exiting the 
+aircraft. 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Mandatory knowledge of: electrical, arithmetic, mechanical, navigation, communication, hydraulic, and pneumatic 
+systems applying to aircraft and related systems; flight theory; minor in-flight maintena",pattern,,,pattern_v0,,
+1A3X1,S,preflight," in Master Training Tasks/Task Training Lists associated with Mission Design Series crew positions. Performs preflight and 
+post-flight of aircraft and aircraft systems. Receives cargo/passenger load briefings, checks place",pattern,,,pattern_v0,,
+1A3X1,A,supervise aviation organizational functions,"rms; 
+principles of dispensing and preserving food aboard aircraft; and cargo restraint techniques. Ability to supervise aviation organizational 
+functions and shops to include Training, Tactics, Scheduling, and Evaluations. 
+3.3.3. 1A192. Qualification in and",pattern,,,pattern_v0,,
+1C3,S,directives,"and maintains entry authority lists. Coordinates and provides input to installation support 
+plans. Maintains directives and daily events log. Updates and maintains national, HHQ, or installation key personnel rosters. Perfor",pattern,,,pattern_v0,,
+1N0,S,intelligence debriefings of us,"s. Advises commanders on force protection and intelligence information for US and Partner Nations. 
+Conducts intelligence debriefings of US and allied military personnel involved in combat operations. Prepares mission reports. 
+2.2. 
+Conducts i",pattern,,,pattern_v0,,
+1N4,K,global communications procedures,"ence 
+Community stakeholders 
+3. Specialty Qualifications: 
+3.1. 
+Knowledge. Must gain and maintain knowledge of global communications procedures; analytical techniques; organization of the 
+national intelligence structure; intelligence organizat",pattern,,,pattern_v0,,
+1N4,S,technical,"gh-interest technical and operational intelligence briefings to all levels of 
+command. Creates and maintains technical and operational databases using diverse computer hardware and software applications. 
+2.2. 
+Computer Net",pattern,,,pattern_v0,,
+21A,K,maintenance and personnel management procedures,"Manages weapons system programs, funding of depot 
+maintenance workloads, and transportation distribution systems. Manages logistics tests and evaluation on new acquisition programs and 
+aircraft modi",AFOCD,,2,anthropic_v0,,
+21A,S,managing weapons system programs,"Manages weapons system programs, funding of depot 
+maintenance workloads, and transportation distribution systems. Manages logistics tests and evaluation on new acquisition programs and 
+aircraft modi",AFOCD,,2,anthropic_v0,,
+21A,A,capacity to manage aircraft maintenance activities,"Manages weapons system programs, funding of depot 
+maintenance workloads, and transportation distribution systems. Manages logistics tests and evaluation on new acquisition programs and 
+aircraft modi",AFOCD,,2,anthropic_v0,,
+21M,K,Wiring harnesses,"Represents logistics in development of flight procedures, mission checklists, and mission flight rules. 2.8. Writes munitions, nuclear weapon, and missile maintenance annexes to logistics plans. Provi",AFOCD,,2,anthropic_v0,,
+21M,S,"conventional munitions, nuclear weapons,","ns for storage, 
+movement, and operations of conventional munitions, nuclear weapons, and missiles. Conducts conventional munitions, nuclear weapons, 
+and missile safety training. 
+2.3. 
+Manages conventional munitions, nuclear weapons, and missile mainten",pattern,,,pattern_v0,,
+21M,A,"Represent logistics in development of flight procedures, mission checklists, and mission flight rules","Represents logistics in development of flight procedures, mission checklists, and mission flight rules. 2.8. Writes munitions, nuclear weapon, and missile maintenance annexes to logistics plans. Provi",AFOCD,,2,anthropic_v0,,
+2A3,S,"aircraft engines, hydraulic,","ntenance procedures and policies to repair aircraft and related equipment. 
+2.2. 
+Troubleshoots and maintains aircraft engines, hydraulic, and other related systems, structures, components, and related equipment. 
+Removes and installs aircraft",pattern,,,pattern_v0,,
+2A5,S,powered,"s for clearances, tolerances, proper installation, and operation. Performs pre-use 
+inspections and operates powered and non-powered aerospace ground equipment. Inspects and identifies aircraft corrosion for prevention 
+a",pattern,,,pattern_v0,,

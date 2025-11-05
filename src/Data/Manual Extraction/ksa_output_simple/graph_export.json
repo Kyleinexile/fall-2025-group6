@@ -1,0 +1,999 @@
+{
+  "nodes": [
+    {
+      "id": "11F3",
+      "type": "AFSC",
+      "properties": {
+        "title": "FIGHTER PILOT",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "12B",
+      "type": "AFSC",
+      "properties": {
+        "title": "BOMBER COMBAT SYSTEMS OFFICER",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "14N",
+      "type": "AFSC",
+      "properties": {
+        "title": "INTELLIGENCE",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "14F",
+      "type": "AFSC",
+      "properties": {
+        "title": "INFORMATION OPERATIONS",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "21A",
+      "type": "AFSC",
+      "properties": {
+        "title": "AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "21M",
+      "type": "AFSC",
+      "properties": {
+        "title": "MUNITIONS AND MISSILE MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "1A3X1",
+      "type": "AFSC",
+      "properties": {
+        "title": "MOBILITY FORCE AVIATOR",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "1C3",
+      "type": "AFSC",
+      "properties": {
+        "title": "ALL-DOMAIN COMMAND AND CONTROL OPERATIONS",
+        "category": "Operations"
+      }
+    },
+    {
+      "id": "1N0",
+      "type": "AFSC",
+      "properties": {
+        "title": "ALL SOURCE INTELLIGENCE ANALYST",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "1N4",
+      "type": "AFSC",
+      "properties": {
+        "title": "CYBER INTELLIGENCE",
+        "category": "Intelligence"
+      }
+    },
+    {
+      "id": "2A3",
+      "type": "AFSC",
+      "properties": {
+        "title": "TACTICAL AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "2A5",
+      "type": "AFSC",
+      "properties": {
+        "title": "AIRLIFT/SPECIAL MISSION AIRCRAFT MAINTENANCE",
+        "category": "Maintenance"
+      }
+    },
+    {
+      "id": "skill_train_air_force_crew",
+      "type": "SKILL",
+      "properties": {
+        "text": "train air force crew",
+        "confidence": 0.5931535363197327
+      }
+    },
+    {
+      "id": "skill_military_aviation",
+      "type": "SKILL",
+      "properties": {
+        "text": "military aviation",
+        "confidence": 0.5884260535240173
+      }
+    },
+    {
+      "id": "skill_air_force_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "air force operations",
+        "confidence": 0.5530112981796265
+      }
+    },
+    {
+      "id": "skill_develop_military_intelligence_records",
+      "type": "SKILL",
+      "properties": {
+        "text": "develop military intelligence records",
+        "confidence": 0.5832751393318176
+      }
+    },
+    {
+      "id": "skill_advise_superiors_on_military_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "advise superiors on military operations",
+        "confidence": 0.6204969882965088
+      }
+    },
+    {
+      "id": "skill_perform_military_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform military operations",
+        "confidence": 0.5936249494552612
+      }
+    },
+    {
+      "id": "skill_instruct_in_military_duties",
+      "type": "SKILL",
+      "properties": {
+        "text": "instruct in military duties",
+        "confidence": 0.5832948684692383
+      }
+    },
+    {
+      "id": "skill_conduct_threat_intelligence",
+      "type": "SKILL",
+      "properties": {
+        "text": "conduct threat intelligence",
+        "confidence": 0.5652889013290405
+      }
+    },
+    {
+      "id": "skill_supervise_the_maintenance_of_military_equipment",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise the maintenance of military equipment",
+        "confidence": 0.7277299165725708
+      }
+    },
+    {
+      "id": "skill_perform_aircraft_maintenance",
+      "type": "SKILL",
+      "properties": {
+        "text": "perform aircraft maintenance",
+        "confidence": 0.6620861291885376
+      }
+    },
+    {
+      "id": "skill_organise_aircraft_maintenance",
+      "type": "SKILL",
+      "properties": {
+        "text": "organise aircraft maintenance",
+        "confidence": 0.6301000118255615
+      }
+    },
+    {
+      "id": "skill_aircraft_mechanics",
+      "type": "SKILL",
+      "properties": {
+        "text": "aircraft mechanics",
+        "confidence": 0.595760703086853
+      }
+    },
+    {
+      "id": "skill_maintenance_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "maintenance operations",
+        "confidence": 0.5851489305496216
+      }
+    },
+    {
+      "id": "ability_manage_aircraft_support_systems",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage aircraft support systems",
+        "confidence": 0.5821669101715088
+      }
+    },
+    {
+      "id": "skill_supervise_maintenance_activities_in_airports",
+      "type": "SKILL",
+      "properties": {
+        "text": "supervise maintenance activities in airports",
+        "confidence": 0.5816568732261658
+      }
+    },
+    {
+      "id": "skill_apply_military_aviation_regulations",
+      "type": "SKILL",
+      "properties": {
+        "text": "apply military aviation regulations",
+        "confidence": 0.5632179379463196
+      }
+    },
+    {
+      "id": "skill_oversee_maintenance_work",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee maintenance work",
+        "confidence": 0.555894672870636
+      }
+    },
+    {
+      "id": "ability_manage_maintenance_operations",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage maintenance operations",
+        "confidence": 0.555893063545227
+      }
+    },
+    {
+      "id": "skill_assist_in_military_logistics",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in military logistics",
+        "confidence": 0.597975492477417
+      }
+    },
+    {
+      "id": "skill_military_logistics",
+      "type": "SKILL",
+      "properties": {
+        "text": "military logistics",
+        "confidence": 0.5968084335327148
+      }
+    },
+    {
+      "id": "ability_manage_military_logistics",
+      "type": "ABILITY",
+      "properties": {
+        "text": "manage military logistics",
+        "confidence": 0.5895761251449585
+      }
+    },
+    {
+      "id": "ability_air_traffic_management",
+      "type": "ABILITY",
+      "properties": {
+        "text": "air traffic management",
+        "confidence": 0.5952107906341553
+      }
+    },
+    {
+      "id": "skill_air_traffic_control_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "air traffic control operations",
+        "confidence": 0.5735561847686768
+      }
+    },
+    {
+      "id": "skill_teach_air_cabin_crew_procedures",
+      "type": "SKILL",
+      "properties": {
+        "text": "teach air cabin crew procedures",
+        "confidence": 0.5609347820281982
+      }
+    },
+    {
+      "id": "skill_assist_in_ship_maintenance",
+      "type": "SKILL",
+      "properties": {
+        "text": "assist in ship maintenance",
+        "confidence": 0.6240840554237366
+      }
+    },
+    {
+      "id": "skill_carry_out_repairs_and_maintenance_of_vehicle_bodie",
+      "type": "SKILL",
+      "properties": {
+        "text": "carry out repairs and maintenance of vehicle bodies",
+        "confidence": 0.5855627059936523
+      }
+    },
+    {
+      "id": "skill_inspect_cabin_service_equipment",
+      "type": "SKILL",
+      "properties": {
+        "text": "inspect cabin service equipment",
+        "confidence": 0.5770492553710938
+      }
+    },
+    {
+      "id": "skill_execute_vehicle_maintenance",
+      "type": "SKILL",
+      "properties": {
+        "text": "execute vehicle maintenance",
+        "confidence": 0.5570502281188965
+      }
+    },
+    {
+      "id": "skill_oversee_equipment_cleaning",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee equipment cleaning",
+        "confidence": 0.5553168058395386
+      }
+    },
+    {
+      "id": "skill_oversee_assembly_operations",
+      "type": "SKILL",
+      "properties": {
+        "text": "oversee assembly operations",
+        "confidence": 0.5518349409103394
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "11F3",
+      "target": "skill_train_air_force_crew",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5931535363197327,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "skill_military_aviation",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5884260535240173,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "11F3",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5530112981796265,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "12B",
+      "target": "skill_military_aviation",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5680825710296631,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14N",
+      "target": "skill_develop_military_intelligence_records",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5832751393318176,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14N",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5505449771881104,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_advise_superiors_on_military_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6204969882965088,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_develop_military_intelligence_records",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6065314412117004,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_perform_military_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5936249494552612,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5852580070495605,
+        "evidence": "...n Support Operations (IIC-MISO) or Psychological Operations Qualification Course (POQC); and 3.3.4. Air Force Operations Security Course (AFOC); or 3.3.5. Similar courses as approved by the 14F Car"
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_instruct_in_military_duties",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5832948684692383,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "14F",
+      "target": "skill_conduct_threat_intelligence",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5652889013290405,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7277299165725708,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_perform_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6620861291885376,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_organise_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6301000118255615,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_aircraft_mechanics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.595760703086853,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_maintenance_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5851489305496216,
+        "evidence": "...ergency or contingency situations. 2.6. Coordinates core logistics requirements supporting aircraft maintenance operations. Establishes support requirements for supply requisition, repair cycle, de"
+      }
+    },
+    {
+      "source": "21A",
+      "target": "ability_manage_aircraft_support_systems",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5821669101715088,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_supervise_maintenance_activities_in_airports",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5816568732261658,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_apply_military_aviation_regulations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5632179379463196,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "skill_oversee_maintenance_work",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.555894672870636,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21A",
+      "target": "ability_manage_maintenance_operations",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.555893063545227,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7243605256080627,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_assist_in_military_logistics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.597975492477417,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_military_logistics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5968084335327148,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "ability_manage_military_logistics",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5895761251449585,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_instruct_in_military_duties",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5847635269165039,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "21M",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5589534044265747,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_military_aviation",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6108384132385254,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6007327437400818,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "ability_air_traffic_management",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5952107906341553,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5843087434768677,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_train_air_force_crew",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5835489630699158,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_air_traffic_control_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5735561847686768,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_apply_military_aviation_regulations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5718212127685547,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_teach_air_cabin_crew_procedures",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5609347820281982,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_assist_in_military_logistics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.558692455291748,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_instruct_in_military_duties",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.557281494140625,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1A3X1",
+      "target": "skill_aircraft_mechanics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5558533668518066,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_air_force_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5986218452453613,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5856939554214478,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_air_traffic_control_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5693976879119873,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1C3",
+      "target": "skill_instruct_in_military_duties",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5621429681777954,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "skill_conduct_threat_intelligence",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5967926383018494,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1N0",
+      "target": "skill_develop_military_intelligence_records",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5949185490608215,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "1N4",
+      "target": "skill_conduct_threat_intelligence",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5885803699493408,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7668882608413696,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_perform_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6993632912635803,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_aircraft_mechanics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6624455451965332,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_organise_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6360499858856201,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_assist_in_ship_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6240840554237366,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_maintenance_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6072608232498169,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_supervise_maintenance_activities_in_airports",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6012698411941528,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_oversee_maintenance_work",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5952968597412109,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_carry_out_repairs_and_maintenance_of_vehicle_bodie",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5855627059936523,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "skill_inspect_cabin_service_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5770492553710938,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "ability_manage_aircraft_support_systems",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5685244798660278,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A3",
+      "target": "ability_manage_maintenance_operations",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.556107223033905,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_supervise_the_maintenance_of_military_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7367058992385864,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_perform_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.7315247654914856,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_aircraft_mechanics",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6732499599456787,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_organise_aircraft_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6606305241584778,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_supervise_maintenance_activities_in_airports",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6293840408325195,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_assist_in_ship_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6211857795715332,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_oversee_maintenance_work",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6159816980361938,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_maintenance_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.6072996854782104,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_carry_out_repairs_and_maintenance_of_vehicle_bodie",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5869937539100647,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_inspect_cabin_service_equipment",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5736016035079956,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "ability_manage_aircraft_support_systems",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.5730355381965637,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "ability_manage_maintenance_operations",
+      "relationship": "REQUIRES_ABILITY",
+      "properties": {
+        "confidence": 0.570759654045105,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_execute_vehicle_maintenance",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5570502281188965,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_oversee_equipment_cleaning",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5553168058395386,
+        "evidence": ""
+      }
+    },
+    {
+      "source": "2A5",
+      "target": "skill_oversee_assembly_operations",
+      "relationship": "REQUIRES_SKILL",
+      "properties": {
+        "confidence": 0.5518349409103394,
+        "evidence": ""
+      }
+    }
+  ]
+}

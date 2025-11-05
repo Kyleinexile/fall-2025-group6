@@ -1,0 +1,63 @@
+AFSC Sample Snippets for Manual Review
+============================================================
+
+AFSC: 96D0 | AFOCD | Operations
+Score: 118.25  Pages: 275-304  KSA cues: 33
+Sample: DAFOCD, 31 Oct 24 36. 96D0 Officer Not Available for Use in Awarded AFSC for Cause. Use this RI to report the duty AFSC of officers not available to perform duty in an awarded AFSC because of duty sta
+------------------------------------------------------------
+
+AFSC: 11R3 | AFOCD | Operations
+Score: 92.57  Pages: 15-41  KSA cues: 24
+Sample: DAFOCD, 31 Oct 24 PREFIX K INSTRUCTOR (Changed 31 Oct 24) Prefix K identifies positions on manning documents and officers serving in or qualified to serve in positions as an Instructor Pilot, Navigat
+------------------------------------------------------------
+
+AFSC: 14N1 | AFOCD | Intelligence
+Score: 47.32  Pages: 6-76  KSA cues: 13
+Sample: DAFOCD, 31 Oct 24 SECTION I-B AUTHORIZED PREFIXES PREFIX A MULTI-DOMAIN WARFARE PLANNER (Changed 31 Oct 24) Prefix A identifies positions on manning documents and officers serving in, or qualified to
+------------------------------------------------------------
+
+AFSC: 14N3 | AFOCD | Intelligence
+Score: 45.75  Pages: 17-75  KSA cues: 13
+Sample: DAFOCD, 31 Oct 24 PREFIX O SUPPORT SQUADRON OPERATIONS OFFICER (Changed 31 Oct 24) Prefix O identifies positions on manning documents and officers serving in, or qualified to serve in, positions in n
+------------------------------------------------------------
+
+AFSC: 21A4 | AFOCD | Maintenance
+Score: 31.97  Pages: 110-110  KSA cues: 8
+Sample: DAFOCD, 31 Oct 24 AFSC 21A4, Staff AFSC 21A3, Qualified AFSC 21A1, Entry AIRCRAFT MAINTENANCE (Changed 31 Oct 15, Effective 26 Feb 15) 1. Specialty Summary. Leads, trains, and equips personnel support
+------------------------------------------------------------
+
+AFSC: 21A1 | AFOCD | Maintenance
+Score: 31.97  Pages: 110-110  KSA cues: 8
+Sample: DAFOCD, 31 Oct 24 AFSC 21A4, Staff AFSC 21A3, Qualified AFSC 21A1, Entry AIRCRAFT MAINTENANCE (Changed 31 Oct 15, Effective 26 Feb 15) 1. Specialty Summary. Leads, trains, and equips personnel support
+------------------------------------------------------------
+
+AFSC: 6C0X1 | AFECD | Operations
+Score: 838.22  Pages: 297-378  KSA cues: 275
+Sample: DAFECD, 31 Oct 24 funds or property, financial irresponsibility, committing acts of misconduct relating to or engaging in falsification of legal documents, or failure to exercise sound leadership prin
+------------------------------------------------------------
+
+AFSC: 1C8X3 | AFECD | Operations
+Score: 340.74  Pages: 20-39  KSA cues: 74
+Sample: DAFECD, 31 Oct 24 ★Prefix X Aircrew (Changed 31 Oct 24) Prefix X identifies positions on manpower documents and Airmen/Guardian serving in or qualified to serve in aircraft crew positions. Affix prefi
+------------------------------------------------------------
+
+AFSC: 1N1X1 | AFECD | Intelligence
+Score: 62.62  Pages: 76-78  KSA cues: 15
+Sample: DAFECD, 31 Oct 24 3.5. Other. The following are mandatory as indicated: 3.5.1. into this specialty: 3.5.1.1. Normal color vision as defined by correctly identifying at least 10 of 14 Pseudo-isochromat
+------------------------------------------------------------
+
+AFSC: 1N2X1 | AFECD | Intelligence
+Score: 61.81  Pages: 79-82  KSA cues: 16
+Sample: DAFECD, 31 Oct 24 3.3.2.1. For U.S. Space Force, completion of the Communication Signals Intelligence Course and Space Warfighter Intelligence Formal Training Unit is mandatory until replaced by new c
+------------------------------------------------------------
+
+AFSC: 2A3X5 | AFECD | Maintenance
+Score: 921.87  Pages: 128-179  KSA cues: 238
+Sample: DAFECD, 31 Oct 24 3.5.2.2. Specialty requires routine access to Tier 3 (T3) information, systems, or similar classified environment. For award and retention of AFSCs 2A3X5/X, completion of a current T
+------------------------------------------------------------
+
+AFSC: 2W1X1 | AFECD | Maintenance
+Score: 261.73  Pages: 189-200  KSA cues: 69
+Sample: DAFECD, 31 Oct 24 3.5.1. See attachment 4 for additional entry requirements. 3.5.2. For entry, award, and retention of these AFSCs: 3.5.2.1. Must not have chronic mental health conditions. 3.5.2.2. No
+------------------------------------------------------------
+
