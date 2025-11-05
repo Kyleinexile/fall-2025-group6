@@ -8,8 +8,19 @@ except ModuleNotFoundError:
     # Path setup for Streamlit Cloud
     REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
     SRC = REPO_ROOT / "src"
+    
+    # DEBUG: Print what we calculated
+    print(f"[DEBUG] __file__ = {__file__}")
+    print(f"[DEBUG] REPO_ROOT = {REPO_ROOT}")
+    print(f"[DEBUG] SRC = {SRC}")
+    print(f"[DEBUG] SRC exists? {SRC.exists()}")
+    print(f"[DEBUG] REPO_ROOT contents: {list(REPO_ROOT.glob('*')) if REPO_ROOT.exists() else 'DOES NOT EXIST'}")
+    
     if str(SRC) not in sys.path:
         sys.path.insert(0, str(SRC))
+    
+    print(f"[DEBUG] sys.path[0] = {sys.path[0]}")
+    
     # Retry import
     from afsc_pipeline.preprocess import clean_afsc_text
 
