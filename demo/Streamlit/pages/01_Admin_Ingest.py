@@ -409,15 +409,15 @@ with tab3:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
                     # Delete everything in one transaction
-                    result = s.run("""
+                     result = s.run("""
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
                         OPTIONAL MATCH (a)-[r:REQUIRES]->(k:KSA)
-                        DELETE r
-                        DELETE a
-                        WITH k
-                        WHERE k IS NOT NULL
-                        WITH k WHERE NOT ()-[:REQUIRES]->(k)
+                        WITH a, collect(DISTINCT k) as ksa_nodes
+                        DETACH DELETE a
+                        WITH ksa_nodes
+                        UNWIND ksa_nodes as k
+                        WITH k WHERE k IS NOT NULL AND NOT ()-[:REQUIRES]->(k)
                         DELETE k
                         RETURN count(k) as ksas_deleted
                     """, {"codes": afsc_list})
