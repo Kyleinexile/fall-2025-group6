@@ -409,7 +409,7 @@ with tab3:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
                     # Delete everything in one transaction
-                     result = s.run("""
+                    result = s.run("""
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
                         OPTIONAL MATCH (a)-[r:REQUIRES]->(k:KSA)
