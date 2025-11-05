@@ -32,13 +32,13 @@ def get_items_for_afsc(afsc_code: str):
     driver = get_driver()
     with driver.session(database=NEO4J_DATABASE) as s:
         result = s.run("""
-            MATCH (a:AFSC {code: $code})-[:HAS_ITEM|REQUIRES]->(i:Item)
+            MATCH (a:AFSC {code: $code})-[:REQUIRES]->(k:KSA)
             RETURN 
-                i.text as text,
-                i.item_type as type,
-                coalesce(i.confidence, 0.0) as confidence,
-                coalesce(i.source, '') as source,
-                coalesce(i.esco_id, '') as esco_id
+                k.text as text,
+                k.type as type,
+                coalesce(k.confidence, 0.0) as confidence,
+                coalesce(k.source, '') as source,
+                coalesce(k.esco_id, '') as esco_id
             ORDER BY type, confidence DESC, text
         """, {"code": afsc_code})
         return pd.DataFrame([r.data() for r in result])
@@ -48,13 +48,13 @@ def find_overlaps(afsc_codes: list):
     driver = get_driver()
     with driver.session(database=NEO4J_DATABASE) as s:
         result = s.run("""
-            MATCH (a:AFSC)-[:HAS_ITEM|REQUIRES]->(i:Item)
+            MATCH (a:AFSC)-[:REQUIRES]->(k:KSA)
             WHERE a.code IN $codes
-            WITH i, collect(DISTINCT a.code) as afscs
+            WITH k, collect(DISTINCT a.code) as afscs
             WHERE size(afscs) > 1
             RETURN 
-                i.text as text,
-                i.item_type as type,
+                k.text as text,
+                k.type as type,
                 afscs,
                 size(afscs) as overlap_count
             ORDER BY overlap_count DESC, text
