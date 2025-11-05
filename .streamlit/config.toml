@@ -1,0 +1,6 @@
+[server]
+enableCORS = false
+enableXsrfProtection = false
+
+[runner]
+pythonPath = ["src"]
