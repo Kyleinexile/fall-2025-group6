@@ -1,12 +1,15 @@
 from __future__ import annotations
-import sys, pathlib, os, json, time, re
-from typing import Dict, Any, List
+import sys, pathlib, os
 
+# FIRST: Set up paths BEFORE any local imports
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+# NOW import everything else
+import json, time, re
+from typing import Dict, Any, List
 import pandas as pd
 import streamlit as st
 from neo4j import GraphDatabase
@@ -14,10 +17,9 @@ from neo4j.exceptions import ServiceUnavailable, AuthError
 from dotenv import load_dotenv
 load_dotenv()
 
+# Local imports AFTER path is set
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.pipeline import run_pipeline, ItemDraft
-
-# NEW: Import LAiSER and LLM enhancement
 from afsc_pipeline.extract_laiser import extract_ksa_items
 from afsc_pipeline.enhance_llm import enhance_items_with_llm
 
