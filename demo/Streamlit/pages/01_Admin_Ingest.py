@@ -407,15 +407,24 @@ with tab3:
             else:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
-                    # Updated deletion logic: safely remove AFSCs and orphan KSAs
                     result = s.run("""
+                        // 1) Collect AFSCs and their KSAs
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
                         OPTIONAL MATCH (a)-[:REQUIRES|HAS_ITEM]->(k:KSA)
-                        WITH a, collect(DISTINCT k) AS ksa_nodes
+                        WITH collect(DISTINCT a) AS afscs, collect(DISTINCT k) AS ksa_nodes
+
+                        // 2) Delete AFSC nodes
+                        UNWIND afscs AS a
                         DETACH DELETE a
+
+                        // 3) Now consider KSA orphans; need WITH after DELETE
+                        WITH ksa_nodes
                         UNWIND ksa_nodes AS k
-                        WITH k WHERE k IS NOT NULL AND NOT (k)<-[:REQUIRES|HAS_ITEM]-(:AFSC)
+                        WITH DISTINCT k
+                        WHERE k IS NOT NULL AND NOT (k)<-[:REQUIRES|HAS_ITEM]-(:AFSC)
+
+                        // 4) Remove only true orphans; DETACH in case other edges exist
                         DETACH DELETE k
                         RETURN count(k) AS ksas_deleted
                     """, {"codes": afsc_list})
