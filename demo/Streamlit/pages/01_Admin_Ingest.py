@@ -2,16 +2,28 @@ from __future__ import annotations
 import sys, pathlib, os
 
 # FIRST: Set up paths BEFORE any local imports
+import streamlit as st  # Import st early for debug output
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
+
+# DEBUG: Show what we calculated
+st.sidebar.write(f"DEBUG: __file__ = {__file__}")
+st.sidebar.write(f"DEBUG: REPO_ROOT = {REPO_ROOT}")
+st.sidebar.write(f"DEBUG: SRC = {SRC}")
+st.sidebar.write(f"DEBUG: SRC exists? {SRC.exists()}")
+if SRC.exists():
+    st.sidebar.write(f"DEBUG: SRC contents: {list(SRC.glob('*'))[:5]}")
+
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+
+st.sidebar.write(f"DEBUG: sys.path[0] = {sys.path[0]}")
 
 # NOW import everything else
 import json, time, re
 from typing import Dict, Any, List
 import pandas as pd
-import streamlit as st
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 from dotenv import load_dotenv
