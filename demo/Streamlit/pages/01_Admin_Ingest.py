@@ -409,25 +409,26 @@ with tab3:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
                     # Delete everything in one transaction
-                    # Delete everything in one transaction
                     result = s.run("""
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
                         OPTIONAL MATCH (a)-[r:REQUIRES]->(k:KSA)
-                        DELETE r, a
-                        WITH collect(DISTINCT k) as ksa_nodes
-                        UNWIND ksa_nodes as k
-                        WHERE k IS NOT NULL AND NOT ()-[:REQUIRES]->(k)
+                        DELETE r
+                        DELETE a
+                        WITH k
+                        WHERE k IS NOT NULL
+                        WITH k WHERE NOT ()-[:REQUIRES]->(k)
                         DELETE k
                         RETURN count(k) as ksas_deleted
                     """, {"codes": afsc_list})
                     
                     rec = result.single()
                     ksas_deleted = rec["ksas_deleted"] if rec else 0
-                    afscs_deleted = len(afsc_list)  # We know how many we tried to delete
+                    afscs_deleted = len(afsc_list)
                 
                 driver.close()
                 st.success(f"Deleted {afscs_deleted} AFSCs and {ksas_deleted} orphaned KSAs")
+                st.cache_data.clear()
                 
         except Exception as e:
             st.error(f"Delete failed: {e}")
