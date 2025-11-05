@@ -266,34 +266,18 @@ with tab1:
                     
                     # Step 4: Write to Neo4j
                     st.write("💾 Writing to Neo4j...")
+                    
+                    # Import the graph writer
+                    from afsc_pipeline.graph_writer_v2 import upsert_afsc_and_items
+                    
                     with driver.session(database=NEO4J_DATABASE) as session:
-                        # Create AFSC node
-                        session.run("""
-                            MERGE (a:AFSC {code: $code})
-                            ON CREATE SET a.created_at = datetime()
-                            SET a.updated_at = datetime()
-                        """, {"code": code.strip()})
-                        
-                        # Create KSA nodes and relationships
-                        for item in all_items:
-                            session.run("""
-                                MERGE (k:Item {text: $text, item_type: $item_type})
-                                ON CREATE SET 
-                                    k.confidence = $confidence,
-                                    k.source = $source,
-                                    k.esco_id = $esco_id,
-                                    k.created_at = datetime()
-                                WITH k
-                                MATCH (a:AFSC {code: $code})
-                                MERGE (a)-[:HAS_ITEM]->(k)
-                            """, {
-                                "text": item.text,
-                                "item_type": item.item_type.value if hasattr(item.item_type, 'value') else str(item.item_type),
-                                "confidence": float(getattr(item, 'confidence', 0)),
-                                "source": getattr(item, 'source', 'unknown'),
-                                "esco_id": getattr(item, 'esco_id', None),
-                                "code": code.strip()
-                            })
+                        # Use the new schema writer
+                        write_stats = upsert_afsc_and_items(
+                            session=session,
+                            afsc_code=code.strip(),
+                            items=all_items
+                        )
+                        st.write(f"   ✓ Wrote {len(all_items)} KSAs with new schema")
                     
                     status.update(label="✅ Complete!", state="complete")
                 
@@ -424,18 +408,18 @@ with tab3:
             else:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
-                    # Delete relationships and orphaned items
+                    # Delete relationships and orphaned KSAs
                     result1 = s.run("""
-                        MATCH (a:AFSC)-[r:HAS_ITEM|REQUIRES]->(i:Item)
+                        MATCH (a:AFSC)-[r:REQUIRES]->(k:KSA)
                         WHERE a.code IN $codes
                         DELETE r
-                        WITH i
-                        WHERE NOT ()-[:HAS_ITEM|REQUIRES]->(i)
-                        DELETE i
-                        RETURN count(i) as items_deleted
+                        WITH k
+                        WHERE NOT ()-[:REQUIRES]->(k)
+                        DELETE k
+                        RETURN count(k) as ksas_deleted
                     """, {"codes": afsc_list})
                     
-                    items_deleted = result1.single()["items_deleted"]
+                    ksas_deleted = result1.single()["ksas_deleted"]
                     
                     # Delete AFSCs
                     result2 = s.run("""
@@ -448,7 +432,7 @@ with tab3:
                     afscs_deleted = result2.single()["afscs_deleted"]
                 
                 driver.close()
-                st.success(f"Deleted {afscs_deleted} AFSCs and {items_deleted} orphaned items")
+                st.success(f"Deleted {afscs_deleted} AFSCs and {ksas_deleted} orphaned KSAs")
                 st.cache_data.clear()
                 
         except Exception as e:
