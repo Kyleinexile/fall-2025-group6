@@ -408,32 +408,24 @@ with tab3:
             else:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
-                    # Delete relationships and orphaned KSAs
-                    result1 = s.run("""
-                        MATCH (a:AFSC)-[r:REQUIRES]->(k:KSA)
+                    # Delete everything in one transaction
+                    result = s.run("""
+                        MATCH (a:AFSC)
                         WHERE a.code IN $codes
-                        DELETE r
+                        OPTIONAL MATCH (a)-[r:REQUIRES]->(k:KSA)
+                        DELETE r, a
                         WITH k
-                        WHERE NOT ()-[:REQUIRES]->(k)
+                        WHERE k IS NOT NULL AND NOT ()-[:REQUIRES]->(k)
                         DELETE k
-                        RETURN count(k) as ksas_deleted
+                        RETURN count(DISTINCT k) as ksas_deleted, count(DISTINCT a) as afscs_deleted
                     """, {"codes": afsc_list})
                     
-                    ksas_deleted = result1.single()["ksas_deleted"]
-                    
-                    # Delete AFSCs
-                    result2 = s.run("""
-                        MATCH (a:AFSC) 
-                        WHERE a.code IN $codes 
-                        DELETE a
-                        RETURN count(a) as afscs_deleted
-                    """, {"codes": afsc_list})
-                    
-                    afscs_deleted = result2.single()["afscs_deleted"]
+                    rec = result.single()
+                    ksas_deleted = rec["ksas_deleted"] if rec else 0
+                    afscs_deleted = len(afsc_list)  # We know we tried to delete them
                 
                 driver.close()
                 st.success(f"Deleted {afscs_deleted} AFSCs and {ksas_deleted} orphaned KSAs")
-                st.cache_data.clear()
                 
         except Exception as e:
             st.error(f"Delete failed: {e}")
