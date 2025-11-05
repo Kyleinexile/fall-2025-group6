@@ -1,36 +1,29 @@
 from __future__ import annotations
 import sys, pathlib, os
 
-# FIRST: Set up paths BEFORE any local imports
-import streamlit as st  # Import st early for debug output
+# Try to import - if it fails, fix the path and retry
+try:
+    from afsc_pipeline.preprocess import clean_afsc_text
+except ModuleNotFoundError:
+    # Path setup for Streamlit Cloud
+    REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+    SRC = REPO_ROOT / "src"
+    if str(SRC) not in sys.path:
+        sys.path.insert(0, str(SRC))
+    # Retry import
+    from afsc_pipeline.preprocess import clean_afsc_text
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
-SRC = REPO_ROOT / "src"
-
-# DEBUG: Show what we calculated
-st.sidebar.write(f"DEBUG: __file__ = {__file__}")
-st.sidebar.write(f"DEBUG: REPO_ROOT = {REPO_ROOT}")
-st.sidebar.write(f"DEBUG: SRC = {SRC}")
-st.sidebar.write(f"DEBUG: SRC exists? {SRC.exists()}")
-if SRC.exists():
-    st.sidebar.write(f"DEBUG: SRC contents: {list(SRC.glob('*'))[:5]}")
-
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
-
-st.sidebar.write(f"DEBUG: sys.path[0] = {sys.path[0]}")
-
-# NOW import everything else
+# Now import everything else
 import json, time, re
 from typing import Dict, Any, List
 import pandas as pd
+import streamlit as st
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 from dotenv import load_dotenv
 load_dotenv()
 
-# Local imports AFTER path is set
-from afsc_pipeline.preprocess import clean_afsc_text
+# Other local imports
 from afsc_pipeline.pipeline import run_pipeline, ItemDraft
 from afsc_pipeline.extract_laiser import extract_ksa_items
 from afsc_pipeline.enhance_llm import enhance_items_with_llm
@@ -48,6 +41,9 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 # Path fallback for both Codespaces and Streamlit Cloud
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+SRC = REPO_ROOT / "src"
+
 DOCS_ROOTS = [
     pathlib.Path("/workspaces/docs_text"),  # Codespaces
     SRC / "docs_text",  # Fallback to repo
