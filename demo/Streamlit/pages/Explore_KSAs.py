@@ -145,7 +145,7 @@ if len(selected) == 1:
             hide_index=True,
             column_config={
                 "confidence": st.column_config.NumberColumn(format="%.2f"),
-                "esco_id": st.column_config.TextColumn("ESCO ID")
+                "esco_id": st.column_config.TextColumn("Skill Taxonomy")
             }
         )
         
@@ -227,7 +227,7 @@ else:
                     column_config={
                         "overlap_count": st.column_config.NumberColumn("# AFSCs"),
                         "afscs": st.column_config.TextColumn("Found in"),
-                        "esco_id": st.column_config.TextColumn("ESCO ID")
+                        "esco_id": st.column_config.TextColumn("Skill Taxonomy")
                     }
                 )
                 
