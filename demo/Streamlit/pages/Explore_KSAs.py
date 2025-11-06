@@ -33,12 +33,13 @@ def get_items_for_afsc(afsc_code: str):
     with driver.session(database=NEO4J_DATABASE) as s:
         result = s.run("""
             MATCH (a:AFSC {code: $code})-[:REQUIRES]->(k:KSA)
+            OPTIONAL MATCH (k)-[:ALIGNS_TO]->(e:ESCOSkill)
             RETURN 
                 k.text as text,
                 k.type as type,
                 coalesce(k.confidence, 0.0) as confidence,
                 coalesce(k.source, '') as source,
-                coalesce(k.esco_id, '') as esco_id
+                coalesce(e.esco_id, '') as esco_id
             ORDER BY type, confidence DESC, text
         """, {"code": afsc_code})
         return pd.DataFrame([r.data() for r in result])
@@ -50,11 +51,13 @@ def find_overlaps(afsc_codes: list):
         result = s.run("""
             MATCH (a:AFSC)-[:REQUIRES]->(k:KSA)
             WHERE a.code IN $codes
-            WITH k, collect(DISTINCT a.code) as afscs
+            OPTIONAL MATCH (k)-[:ALIGNS_TO]->(e:ESCOSkill)
+            WITH k, e, collect(DISTINCT a.code) as afscs
             WHERE size(afscs) > 1
             RETURN 
                 k.text as text,
                 k.type as type,
+                coalesce(e.esco_id, '') as esco_id,
                 afscs,
                 size(afscs) as overlap_count
             ORDER BY overlap_count DESC, text
@@ -109,11 +112,12 @@ if len(selected) == 1:
             st.stop()
         
         # Stats
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
         col1.metric("Total Items", len(df))
         col2.metric("Knowledge", len(df[df["type"] == "knowledge"]))
         col3.metric("Skills", len(df[df["type"] == "skill"]))
         col4.metric("Abilities", len(df[df["type"] == "ability"]))
+        col5.metric("ESCO Aligned", len(df[df["esco_id"] != ""]))
         
         # Filters
         st.markdown("### Filters")
@@ -175,7 +179,8 @@ else:
                     "Total": len(df),
                     "Knowledge": len(df[df["type"] == "knowledge"]),
                     "Skills": len(df[df["type"] == "skill"]),
-                    "Abilities": len(df[df["type"] == "ability"])
+                    "Abilities": len(df[df["type"] == "ability"]),
+                    "ESCO": len(df[df["esco_id"] != ""])
                 })
             except:
                 pass
@@ -221,7 +226,8 @@ else:
                     hide_index=True,
                     column_config={
                         "overlap_count": st.column_config.NumberColumn("# AFSCs"),
-                        "afscs": st.column_config.TextColumn("Found in")
+                        "afscs": st.column_config.TextColumn("Found in"),
+                        "esco_id": st.column_config.TextColumn("ESCO ID")
                     }
                 )
                 
