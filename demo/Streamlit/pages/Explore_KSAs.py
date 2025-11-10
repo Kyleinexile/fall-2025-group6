@@ -22,10 +22,15 @@ def get_driver():
 
 @st.cache_data(ttl=60)
 def get_afsc_list():
+    """Get list of AFSCs with codes and titles"""
     driver = get_driver()
     with driver.session(database=NEO4J_DATABASE) as s:
-        result = s.run("MATCH (a:AFSC) RETURN a.code as code ORDER BY code")
-        return [r["code"] for r in result]
+        result = s.run("""
+            MATCH (a:AFSC) 
+            RETURN a.code as code, coalesce(a.title, '') as title 
+            ORDER BY code
+        """)
+        return [(r["code"], r["title"]) for r in result]
 
 @st.cache_data(ttl=60)
 def get_items_for_afsc(afsc_code: str):
@@ -39,7 +44,7 @@ def get_items_for_afsc(afsc_code: str):
                 k.type as type,
                 coalesce(k.confidence, 0.0) as confidence,
                 coalesce(k.source, '') as source,
-                coalesce(e.esco_id, '') as esco_id
+                coalesce(e.esco_id, '') as skill_taxonomy
             ORDER BY type, confidence DESC, text
         """, {"code": afsc_code})
         return pd.DataFrame([r.data() for r in result])
@@ -57,7 +62,7 @@ def find_overlaps(afsc_codes: list):
             RETURN 
                 k.text as text,
                 k.type as type,
-                coalesce(e.esco_id, '') as esco_id,
+                coalesce(e.esco_id, '') as skill_taxonomy,
                 afscs,
                 size(afscs) as overlap_count
             ORDER BY overlap_count DESC, text
@@ -78,19 +83,28 @@ with st.sidebar:
             st.warning("No AFSCs in database")
             st.stop()
         
+        # Create display labels (code - title)
+        afsc_options = {}
+        for code, title in all_afscs:
+            label = f"{code} - {title}" if title else code
+            afsc_options[label] = code
+        
         st.caption(f"{len(all_afscs)} total AFSCs")
         
-        # Multi-select
-        selected = st.multiselect(
+        # Multi-select with formatted labels
+        selected_labels = st.multiselect(
             "Choose one or more",
-            all_afscs,
+            list(afsc_options.keys()),
             max_selections=5,
             help="Select up to 5 AFSCs"
         )
         
-        if not selected:
+        if not selected_labels:
             st.info("👆 Select at least one AFSC")
             st.stop()
+        
+        # Convert back to codes
+        selected = [afsc_options[label] for label in selected_labels]
         
         st.success(f"{len(selected)} selected")
         
@@ -102,7 +116,9 @@ with st.sidebar:
 if len(selected) == 1:
     # Single AFSC view
     code = selected[0]
-    st.markdown(f"## {code}")
+    # Get the display label
+    display_label = [label for label, c in afsc_options.items() if c == code][0]
+    st.markdown(f"## {display_label}")
     
     try:
         df = get_items_for_afsc(code)
@@ -117,7 +133,7 @@ if len(selected) == 1:
         col2.metric("Knowledge", len(df[df["type"] == "knowledge"]))
         col3.metric("Skills", len(df[df["type"] == "skill"]))
         col4.metric("Abilities", len(df[df["type"] == "ability"]))
-        col5.metric("ESCO Aligned", len(df[df["esco_id"] != ""]))
+        col5.metric("Aligned", len(df[df["skill_taxonomy"] != ""]))
         
         # Filters
         st.markdown("### Filters")
@@ -145,7 +161,7 @@ if len(selected) == 1:
             hide_index=True,
             column_config={
                 "confidence": st.column_config.NumberColumn(format="%.2f"),
-                "esco_id": st.column_config.TextColumn("Skill Taxonomy")
+                "skill_taxonomy": st.column_config.TextColumn("Skill Taxonomy")
             }
         )
         
@@ -163,7 +179,9 @@ if len(selected) == 1:
 
 else:
     # Multi-AFSC comparison
-    st.markdown(f"## Comparison: {', '.join(selected)}")
+    display_labels = [label for label, c in afsc_options.items() if c in selected]
+    st.markdown(f"## Comparison")
+    st.caption(", ".join(display_labels))
     
     tab1, tab2 = st.tabs(["📊 Overview", "🔗 Overlaps"])
     
@@ -174,13 +192,14 @@ else:
         for code in selected:
             try:
                 df = get_items_for_afsc(code)
+                label = [l for l, c in afsc_options.items() if c == code][0]
                 data.append({
-                    "AFSC": code,
+                    "AFSC": label,
                     "Total": len(df),
                     "Knowledge": len(df[df["type"] == "knowledge"]),
                     "Skills": len(df[df["type"] == "skill"]),
                     "Abilities": len(df[df["type"] == "ability"]),
-                    "ESCO": len(df[df["esco_id"] != ""])
+                    "Aligned": len(df[df["skill_taxonomy"] != ""])
                 })
             except:
                 pass
@@ -227,7 +246,7 @@ else:
                     column_config={
                         "overlap_count": st.column_config.NumberColumn("# AFSCs"),
                         "afscs": st.column_config.TextColumn("Found in"),
-                        "esco_id": st.column_config.TextColumn("Skill Taxonomy")
+                        "skill_taxonomy": st.column_config.TextColumn("Skill Taxonomy")
                     }
                 )
                 
