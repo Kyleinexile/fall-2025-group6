@@ -12,6 +12,62 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ============================================================================
+# SPLASH SCREEN - Entry Page
+# ============================================================================
+if 'entered' not in st.session_state:
+    st.session_state.entered = False
+
+if not st.session_state.entered:
+    # Center content
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        # Air Force Image
+        st.image("assets/air force.jpg", use_container_width=True)
+        
+        # Title and Description
+        st.markdown("<h1 style='text-align: center;'>USAF KSA Extraction Pipeline</h1>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>Translating Military Skills to Civilian Careers</h3>", unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Project Description
+        st.markdown("""
+        <div style='text-align: center; font-size: 1.1em;'>
+        <p>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
+        <p><strong>MS Data Science Capstone Project</strong></p>
+        <p>George Washington University | 2025</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Key Features
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.markdown("### 🤖 AI-Powered")
+            st.markdown("LAiSER + LLM extraction")
+        with col_b:
+            st.markdown("### 🔍 Comprehensive")
+            st.markdown("Knowledge, Skills, Abilities")
+        with col_c:
+            st.markdown("### 🌐 Interactive")
+            st.markdown("Real-time exploration")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Enter Button
+        if st.button("🚀 Enter Application", type="primary", use_container_width=True):
+            st.session_state.entered = True
+            st.rerun()
+    
+    st.stop()
+
+# ============================================================================
+# MAIN APPLICATION - Only shown after entering
+# ============================================================================
+
 # Header
 st.title("✈️ USAF KSA Extraction Pipeline")
 st.markdown("**Automated extraction and analysis of Air Force Specialty Code knowledge requirements**")
@@ -75,7 +131,7 @@ with col1:
     st.markdown("- Find overlapping skills")
     st.markdown("- Export to CSV")
     if st.button("→ Explore KSAs", use_container_width=True, type="primary", key="explore"):
-        st.switch_page("pages/Explore_KSAs.py")
+        st.switch_page("pages/03_Explore_KSAs.py")
 
 with col2:
     st.markdown("### ⚙️ Admin Tools")
@@ -86,7 +142,7 @@ with col2:
     st.markdown("- Run LAiSER + LLM pipeline")
     st.markdown("- Manage database content")
     if st.button("→ Admin Ingest", use_container_width=True, type="secondary", key="admin"):
-        st.switch_page("pages/01_Admin_Ingest.py")
+        st.switch_page("pages/04_Admin_Tools.py")
 
 with col3:
     st.markdown("### 🔑 Try It Yourself")
@@ -97,7 +153,7 @@ with col3:
     st.markdown("- No quota limits")
     st.markdown("- Session-only storage")
     if st.button("→ BYO-API Query", use_container_width=True, type="secondary", key="byo"):
-    	st.switch_page("pages/02_Try_It_Yourself.py")
+        st.switch_page("pages/02_Try_It_Yourself.py")
 
 st.divider()
 
