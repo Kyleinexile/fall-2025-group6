@@ -14,53 +14,244 @@ st.set_page_config(
 )
 
 # ============================================================================
+# CUSTOM CSS - Air Force Theme & Professional Styling
+# ============================================================================
+st.markdown("""
+<style>
+    /* Import Professional Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    /* Global Font */
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Air Force Blue Theme */
+    .stButton>button[kind="primary"] {
+        background-color: #00539B !important;
+        border: none !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton>button[kind="primary"]:hover {
+        background-color: #003D7A !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 83, 155, 0.3) !important;
+    }
+    
+    .stButton>button[kind="secondary"] {
+        background-color: #F8F9FA !important;
+        border: 2px solid #00539B !important;
+        color: #00539B !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton>button[kind="secondary"]:hover {
+        background-color: #00539B !important;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2) !important;
+    }
+    
+    /* Metrics Styling */
+    [data-testid="stMetricValue"] {
+        font-size: 32px;
+        font-weight: 700;
+        color: #00539B;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Headers */
+    h1 {
+        color: #1F2937;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    h2 {
+        color: #374151;
+        font-weight: 600;
+        margin-top: 2rem;
+    }
+    h3 {
+        color: #00539B;
+        font-weight: 600;
+    }
+    
+    /* Dividers */
+    hr {
+        margin: 2.5rem 0;
+        border: none;
+        border-top: 2px solid #E5E7EB;
+    }
+    
+    /* Better Typography */
+    p {
+        line-height: 1.6;
+        color: #4B5563;
+    }
+    
+    /* Card Styling */
+    .nav-card {
+        padding: 24px;
+        border-radius: 12px;
+        border: 2px solid #E5E7EB;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .nav-card:hover {
+        border-color: #00539B;
+        box-shadow: 0 8px 24px rgba(0, 83, 155, 0.12);
+        transform: translateY(-4px);
+    }
+    
+    /* Expander Styling */
+    .streamlit-expanderHeader {
+        font-weight: 600;
+        color: #374151;
+        font-size: 16px;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    .status-success {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .status-warning {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    .status-info {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    /* Splash Screen Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .splash-container {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    .splash-image {
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        margin-bottom: 2rem;
+    }
+    
+    /* Gradient Background for Header */
+    .main-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================================
 # SPLASH SCREEN - Entry Page
 # ============================================================================
 if 'entered' not in st.session_state:
     st.session_state.entered = False
 
 if not st.session_state.entered:
+    st.markdown("<div class='splash-container'>", unsafe_allow_html=True)
+    
     # Center content
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # Air Force Image - Get absolute path
+        # Air Force Image
         current_dir = Path(__file__).parent
         image_path = current_dir / "assets" / "air force.jpg"
         
         if image_path.exists():
+            st.markdown("<div class='splash-image'>", unsafe_allow_html=True)
             st.image(str(image_path), use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
-            st.warning("Air Force image not found")
+            st.info("📸 Air Force image: assets/air force.jpg")
         
         # Title and Description
-        st.markdown("<h1 style='text-align: center;'>USAF KSA Extraction Pipeline</h1>", unsafe_allow_html=True)
-        st.markdown("<h3 style='text-align: center;'>Translating Military Skills to Civilian Careers</h3>", unsafe_allow_html=True)
+        st.markdown("""
+        <h1 style='text-align: center; font-size: 3rem; font-weight: 700; 
+                   color: #00539B; margin-bottom: 0.5rem;'>
+            USAF KSA Extraction Pipeline
+        </h1>
+        """, unsafe_allow_html=True)
         
-        st.markdown("---")
+        st.markdown("""
+        <h3 style='text-align: center; font-weight: 400; color: #6B7280; 
+                   margin-top: 0; margin-bottom: 2rem;'>
+            Translating Military Skills to Civilian Careers
+        </h3>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<hr style='margin: 2rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
         # Project Description
         st.markdown("""
-        <div style='text-align: center; font-size: 1.1em;'>
-        <p>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
-        <p><strong>MS Data Science Capstone Project</strong></p>
-        <p>George Washington University | 2025</p>
+        <div style='text-align: center; font-size: 1.1em; color: #4B5563; margin-bottom: 2rem;'>
+            <p style='margin-bottom: 0.5rem;'>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
+            <p style='font-weight: 600; color: #00539B; margin-bottom: 0.5rem;'>MS Data Science Capstone Project</p>
+            <p style='color: #6B7280;'>George Washington University | 2025</p>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("---")
+        st.markdown("<hr style='margin: 2rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
-        # Key Features
+        # Key Features with Icons
         col_a, col_b, col_c = st.columns(3)
+        
         with col_a:
-            st.markdown("### 🤖 AI-Powered")
-            st.markdown("LAiSER + LLM extraction")
+            st.markdown("""
+            <div style='text-align: center; padding: 20px;'>
+                <div style='font-size: 3rem; margin-bottom: 0.5rem;'>🤖</div>
+                <h3 style='color: #00539B; font-size: 1.2rem; margin-bottom: 0.5rem;'>AI-Powered</h3>
+                <p style='color: #6B7280; font-size: 0.95rem;'>LAiSER + LLM extraction</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
         with col_b:
-            st.markdown("### 🔍 Comprehensive")
-            st.markdown("Knowledge, Skills, Abilities")
+            st.markdown("""
+            <div style='text-align: center; padding: 20px;'>
+                <div style='font-size: 3rem; margin-bottom: 0.5rem;'>🔍</div>
+                <h3 style='color: #00539B; font-size: 1.2rem; margin-bottom: 0.5rem;'>Comprehensive</h3>
+                <p style='color: #6B7280; font-size: 0.95rem;'>Knowledge, Skills, Abilities</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
         with col_c:
-            st.markdown("### 🌐 Interactive")
-            st.markdown("Real-time exploration")
+            st.markdown("""
+            <div style='text-align: center; padding: 20px;'>
+                <div style='font-size: 3rem; margin-bottom: 0.5rem;'>🌐</div>
+                <h3 style='color: #00539B; font-size: 1.2rem; margin-bottom: 0.5rem;'>Interactive</h3>
+                <p style='color: #6B7280; font-size: 0.95rem;'>Real-time exploration</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -69,19 +260,30 @@ if not st.session_state.entered:
             st.session_state.entered = True
             st.rerun()
     
+    st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 # ============================================================================
 # MAIN APPLICATION - Only shown after entering
 # ============================================================================
 
-# Header
-st.title("✈️ USAF KSA Extraction Pipeline")
-st.markdown("**Automated extraction and analysis of Air Force Specialty Code knowledge requirements**")
+# Header with Gradient Effect
+st.markdown("""
+<h1 style='font-size: 2.5rem; margin-bottom: 0.5rem;'>
+    ✈️ USAF KSA Extraction Pipeline
+</h1>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<p style='font-size: 1.1rem; color: #6B7280; margin-bottom: 0.5rem;'>
+    <strong>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</strong>
+</p>
+""", unsafe_allow_html=True)
+
 st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
 st.divider()
 
-# Live Database Stats
+# Live Database Stats with Enhanced Styling
 st.markdown("## 📊 Current Database Status")
 
 try:
@@ -93,7 +295,6 @@ try:
     if all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]):
         driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
         with driver.session(database=NEO4J_DATABASE) as session:
-            # Query with NEW schema (KSA nodes, REQUIRES relationships)
             result = session.run("""
                 MATCH (a:AFSC)
                 OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
@@ -107,29 +308,41 @@ try:
                     count(DISTINCT e) as esco_aligned
             """).single()
             
+            # Enhanced Metrics Display
             m1, m2, m3, m4, m5, m6 = st.columns(6)
-            m1.metric("AFSCs Processed", result["afscs"] or 0)
-            m2.metric("Total KSAs", result["total_ksas"] or 0)
-            m3.metric("Knowledge", result["knowledge"] or 0)
-            m4.metric("Skills", result["skills"] or 0)
-            m5.metric("Abilities", result["abilities"] or 0)
-            m6.metric("Skill Aligned", result["esco_aligned"] or 0)
+            m1.metric("AFSCs Processed", result["afscs"] or 0, delta=None)
+            m2.metric("Total KSAs", result["total_ksas"] or 0, delta=None)
+            m3.metric("Knowledge", result["knowledge"] or 0, delta=None)
+            m4.metric("Skills", result["skills"] or 0, delta=None)
+            m5.metric("Abilities", result["abilities"] or 0, delta=None)
+            m6.metric("ESCO Aligned", result["esco_aligned"] or 0, delta=None)
             
         driver.close()
+        
+        # Status Badge
+        st.markdown("""
+        <div style='margin-top: 1rem;'>
+            <span class='status-badge status-success'>✓ Database Connected</span>
+        </div>
+        """, unsafe_allow_html=True)
     else:
         st.warning("⚠️ Neo4j connection not configured")
+        st.markdown("<span class='status-badge status-warning'>⚠ Configuration Required</span>", unsafe_allow_html=True)
         
 except Exception as e:
     st.error(f"Could not load database stats: {str(e)[:100]}")
+    st.markdown("<span class='status-badge status-warning'>⚠ Connection Error</span>", unsafe_allow_html=True)
 
 st.divider()
 
-# Navigation Cards
+# Navigation Cards with Enhanced Styling
 st.markdown("## 🚀 Quick Access")
+st.markdown("<br>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
+    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
     st.markdown("### 🔍 Explore KSAs")
     st.markdown("Query, filter, and analyze extracted Knowledge, Skills, and Abilities across all AFSCs")
     st.markdown("**Features:**")
@@ -137,21 +350,13 @@ with col1:
     st.markdown("- Filter by type and confidence")
     st.markdown("- Find overlapping skills")
     st.markdown("- Export to CSV")
+    st.markdown("<br>", unsafe_allow_html=True)
     if st.button("→ Explore KSAs", use_container_width=True, type="primary", key="explore"):
         st.switch_page("pages/03_Explore_KSAs.py")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
-    st.markdown("### ⚙️ Admin Tools")
-    st.markdown("Browse existing documents and process new AFSC text through the extraction pipeline")
-    st.markdown("**Capabilities:**")
-    st.markdown("- View all source documents")
-    st.markdown("- Upload new AFSC data")
-    st.markdown("- Run LAiSER + LLM pipeline")
-    st.markdown("- Manage database content")
-    if st.button("→ Admin Ingest", use_container_width=True, type="secondary", key="admin"):
-        st.switch_page("pages/04_Admin_Tools.py")
-
-with col3:
+    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
     st.markdown("### 🔑 Try It Yourself")
     st.markdown("Run KSA extraction on your own AFSC text using your API key")
     st.markdown("**Benefits:**")
@@ -159,8 +364,24 @@ with col3:
     st.markdown("- Test with custom text")
     st.markdown("- No quota limits")
     st.markdown("- Session-only storage")
-    if st.button("→ BYO-API Query", use_container_width=True, type="secondary", key="byo"):
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("→ Try It Yourself", use_container_width=True, type="secondary", key="byo"):
         st.switch_page("pages/02_Try_It_Yourself.py")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with col3:
+    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
+    st.markdown("### ⚙️ Admin Tools")
+    st.markdown("Browse existing documents and process new AFSC text through the extraction pipeline")
+    st.markdown("**Capabilities:**")
+    st.markdown("- View all source documents")
+    st.markdown("- Upload new AFSC data")
+    st.markdown("- Run LAiSER + LLM pipeline")
+    st.markdown("- Manage database content")
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("→ Admin Tools", use_container_width=True, type="secondary", key="admin"):
+        st.switch_page("pages/04_Admin_Tools.py")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.divider()
 
@@ -344,4 +565,15 @@ OpenAI API: {'✅ Set' if os.getenv('OPENAI_API_KEY') else '❌ Not set'}
         """)
 
 st.divider()
-st.caption("🚀 USAF KSA Extraction Pipeline | Capstone Project 2025 | George Washington University")
+
+# Footer with Enhanced Styling
+st.markdown("""
+<div style='text-align: center; padding: 2rem 0; color: #6B7280; font-size: 0.9rem;'>
+    <p style='margin-bottom: 0.5rem;'>
+        <strong style='color: #00539B;'>🚀 USAF KSA Extraction Pipeline</strong>
+    </p>
+    <p style='margin: 0;'>
+        Capstone Project 2025 | George Washington University | MS Data Science
+    </p>
+</div>
+""", unsafe_allow_html=True)
