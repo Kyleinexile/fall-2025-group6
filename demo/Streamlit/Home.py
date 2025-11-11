@@ -96,8 +96,8 @@ with col3:
     st.markdown("- Test with custom text")
     st.markdown("- No quota limits")
     st.markdown("- Session-only storage")
-    if st.button("→ BYO-API Query", use_container_width=True, type="secondary", key="byo", disabled=True):
-        st.info("Coming soon!")
+    if st.button("→ BYO-API Query", use_container_width=True, type="secondary", key="byo"):
+    	st.switch_page("pages/02_Try_It_Yourself.py")
 
 st.divider()
 
