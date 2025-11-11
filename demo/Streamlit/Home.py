@@ -29,18 +29,20 @@ st.markdown("""
     /* Air Force Blue Theme */
     .stButton>button[kind="primary"] {
         background-color: #00539B !important;
+        color: white !important;
         border: none !important;
         font-weight: 600 !important;
         transition: all 0.3s ease !important;
     }
     .stButton>button[kind="primary"]:hover {
         background-color: #003D7A !important;
+        color: white !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 83, 155, 0.3) !important;
     }
     
     .stButton>button[kind="secondary"] {
-        background-color: #F8F9FA !important;
+        background-color: white !important;
         border: 2px solid #00539B !important;
         color: #00539B !important;
         font-weight: 600 !important;
@@ -49,6 +51,7 @@ st.markdown("""
     .stButton>button[kind="secondary"]:hover {
         background-color: #00539B !important;
         color: white !important;
+        border: 2px solid #00539B !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2) !important;
     }
@@ -79,7 +82,7 @@ st.markdown("""
         margin-top: 2rem;
     }
     h3 {
-        color: #00539B;
+        color: #1F2937;
         font-weight: 600;
     }
     
