@@ -26,34 +26,52 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
-    /* Air Force Blue Theme */
-    .stButton>button[kind="primary"] {
+    /* Air Force Blue Theme - Aggressive Button Styling */
+    .stButton>button[kind="primary"],
+    button[kind="primary"],
+    .stButton > button[data-testid="baseButton-primary"] {
         background-color: #00539B !important;
-        color: white !important;
+        color: #FFFFFF !important;
         border: none !important;
         font-weight: 600 !important;
         transition: all 0.3s ease !important;
     }
-    .stButton>button[kind="primary"]:hover {
+    .stButton>button[kind="primary"]:hover,
+    button[kind="primary"]:hover,
+    .stButton > button[data-testid="baseButton-primary"]:hover {
         background-color: #003D7A !important;
-        color: white !important;
+        color: #FFFFFF !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 83, 155, 0.3) !important;
     }
+    .stButton>button[kind="primary"] p,
+    .stButton>button[kind="primary"] span,
+    .stButton>button[kind="primary"] div {
+        color: #FFFFFF !important;
+    }
     
-    .stButton>button[kind="secondary"] {
-        background-color: white !important;
+    .stButton>button[kind="secondary"],
+    button[kind="secondary"],
+    .stButton > button[data-testid="baseButton-secondary"] {
+        background-color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         color: #00539B !important;
         font-weight: 600 !important;
         transition: all 0.3s ease !important;
     }
-    .stButton>button[kind="secondary"]:hover {
+    .stButton>button[kind="secondary"]:hover,
+    button[kind="secondary"]:hover,
+    .stButton > button[data-testid="baseButton-secondary"]:hover {
         background-color: #00539B !important;
-        color: white !important;
+        color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2) !important;
+    }
+    .stButton>button[kind="secondary"] p,
+    .stButton>button[kind="secondary"] span,
+    .stButton>button[kind="secondary"] div {
+        color: inherit !important;
     }
     
     /* Metrics Styling */
@@ -162,14 +180,6 @@ st.markdown("""
         border-radius: 16px;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
         margin-bottom: 2rem;
-    }
-    
-    /* Gradient Background for Header */
-    .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 </style>
 """, unsafe_allow_html=True)
