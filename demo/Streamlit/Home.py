@@ -1,10 +1,30 @@
 import streamlit as st
 import os
+import base64
 from pathlib import Path
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# ============================================================================
+# HELPER FUNCTION - Convert image to base64
+# ============================================================================
+def get_base64_image(image_path):
+    """Convert an image file to base64 string for embedding in CSS"""
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except Exception as e:
+        st.warning(f"Could not load background image: {e}")
+        return None
+
+# ============================================================================
+# LOAD BACKGROUND IMAGE
+# ============================================================================
+current_dir = Path(__file__).parent
+bg_image_path = current_dir / "assets" / "AFDOGGO.jpg"
+bg_image_base64 = get_base64_image(bg_image_path)
 
 st.set_page_config(
     page_title="USAF KSA Explorer",
@@ -16,22 +36,21 @@ st.set_page_config(
 # ============================================================================
 # CUSTOM CSS - Air Force Theme & Professional Styling
 # ============================================================================
-st.markdown("""
-<style>
-    /* Import Professional Font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    
+# Build CSS with background image if available
+background_css = ""
+if bg_image_base64:
+    background_css = f"""
     /* Semi-transparent Background Image */
-    .main {
-        background-image: url('assets/AFDOGGO.jpg');
+    .main {{
+        background-image: url('data:image/jpeg;base64,{bg_image_base64}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
         position: relative;
-    }
+    }}
     
-    .main::before {
+    .main::before {{
         content: '';
         position: fixed;
         top: 0;
@@ -41,18 +60,26 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.95);
         z-index: -1;
         pointer-events: none;
-    }
+    }}
+    """
+
+st.markdown(f"""
+<style>
+    /* Import Professional Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    {background_css}
     
     /* Global Font & Typography */
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
         font-family: 'Inter', sans-serif;
         font-size: 15px;
-    }
+    }}
     
     /* Air Force Blue Theme - Aggressive Button Styling */
     .stButton>button[kind="primary"],
     button[kind="primary"],
-    .stButton > button[data-testid="baseButton-primary"] {
+    .stButton > button[data-testid="baseButton-primary"] {{
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: none !important;
@@ -61,22 +88,22 @@ st.markdown("""
         font-size: 16px !important;
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
-    }
-    .stButton>button[kind="primary"]:hover {
+    }}
+    .stButton>button[kind="primary"]:hover {{
         background-color: #003D7A !important;
         color: #FFFFFF !important;
         transform: translateY(-3px);
         box-shadow: 0 6px 20px rgba(0, 83, 155, 0.4) !important;
-    }
+    }}
     .stButton>button[kind="primary"] p,
     .stButton>button[kind="primary"] span,
-    .stButton>button[kind="primary"] div {
+    .stButton>button[kind="primary"] div {{
         color: #FFFFFF !important;
-    }
+    }}
     
     .stButton>button[kind="secondary"],
     button[kind="secondary"],
-    .stButton > button[data-testid="baseButton-secondary"] {
+    .stButton > button[data-testid="baseButton-secondary"] {{
         background-color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         color: #00539B !important;
@@ -85,66 +112,66 @@ st.markdown("""
         font-size: 16px !important;
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
-    }
-    .stButton>button[kind="secondary"]:hover {
+    }}
+    .stButton>button[kind="secondary"]:hover {{
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         transform: translateY(-3px);
         box-shadow: 0 6px 20px rgba(0, 83, 155, 0.3) !important;
-    }
+    }}
     .stButton>button[kind="secondary"] p,
     .stButton>button[kind="secondary"] span,
-    .stButton>button[kind="secondary"] div {
+    .stButton>button[kind="secondary"] div {{
         color: inherit !important;
-    }
+    }}
     
     /* Metrics Styling - Bigger and Bolder */
-    [data-testid="stMetricValue"] {
+    [data-testid="stMetricValue"] {{
         font-size: 42px;
         font-weight: 800;
         color: #00539B;
-    }
-    [data-testid="stMetricLabel"] {
+    }}
+    [data-testid="stMetricLabel"] {{
         font-size: 14px;
         font-weight: 600;
         color: #6B7280;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-    }
+    }}
     
     /* Headers */
-    h1 {
+    h1 {{
         color: #1F2937;
         font-weight: 800;
         letter-spacing: -0.5px;
-    }
-    h2 {
+    }}
+    h2 {{
         color: #374151;
         font-weight: 700;
         margin-top: 2rem;
         margin-bottom: 1rem;
-    }
-    h3 {
+    }}
+    h3 {{
         color: #1F2937;
         font-weight: 600;
-    }
+    }}
     
     /* Thicker Dividers */
-    hr {
+    hr {{
         border: none;
         border-top: 3px solid #E5E7EB;
         margin: 3rem 0;
-    }
+    }}
     
     /* Better Typography */
-    p {
+    p {{
         line-height: 1.6;
         color: #4B5563;
-    }
+    }}
     
     /* Status Badge */
-    .status-badge {
+    .status-badge {{
         display: inline-block;
         padding: 6px 16px;
         border-radius: 16px;
@@ -153,42 +180,42 @@ st.markdown("""
         letter-spacing: 0.3px;
         margin-right: 8px;
         margin-bottom: 8px;
-    }
-    .status-success {
+    }}
+    .status-success {{
         background-color: #D1FAE5;
         color: #065F46;
-    }
-    .status-warning {
+    }}
+    .status-warning {{
         background-color: #FEF3C7;
         color: #92400E;
-    }
-    .status-error {
+    }}
+    .status-error {{
         background-color: #FEE2E2;
         color: #991B1B;
-    }
+    }}
     
     /* Splash Screen Animation */
-    @keyframes fadeInUp {
-        from {
+    @keyframes fadeInUp {{
+        from {{
             opacity: 0;
             transform: translateY(30px);
-        }
-        to {
+        }}
+        to {{
             opacity: 1;
             transform: translateY(0);
-        }
-    }
-    .splash-container {
+        }}
+    }}
+    .splash-container {{
         animation: fadeInUp 0.8s ease-out;
-    }
-    .splash-image {
+    }}
+    .splash-image {{
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         margin-bottom: 2rem;
-    }
+    }}
     
     /* Pipeline Step Boxes */
-    .pipeline-step {
+    .pipeline-step {{
         background: white;
         border: 3px solid #00539B;
         border-radius: 12px;
@@ -200,11 +227,11 @@ st.markdown("""
         justify-content: center;
         align-items: center;
         transition: all 0.3s ease;
-    }
-    .pipeline-step:hover {
+    }}
+    .pipeline-step:hover {{
         transform: translateY(-4px);
         box-shadow: 0 8px 24px rgba(0, 83, 155, 0.2);
-    }
+    }}
 </style>
 """, unsafe_allow_html=True)
 
