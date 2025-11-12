@@ -367,28 +367,28 @@ with st.sidebar:
 # ============================================================================
 st.markdown(f"""
 <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
-            padding: 8px 24px; border-radius: 8px; margin-bottom: 2rem;
+            padding: 12px 24px; border-radius: 8px; margin-bottom: 2rem;
             box-shadow: 0 2px 8px rgba(0, 83, 155, 0.15);'>
-    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;'>
-        <div style='text-align: center; padding: 2px 16px;'>
-            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs</p>
-            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["afscs"]}</h3>
+    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px;'>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs:</span>
+            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["afscs"]}</span>
         </div>
-        <div style='text-align: center; padding: 2px 16px;'>
-            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs</p>
-            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["total_ksas"]}</h3>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs:</span>
+            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["total_ksas"]}</span>
         </div>
-        <div style='text-align: center; padding: 2px 16px;'>
-            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge</p>
-            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["knowledge"]}</h3>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge:</span>
+            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["knowledge"]}</span>
         </div>
-        <div style='text-align: center; padding: 2px 16px;'>
-            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Skills</p>
-            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["skills"]}</h3>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Skills:</span>
+            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["skills"]}</span>
         </div>
-        <div style='text-align: center; padding: 2px 16px;'>
-            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities</p>
-            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["abilities"]}</h3>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities:</span>
+            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["abilities"]}</span>
         </div>
     </div>
 </div>
