@@ -326,27 +326,13 @@ status = get_env_status()
 metrics = get_database_metrics()
 
 # ============================================================================
-# SIDEBAR - System Status (Option 1)
+# SIDEBAR - Connection Status Only
 # ============================================================================
 with st.sidebar:
     st.markdown("### 📊 System Status")
     st.markdown("<hr style='border-top: 2px solid #E5E7EB; margin: 1rem 0;'>", unsafe_allow_html=True)
     
-    # Database Metrics
-    st.markdown("**Database Metrics:**")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.metric("AFSCs", metrics["afscs"])
-        st.metric("Knowledge", metrics["knowledge"])
-    with col_b:
-        st.metric("Total KSAs", metrics["total_ksas"])
-        st.metric("Skills", metrics["skills"])
-    
-    st.metric("Abilities", metrics["abilities"])
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Connection Status
+    # Connection Status Only
     st.markdown("**Connections:**")
     
     # Neo4j
@@ -372,6 +358,38 @@ with st.sidebar:
         st.markdown("✅ Anthropic API")
     else:
         st.markdown("⚠️ Anthropic API")
+
+# ============================================================================
+# COMPACT BANNER - At Very Top (Metrics Only)
+# ============================================================================
+st.markdown(f"""
+<div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
+            padding: 16px 24px; border-radius: 8px; margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 83, 155, 0.15);'>
+    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;'>
+        <div style='text-align: center; padding: 4px 16px;'>
+            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["afscs"]}</h3>
+            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>AFSCs</p>
+        </div>
+        <div style='text-align: center; padding: 4px 16px;'>
+            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["total_ksas"]}</h3>
+            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Total KSAs</p>
+        </div>
+        <div style='text-align: center; padding: 4px 16px;'>
+            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["knowledge"]}</h3>
+            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Knowledge</p>
+        </div>
+        <div style='text-align: center; padding: 4px 16px;'>
+            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["skills"]}</h3>
+            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Skills</p>
+        </div>
+        <div style='text-align: center; padding: 4px 16px;'>
+            <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["abilities"]}</h3>
+            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Abilities</p>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Header
 st.markdown("""
@@ -403,46 +421,6 @@ if not st.session_state.hide_getting_started:
         if st.checkbox("Don't show this again", key="hide_gs_checkbox"):
             st.session_state.hide_getting_started = True
             st.rerun()
-
-# ============================================================================
-# BANNER - System Status (Option 2)
-# ============================================================================
-st.markdown(f"""
-<div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
-            padding: 24px; border-radius: 12px; color: white; margin: 2rem 0;
-            box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2);'>
-    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;'>
-        <div style='text-align: center; padding: 10px;'>
-            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["afscs"]}</h2>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>AFSCs Loaded</p>
-        </div>
-        <div style='text-align: center; padding: 10px;'>
-            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["total_ksas"]}</h2>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Total KSAs</p>
-        </div>
-        <div style='text-align: center; padding: 10px;'>
-            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["knowledge"]}</h2>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Knowledge</p>
-        </div>
-        <div style='text-align: center; padding: 10px;'>
-            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["skills"]}</h2>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Skills</p>
-        </div>
-        <div style='text-align: center; padding: 10px;'>
-            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["abilities"]}</h2>
-            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Abilities</p>
-        </div>
-    </div>
-    <div style='text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);'>
-        <span style='font-size: 0.85rem; opacity: 0.9;'>
-            {'✅ Neo4j' if status["neo4j"] else '❌ Neo4j'} • 
-            {'✅ Gemini' if status["gemini"] else '⚠️ Gemini'} • 
-            {'✅ OpenAI' if status["openai"] else '⚠️ OpenAI'} • 
-            {'✅ Anthropic' if status["anthropic"] else '⚠️ Anthropic'}
-        </span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
 st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
 
