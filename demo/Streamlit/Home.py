@@ -591,16 +591,134 @@ with col6:
     </div>
     """, unsafe_allow_html=True)
 
+# ============================================================================
+# PIPELINE VISUAL DIAGRAM
+# ============================================================================
+PROCESS_CARD_SVG = r"""<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='760' viewBox='0 0 1200 760'>
+  <!-- Deep-blue backdrop -->
+  <rect x='0' y='0' width='1200' height='760' fill='#0F1A2B'/>
+  <defs>
+    <filter id='shadow' x='-20%' y='-20%' width='140%' height='140%'>
+      <feDropShadow dx='0' dy='6' stdDeviation='12' flood-color='#000' flood-opacity='0.3'/>
+    </filter>
+  </defs>
+
+  <!-- Card -->
+  <rect x='80' y='60' rx='24' ry='24' width='1040' height='640' fill='#FFFFFF' filter='url(#shadow)'/>
+
+  <!-- Title -->
+  <text x='120' y='108' font-family='Inter, Segoe UI, Arial' font-size='28' font-weight='700' fill='#0F1A2B'>AFSC → KSA Pipeline</text>
+  <text x='120' y='144' font-family='Inter, Segoe UI, Arial' font-size='16' fill='#334155'>From unstructured AFSC text to a queryable graph of Knowledge, Skills, and Abilities</text>
+  <line x1='120' y1='170' x2='1080' y2='170' stroke='#E6E8EC' stroke-width='1'/>
+  <path d='M 120 210 H 1080' stroke='#4F9ED8' stroke-width='3' stroke-linecap='round' opacity='0.3'/>
+
+  <!-- Row 1 -->
+  <g>
+    <rect x='120' y='240' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='120' y='240' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='140' y='268' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>Preprocess</text>
+    <text x='140' y='294' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Clean headers/line breaks</text>
+    <text x='140' y='314' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Normalize text</text>
+    <line x1='388' y1='300' x2='420' y2='300' stroke='#1F77B4' stroke-width='2'/>
+    <polygon points='420,300 412,295 412,305' fill='#1F77B4'/>
+  </g>
+  <g>
+    <rect x='460' y='240' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='460' y='240' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='480' y='268' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>Extract (LAiSER)</text>
+    <text x='480' y='294' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Skills via taxonomy alignment</text>
+    <text x='480' y='314' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Fallback: regex</text>
+    <line x1='728' y1='300' x2='760' y2='300' stroke='#1F77B4' stroke-width='2'/>
+    <polygon points='760,300 752,295 752,305' fill='#1F77B4'/>
+  </g>
+  <g>
+    <rect x='800' y='240' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='800' y='240' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='820' y='268' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>Enhance (LLM)</text>
+    <text x='820' y='294' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Add Knowledge/Ability</text>
+    <text x='820' y='314' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Strict format &amp; de-dup</text>
+  </g>
+
+  <!-- Down connector to row 2 -->
+  <line x1='1068' y1='360' x2='1068' y2='388' stroke='#1F77B4' stroke-width='2'/>
+  <polygon points='1068,388 1063,380 1073,380' fill='#1F77B4'/>
+
+  <!-- Row 2 -->
+  <g>
+    <rect x='120' y='420' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='120' y='420' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='140' y='448' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>Quality Filter</text>
+    <text x='140' y='474' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Normalize &amp; prune</text>
+    <text x='140' y='494' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Domain rules / GEOINT bias</text>
+    <line x1='388' y1='480' x2='420' y2='480' stroke='#1F77B4' stroke-width='2'/>
+    <polygon points='420,480 412,475 412,485' fill='#1F77B4'/>
+  </g>
+  <g>
+    <rect x='460' y='420' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='460' y='420' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='480' y='448' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>Dedupe</text>
+    <text x='480' y='474' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Merge near-duplicates</text>
+    <text x='480' y='494' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Unify phrasing</text>
+    <line x1='728' y1='480' x2='760' y2='480' stroke='#1F77B4' stroke-width='2'/>
+    <polygon points='760,480 752,475 752,485' fill='#1F77B4'/>
+  </g>
+  <g>
+    <rect x='800' y='420' rx='16' ry='16' width='260' height='120' fill='#F8FAFC' stroke='#E6E8EC' stroke-width='1'/>
+    <rect x='800' y='420' rx='16' ry='16' width='8' height='120' fill='#1F77B4'/>
+    <text x='820' y='448' font-family='Inter, Segoe UI, Arial' font-size='16' font-weight='700' fill='#0F1A2B'>ESCO Mapping</text>
+    <text x='820' y='474' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Link to ESCO concepts</text>
+    <text x='820' y='494' font-family='Inter, Segoe UI, Arial' font-size='13' fill='#334155'>Keep high-confidence</text>
+  </g>
+
+  <!-- Final footer callout -->
+  <line x1='928' y1='540' x2='928' y2='568' stroke='#1F77B4' stroke-width='2'/>
+  <polygon points='928,568 923,560 933,560' fill='#1F77B4'/>
+  <g>
+    <rect x='800' y='600' rx='16' ry='16' width='260' height='64' fill='#F1F5F9' stroke='#E6E8EC' stroke-width='1'/>
+    <text x='820' y='636' font-family='Inter, Segoe UI, Arial' font-size='15' fill='#334155'>Idempotent writes • Full audit trail</text>
+  </g>
+
+  <text x='120' y='676' font-family='Inter, Segoe UI, Arial' font-size='14' fill='#334155'>
+    Deterministic extraction with optional LLM enhancement • Idempotent graph writes • Full audit trail
+  </text>
+</svg>"""
+
+st.markdown(
+    f"<div style='max-width:1200px;margin:2rem auto;'>{PROCESS_CARD_SVG}</div>",
+    unsafe_allow_html=True
+)
+
 with st.expander("See detailed pipeline steps"):
     st.markdown("""
     ### Detailed Process
     
-    1. **Ingest** • Upload AFSC documents (AFOCD/AFECD) or use pre-split Markdown
-    2. **Preprocess** • Clean text, remove formatting artifacts, normalize structure
-    3. **Extract** • LAiSER generates baseline KSAs with confidence scores and ESCO taxonomy IDs
-    4. **Enhance** • LLMs (Gemini/Claude/OpenAI) add complementary Knowledge/Ability items
-    5. **Store** • Write AFSCs, KSAs, and relationships into Neo4j graph database
-    6. **Explore** • Query, compare AFSCs, find skill overlaps, and export analysis tables
+    The AFSC → KSA Pipeline converts unstructured Air Force specialty descriptions into a structured graph of Knowledge, Skill, and Ability items. It blends deterministic NLP methods with AI-assisted completion and strict quality controls.
+    
+    **1. Preprocessing**  
+    Raw AFSC text is cleaned of headers, footers, and formatting artifacts. Line breaks and hyphenations are repaired, producing a single readable block.
+    
+    **2. Extraction (Skills)**  
+    The LAiSER extractor identifies core skills through semantic alignment against a professional taxonomy. Each item is typed (Skill) and scored for confidence; fallback regex logic ensures coverage even offline.
+    
+    **3. Enhancement (Knowledge & Ability)**  
+    The LLM enhancer (OpenAI, Claude, or Gemini) adds contextual Knowledge and Ability statements based on gaps in coverage. If no API key is present, heuristics generate lightweight alternatives.
+    
+    **4. Quality Filtering**  
+    All items are normalized, short or banned phrases removed, and low-confidence skills screened by domain rules (e.g., GEOINT bias). Outputs are canonicalized and deduplicated on type + text.
+    
+    **5. Deduplication & Canonicalization**  
+    Near-duplicates are merged using string similarity, keeping the highest confidence or ESCO-linked version.
+    
+    **6. ESCO Mapping**  
+    Items are matched to standardized ESCO taxonomy concepts, enabling cross-domain comparisons and labor market linkages.
+    
+    **7. Graph Persistence**  
+    Each AFSC and its unique items are upserted into a Neo4j graph, ensuring no duplicates and preserving relationships for overlap analysis.
+    
+    **8. Audit & Telemetry**  
+    Every run logs counts, durations, and error events to support reproducibility and performance monitoring.
+    
+    ---
     
     **Performance:** ~5-10 seconds per AFSC | **Accuracy:** 85%+ precision on validated samples
     """)
