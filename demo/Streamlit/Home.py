@@ -594,7 +594,9 @@ with col6:
 # ============================================================================
 # PIPELINE VISUAL DIAGRAM
 # ============================================================================
-PROCESS_CARD_SVG = r"""<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='760' viewBox='0 0 1200 760'>
+import urllib.parse
+
+PROCESS_CARD_SVG = r"""<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='760' viewBox='0 0 1200 760' preserveAspectRatio='xMidYMid meet'>
   <!-- Deep-blue backdrop -->
   <rect x='0' y='0' width='1200' height='760' fill='#0F1A2B'/>
   <defs>
@@ -683,8 +685,10 @@ PROCESS_CARD_SVG = r"""<svg xmlns='http://www.w3.org/2000/svg' width='1200' heig
   </text>
 </svg>"""
 
+# Encode SVG as data URI for reliable rendering
+svg_uri = "data:image/svg+xml;utf8," + urllib.parse.quote(PROCESS_CARD_SVG)
 st.markdown(
-    f"<div style='max-width:1200px;margin:2rem auto;'>{PROCESS_CARD_SVG}</div>",
+    f"<div style='max-width:1200px;margin:2rem auto;'><img src='{svg_uri}' style='width:100%;height:auto;' alt='AFSC KSA Pipeline Diagram'/></div>",
     unsafe_allow_html=True
 )
 
