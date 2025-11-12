@@ -34,30 +34,29 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - Air Force Theme & Professional Styling
+# CUSTOM CSS - Air Force Theme & Professional Styling (with transparent bg)
 # ============================================================================
-# Build CSS with background image if available
 background_css = ""
 if bg_image_base64:
     background_css = f"""
-    /* Semi-transparent Background Image */
-    .main {{
+    /* Full-page background image with overlay */
+    body {{
         background-image: url('data:image/jpeg;base64,{bg_image_base64}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-        position: relative;
     }}
-    
-    .main::before {{
-        content: '';
+
+    /* Semi-transparent white overlay for readability */
+    .stApp::before {{
+        content: "";
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(255, 255, 255, 0.90);
         z-index: -1;
         pointer-events: none;
     }}
