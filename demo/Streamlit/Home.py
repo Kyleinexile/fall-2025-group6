@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import base64
 from pathlib import Path
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
@@ -15,42 +14,24 @@ st.set_page_config(
 )
 
 # ============================================================================
-# HELPER FUNCTION - Convert image to base64
-# ============================================================================
-def get_base64_image(image_path):
-    """Convert an image file to base64 string for embedding in CSS"""
-    try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    except Exception as e:
-        st.warning(f"Could not load background image: {e}")
-        return None
-
-# ============================================================================
-# LOAD BACKGROUND IMAGE
-# ============================================================================
-current_dir = Path(__file__).parent
-bg_image_path = current_dir / "assets" / "AFDOGGO.jpg"
-bg_image_base64 = get_base64_image(bg_image_path)
-
-# ============================================================================
 # CUSTOM CSS - Air Force Theme & Professional Styling
 # ============================================================================
-# Build CSS with background image if available
-background_css = ""
-if bg_image_base64:
-    background_css = f"""
+st.markdown("""
+<style>
+    /* Import Professional Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
     /* Semi-transparent Background Image */
-    .main {{
-        background-image: url('data:image/jpeg;base64,{bg_image_base64}');
+    .main {
+        background-image: url('assets/AFDOGGO.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
         position: relative;
-    }}
+    }
     
-    .main::before {{
+    .main::before {
         content: '';
         position: fixed;
         top: 0;
@@ -60,26 +41,18 @@ if bg_image_base64:
         background-color: rgba(255, 255, 255, 0.95);
         z-index: -1;
         pointer-events: none;
-    }}
-    """
-
-st.markdown(f"""
-<style>
-    /* Import Professional Font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    
-    {background_css}
+    }
     
     /* Global Font & Typography */
-    html, body, [class*="css"] {{
+    html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
         font-size: 15px;
-    }}
+    }
     
     /* Air Force Blue Theme - Aggressive Button Styling */
     .stButton>button[kind="primary"],
     button[kind="primary"],
-    .stButton > button[data-testid="baseButton-primary"] {{
+    .stButton > button[data-testid="baseButton-primary"] {
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: none !important;
@@ -88,22 +61,22 @@ st.markdown(f"""
         font-size: 16px !important;
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
-    }}
-    .stButton>button[kind="primary"]:hover {{
+    }
+    .stButton>button[kind="primary"]:hover {
         background-color: #003D7A !important;
         color: #FFFFFF !important;
         transform: translateY(-3px);
         box-shadow: 0 6px 20px rgba(0, 83, 155, 0.4) !important;
-    }}
+    }
     .stButton>button[kind="primary"] p,
     .stButton>button[kind="primary"] span,
-    .stButton>button[kind="primary"] div {{
+    .stButton>button[kind="primary"] div {
         color: #FFFFFF !important;
-    }}
+    }
     
     .stButton>button[kind="secondary"],
     button[kind="secondary"],
-    .stButton > button[data-testid="baseButton-secondary"] {{
+    .stButton > button[data-testid="baseButton-secondary"] {
         background-color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         color: #00539B !important;
@@ -112,66 +85,66 @@ st.markdown(f"""
         font-size: 16px !important;
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
-    }}
-    .stButton>button[kind="secondary"]:hover {{
+    }
+    .stButton>button[kind="secondary"]:hover {
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: 2px solid #00539B !important;
         transform: translateY(-3px);
         box-shadow: 0 6px 20px rgba(0, 83, 155, 0.3) !important;
-    }}
+    }
     .stButton>button[kind="secondary"] p,
     .stButton>button[kind="secondary"] span,
-    .stButton>button[kind="secondary"] div {{
+    .stButton>button[kind="secondary"] div {
         color: inherit !important;
-    }}
+    }
     
     /* Metrics Styling - Bigger and Bolder */
-    [data-testid="stMetricValue"] {{
+    [data-testid="stMetricValue"] {
         font-size: 42px;
         font-weight: 800;
         color: #00539B;
-    }}
-    [data-testid="stMetricLabel"] {{
+    }
+    [data-testid="stMetricLabel"] {
         font-size: 14px;
         font-weight: 600;
         color: #6B7280;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-    }}
+    }
     
     /* Headers */
-    h1 {{
+    h1 {
         color: #1F2937;
         font-weight: 800;
         letter-spacing: -0.5px;
-    }}
-    h2 {{
+    }
+    h2 {
         color: #374151;
         font-weight: 700;
         margin-top: 2rem;
         margin-bottom: 1rem;
-    }}
-    h3 {{
+    }
+    h3 {
         color: #1F2937;
         font-weight: 600;
-    }}
+    }
     
     /* Thicker Dividers */
-    hr {{
+    hr {
         border: none;
         border-top: 3px solid #E5E7EB;
         margin: 3rem 0;
-    }}
+    }
     
     /* Better Typography */
-    p {{
+    p {
         line-height: 1.6;
         color: #4B5563;
-    }}
+    }
     
     /* Status Badge */
-    .status-badge {{
+    .status-badge {
         display: inline-block;
         padding: 6px 16px;
         border-radius: 16px;
@@ -180,42 +153,42 @@ st.markdown(f"""
         letter-spacing: 0.3px;
         margin-right: 8px;
         margin-bottom: 8px;
-    }}
-    .status-success {{
+    }
+    .status-success {
         background-color: #D1FAE5;
         color: #065F46;
-    }}
-    .status-warning {{
+    }
+    .status-warning {
         background-color: #FEF3C7;
         color: #92400E;
-    }}
-    .status-error {{
+    }
+    .status-error {
         background-color: #FEE2E2;
         color: #991B1B;
-    }}
+    }
     
     /* Splash Screen Animation */
-    @keyframes fadeInUp {{
-        from {{
+    @keyframes fadeInUp {
+        from {
             opacity: 0;
             transform: translateY(30px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translateY(0);
-        }}
-    }}
-    .splash-container {{
+        }
+    }
+    .splash-container {
         animation: fadeInUp 0.8s ease-out;
-    }}
-    .splash-image {{
+    }
+    .splash-image {
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         margin-bottom: 2rem;
-    }}
+    }
     
     /* Pipeline Step Boxes */
-    .pipeline-step {{
+    .pipeline-step {
         background: white;
         border: 3px solid #00539B;
         border-radius: 12px;
@@ -227,11 +200,11 @@ st.markdown(f"""
         justify-content: center;
         align-items: center;
         transition: all 0.3s ease;
-    }}
-    .pipeline-step:hover {{
+    }
+    .pipeline-step:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 24px rgba(0, 83, 155, 0.2);
-    }}
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -256,152 +229,221 @@ if not st.session_state.entered:
             st.image(str(image_path), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
         
-        # Branding
+        # Title
         st.markdown("""
-        <div style='text-align: center;'>
-            <h1 style='
-                font-size: 3.5rem; 
-                font-weight: 800; 
-                color: #00539B; 
-                margin-bottom: 0.5rem;
-                letter-spacing: -1px;
-            '>
-                USAF KSA Explorer
-            </h1>
-            <p style='
-                font-size: 1.3rem; 
-                color: #6B7280; 
-                font-weight: 500;
-                margin-bottom: 2.5rem;
-            '>
-                Air Force Specialty Code Intelligence & Career Mapping
-            </p>
-        </div>
+        <h1 style='text-align: center; font-size: 3.2rem; font-weight: 800; 
+                   color: #00539B; margin-bottom: 2rem; line-height: 1.2;'>
+            Military Knowledge, Skills and Abilities (KSA) Pipeline
+        </h1>
         """, unsafe_allow_html=True)
         
         # Enter Button
-        if st.button("🚀 Enter Application", use_container_width=True, type="primary", key="enter_app"):
+        if st.button("🚀 Enter Application", type="primary", use_container_width=True):
             st.session_state.entered = True
             st.rerun()
+        
+        st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
+        
+        # Key Features
+        col_a, col_b, col_c = st.columns(3)
+        
+        with col_a:
+            st.markdown("""
+            <div style='text-align: center; padding: 24px;'>
+                <div style='font-size: 3.5rem; margin-bottom: 1rem;'>🤖</div>
+                <h3 style='color: #00539B; font-size: 1.3rem; margin-bottom: 0.75rem; font-weight: 700;'>AI-Powered</h3>
+                <p style='color: #6B7280; font-size: 1rem; line-height: 1.5;'>GWU's LAiSER + LLM extraction</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col_b:
+            st.markdown("""
+            <div style='text-align: center; padding: 24px;'>
+                <div style='font-size: 3.5rem; margin-bottom: 1rem;'>🔍</div>
+                <h3 style='color: #00539B; font-size: 1.3rem; margin-bottom: 0.75rem; font-weight: 700;'>Comprehensive</h3>
+                <p style='color: #6B7280; font-size: 1rem; line-height: 1.5;'>Knowledge, Skills, Abilities</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col_c:
+            st.markdown("""
+            <div style='text-align: center; padding: 24px;'>
+                <div style='font-size: 3.5rem; margin-bottom: 1rem;'>🌐</div>
+                <h3 style='color: #00539B; font-size: 1.3rem; margin-bottom: 0.75rem; font-weight: 700;'>Interactive</h3>
+                <p style='color: #6B7280; font-size: 1rem; line-height: 1.5;'>Real-time exploration</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
+        
+        # Project Description
+        st.markdown("""
+        <div style='text-align: center; font-size: 1.15em; color: #4B5563; margin-bottom: 2.5rem;'>
+            <p style='margin-bottom: 0.75rem; font-size: 1.1em;'>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
+            <p style='font-weight: 600; color: #00539B; margin-bottom: 0.75rem; font-size: 1.05em;'>MS Data Science Capstone Project</p>
+            <p style='color: #6B7280;'>George Washington University | 2025</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 # ============================================================================
-# NEO4J CONNECTION CHECK
+# MAIN APPLICATION
 # ============================================================================
-@st.cache_resource
-def get_neo4j_status():
-    """Check Neo4j and API key availability"""
-    status = {
-        'neo4j': False,
-        'gemini': bool(os.getenv('GEMINI_API_KEY')),
-        'openai': bool(os.getenv('OPENAI_API_KEY')),
-        'anthropic': bool(os.getenv('ANTHROPIC_API_KEY'))
+
+# Cached functions for status/metrics
+@st.cache_data(ttl=60)
+def get_env_status():
+    return {
+        "neo4j": bool(os.getenv("NEO4J_URI")),
+        "gemini": bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")),
+        "openai": bool(os.getenv("OPENAI_API_KEY")),
+        "anthropic": bool(os.getenv("ANTHROPIC_API_KEY")),
     }
-    
+
+@st.cache_data(ttl=60)
+def get_database_metrics():
     try:
-        uri = os.getenv('NEO4J_URI')
-        user = os.getenv('NEO4J_USER')
-        password = os.getenv('NEO4J_PASSWORD')
+        NEO4J_URI = os.getenv("NEO4J_URI", "")
+        NEO4J_USER = os.getenv("NEO4J_USER", "")
+        NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
+        NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
         
-        if uri and user and password:
-            driver = GraphDatabase.driver(uri, auth=(user, password))
-            driver.verify_connectivity()
+        if all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]):
+            driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+            with driver.session(database=NEO4J_DATABASE) as session:
+                result = session.run("""
+                    MATCH (a:AFSC)
+                    OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
+                    RETURN 
+                        count(DISTINCT a) as afscs,
+                        count(DISTINCT k) as total_ksas,
+                        count(DISTINCT CASE WHEN k.type = 'knowledge' THEN k END) as knowledge,
+                        count(DISTINCT CASE WHEN k.type = 'skill' THEN k END) as skills,
+                        count(DISTINCT CASE WHEN k.type = 'ability' THEN k END) as abilities
+                """).single()
             driver.close()
-            status['neo4j'] = True
+            
+            return {
+                "afscs": result["afscs"] or 0,
+                "total_ksas": result["total_ksas"] or 0,
+                "knowledge": result["knowledge"] or 0,
+                "skills": result["skills"] or 0,
+                "abilities": result["abilities"] or 0
+            }
     except Exception:
         pass
     
-    return status
+    return {
+        "afscs": 0,
+        "total_ksas": 0,
+        "knowledge": 0,
+        "skills": 0,
+        "abilities": 0
+    }
 
-status = get_neo4j_status()
+# Fetch data once
+status = get_env_status()
+metrics = get_database_metrics()
 
 # ============================================================================
-# HERO SECTION
+# SIDEBAR - Connection Status at Bottom
 # ============================================================================
-st.markdown("""
-<div style='text-align: center; padding: 1.5rem 0;'>
-    <h1 style='font-size: 3rem; font-weight: 800; color: #00539B; margin-bottom: 0.5rem;'>
-        🚀 USAF KSA Extraction Pipeline
-    </h1>
-    <p style='font-size: 1.2rem; color: #6B7280; font-weight: 500;'>
-        From Air Force specialty documents to transferable career insights
-    </p>
+with st.sidebar:
+    # Add spacer to push to bottom
+    st.markdown("<br>" * 20, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("### 📊 System Status")
+    
+    # Connection Status
+    st.markdown("**Connections:**")
+    
+    # Neo4j
+    if status["neo4j"]:
+        st.markdown("✅ Neo4j Database")
+    else:
+        st.markdown("❌ Neo4j Database")
+    
+    # Gemini
+    if status["gemini"]:
+        st.markdown("✅ Gemini API")
+    else:
+        st.markdown("⚠️ Gemini API")
+    
+    # OpenAI
+    if status["openai"]:
+        st.markdown("✅ OpenAI API")
+    else:
+        st.markdown("⚠️ OpenAI API")
+    
+    # Anthropic
+    if status["anthropic"]:
+        st.markdown("✅ Anthropic API")
+    else:
+        st.markdown("⚠️ Anthropic API")
+
+# ============================================================================
+# COMPACT BANNER - At Very Top (Metrics Only)
+# ============================================================================
+st.markdown(f"""
+<div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
+            padding: 12px 24px; border-radius: 8px; margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 83, 155, 0.15);'>
+    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px;'>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["afscs"]}</span>
+        </div>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["total_ksas"]}</span>
+        </div>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["knowledge"]}</span>
+        </div>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Skills:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["skills"]}</span>
+        </div>
+        <div style='display: flex; align-items: baseline; gap: 8px;'>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["abilities"]}</span>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 2rem 0;'>", unsafe_allow_html=True)
+# Header
+st.markdown("""
+<h1 style='font-size: 2.75rem; margin-bottom: 0.5rem; font-weight: 800;'>
+    ✈️ USAF KSA Extraction Pipeline
+</h1>
+""", unsafe_allow_html=True)
 
-# ============================================================================
-# KEY METRICS
-# ============================================================================
-st.markdown("## 📊 System Overview")
+st.markdown("""
+<p style='font-size: 1.15rem; color: #6B7280; margin-bottom: 0.5rem; line-height: 1.5;'>
+    Map Air Force Specialty Codes to transferable <strong>Knowledge, Skills, and Abilities</strong> for analysis and career planning.
+</p>
+""", unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4)
+st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
 
-with col1:
-    st.metric(
-        label="AFSCs Processed",
-        value="30+",
-        delta="Officer & Enlisted"
-    )
-
-with col2:
-    st.metric(
-        label="KSA Items Extracted",
-        value="600+",
-        delta="Per AFSC average: 25-30"
-    )
-
-with col3:
-    st.metric(
-        label="ESCO Taxonomy Mappings",
-        value="1000+",
-        delta="EU skills framework"
-    )
-
-with col4:
-    db_status = "🟢 Connected" if status['neo4j'] else "🔴 Offline"
-    st.metric(
-        label="Database Status",
-        value=db_status,
-        delta="Neo4j Graph DB"
-    )
-
-st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
-
-# ============================================================================
-# GETTING STARTED
-# ============================================================================
-if 'hide_getting_started' not in st.session_state:
+# First-time helper
+if "hide_getting_started" not in st.session_state:
     st.session_state.hide_getting_started = False
 
 if not st.session_state.hide_getting_started:
-    st.markdown("## 🎯 Getting Started")
-    st.markdown("""
-    <div style='background-color: #EFF6FF; padding: 1.5rem; border-radius: 12px; border-left: 6px solid #00539B;'>
-        <p style='font-size: 1rem; color: #1F2937; margin-bottom: 1rem; line-height: 1.6;'>
-            <strong>Welcome to the USAF KSA Explorer!</strong> This tool maps Air Force specialty codes to 
-            Knowledge, Skills, and Abilities (KSAs) for career planning and transition insights.
-        </p>
-        <p style='font-size: 0.95rem; color: #4B5563; margin-bottom: 1rem; line-height: 1.6;'>
-            <strong>Quick Start:</strong>
-        </p>
-        <ul style='color: #4B5563; font-size: 0.95rem; line-height: 1.6; margin-left: 1.5rem;'>
-            <li><strong>Explore KSAs</strong> → Browse AFSCs and view extracted skills</li>
-            <li><strong>Try It Yourself</strong> → Test the extraction with your own API key</li>
-            <li><strong>Admin Tools</strong> → Process documents and manage the database</li>
-        </ul>
-        <p style='font-size: 0.9rem; color: #6B7280; margin-top: 1rem; margin-bottom: 0;'>
-            💡 <em>Tip: Check the "Learn More" section below for KSA definitions and tech stack details</em>
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col_dismiss, col_spacer = st.columns([1, 5])
-    with col_dismiss:
-        if st.button("✕ Dismiss", key="dismiss_getting_started", type="secondary"):
+    with st.container():
+        st.info(
+            "**First time here?** Start with **Explore KSAs** to browse existing data. "
+            "Want to test extraction? Use **Try It Yourself** with your own API key. "
+            "Admins can process documents in **Admin Tools**.",
+            icon="🧭"
+        )
+        if st.checkbox("Don't show this again", key="hide_gs_checkbox"):
             st.session_state.hide_getting_started = True
             st.rerun()
 
