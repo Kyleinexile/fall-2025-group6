@@ -326,13 +326,16 @@ status = get_env_status()
 metrics = get_database_metrics()
 
 # ============================================================================
-# SIDEBAR - Connection Status Only
+# SIDEBAR - Connection Status at Bottom
 # ============================================================================
 with st.sidebar:
-    st.markdown("### 📊 System Status")
-    st.markdown("<hr style='border-top: 2px solid #E5E7EB; margin: 1rem 0;'>", unsafe_allow_html=True)
+    # Add spacer to push to bottom
+    st.markdown("<br>" * 20, unsafe_allow_html=True)
     
-    # Connection Status Only
+    st.markdown("---")
+    st.markdown("### 📊 System Status")
+    
+    # Connection Status
     st.markdown("**Connections:**")
     
     # Neo4j
@@ -364,28 +367,28 @@ with st.sidebar:
 # ============================================================================
 st.markdown(f"""
 <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
-            padding: 16px 24px; border-radius: 8px; margin-bottom: 2rem;
+            padding: 8px 24px; border-radius: 8px; margin-bottom: 2rem;
             box-shadow: 0 2px 8px rgba(0, 83, 155, 0.15);'>
     <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;'>
-        <div style='text-align: center; padding: 4px 16px;'>
+        <div style='text-align: center; padding: 2px 16px;'>
+            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs</p>
             <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["afscs"]}</h3>
-            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>AFSCs</p>
         </div>
-        <div style='text-align: center; padding: 4px 16px;'>
+        <div style='text-align: center; padding: 2px 16px;'>
+            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs</p>
             <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["total_ksas"]}</h3>
-            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Total KSAs</p>
         </div>
-        <div style='text-align: center; padding: 4px 16px;'>
+        <div style='text-align: center; padding: 2px 16px;'>
+            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge</p>
             <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["knowledge"]}</h3>
-            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Knowledge</p>
         </div>
-        <div style='text-align: center; padding: 4px 16px;'>
+        <div style='text-align: center; padding: 2px 16px;'>
+            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Skills</p>
             <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["skills"]}</h3>
-            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Skills</p>
         </div>
-        <div style='text-align: center; padding: 4px 16px;'>
+        <div style='text-align: center; padding: 2px 16px;'>
+            <p style='margin: 0; font-size: 0.75rem; color: white; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities</p>
             <h3 style='margin: 0; color: white; font-size: 2rem; font-weight: 800;'>{metrics["abilities"]}</h3>
-            <p style='margin: 0; font-size: 0.85rem; color: white; opacity: 0.95;'>Abilities</p>
         </div>
     </div>
 </div>
