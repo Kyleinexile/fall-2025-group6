@@ -42,25 +42,26 @@ st.set_page_config(
 background_css = ""
 if bg_image_base64:
     background_css = f"""
-    /* Streamlit paints the app inside this container. Put the image here. */
     [data-testid="stAppViewContainer"] {{
-        background: 
-            linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)),
-            url('data:image/jpeg;base64,{bg_image_base64}') 65% center / cover no-repeat fixed !important;
+        /* Combine overlay + image */
+        background:
+            linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)),
+            url('data:image/jpeg;base64,{bg_image_base64}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center 65%; /* horizontal center, vertical offset (positive = down) */
     }}
 
-    /* Make header/toolbar transparent so the bg shows through */
     [data-testid="stHeader"] {{
         background: transparent !important;
     }}
 
-    /* Optional: soften sidebar so bg subtly shows */
     [data-testid="stSidebar"] {{
         background: rgba(255,255,255,0.92) !important;
         backdrop-filter: blur(2px);
     }}
 
-    /* Ensure main content area doesn't reintroduce a solid background */
     .main .block-container {{
         background: transparent !important;
     }}
