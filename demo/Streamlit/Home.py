@@ -40,9 +40,7 @@ st.markdown("""
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
     }
-    .stButton>button[kind="primary"]:hover,
-    button[kind="primary"]:hover,
-    .stButton > button[data-testid="baseButton-primary"]:hover {
+    .stButton>button[kind="primary"]:hover {
         background-color: #003D7A !important;
         color: #FFFFFF !important;
         transform: translateY(-3px);
@@ -66,9 +64,7 @@ st.markdown("""
         transition: all 0.3s ease !important;
         border-radius: 8px !important;
     }
-    .stButton>button[kind="secondary"]:hover,
-    button[kind="secondary"]:hover,
-    .stButton > button[data-testid="baseButton-secondary"]:hover {
+    .stButton>button[kind="secondary"]:hover {
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: 2px solid #00539B !important;
@@ -95,7 +91,7 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Headers - Better Hierarchy */
+    /* Headers */
     h1 {
         color: #1F2937;
         font-weight: 800;
@@ -112,11 +108,11 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Dividers */
+    /* Thicker Dividers */
     hr {
-        margin: 2.5rem 0;
         border: none;
-        border-top: 2px solid #E5E7EB;
+        border-top: 3px solid #E5E7EB;
+        margin: 3rem 0;
     }
     
     /* Better Typography */
@@ -125,7 +121,7 @@ st.markdown("""
         color: #4B5563;
     }
     
-    /* Status Badge - Larger and More Prominent */
+    /* Status Badge */
     .status-badge {
         display: inline-block;
         padding: 6px 16px;
@@ -169,26 +165,29 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
-    /* Action Cards */
-    .action-card {
-        padding: 24px;
-        border-radius: 12px;
-        border: 2px solid #E5E7EB;
-        background: #FAFAFA;
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    .action-card:hover {
-        border-color: #00539B;
+    /* Pipeline Step Boxes */
+    .pipeline-step {
         background: white;
-        box-shadow: 0 8px 24px rgba(0, 83, 155, 0.12);
+        border: 3px solid #00539B;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    .pipeline-step:hover {
         transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 83, 155, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# SPLASH SCREEN - Entry Page
+# SPLASH SCREEN
 # ============================================================================
 if 'entered' not in st.session_state:
     st.session_state.entered = False
@@ -196,7 +195,6 @@ if 'entered' not in st.session_state:
 if not st.session_state.entered:
     st.markdown("<div class='splash-container'>", unsafe_allow_html=True)
     
-    # Center content
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
@@ -269,7 +267,7 @@ if not st.session_state.entered:
     st.stop()
 
 # ============================================================================
-# MAIN APPLICATION - Simplified UX with Air Force Branding
+# MAIN APPLICATION
 # ============================================================================
 
 # Header
@@ -287,7 +285,7 @@ st.markdown("""
 
 st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
 
-# First-time helper (dismissible per session)
+# First-time helper
 if "hide_getting_started" not in st.session_state:
     st.session_state.hide_getting_started = False
 
@@ -303,51 +301,14 @@ if not st.session_state.hide_getting_started:
             st.session_state.hide_getting_started = True
             st.rerun()
 
-st.divider()
+st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
 
 # ============================================================================
-# Quick Actions - What would you like to do?
-# ============================================================================
-st.markdown("## 🚀 What would you like to do?")
-st.markdown("<p style='color: #6B7280; font-size: 1.05rem; margin-bottom: 2rem;'>Choose your workflow below</p>", unsafe_allow_html=True)
-
-col1, col2, col3 = st.columns(3, gap="large")
-
-with col1:
-    st.markdown("<div class='action-card'>", unsafe_allow_html=True)
-    st.markdown("### 🔍 Explore KSAs")
-    st.markdown("Browse AFSCs, view extracted Knowledge, Skills, and Abilities, and find overlaps between specialties.")
-    st.caption("→ Read-only insights & cross-AFSC analysis")
-    if st.button("Open Explore KSAs →", use_container_width=True, type="primary", key="explore"):
-        st.switch_page("pages/03_Explore_KSAs.py")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("<div class='action-card'>", unsafe_allow_html=True)
-    st.markdown("### 🔑 Try It Yourself")
-    st.markdown("Paste AFSC text and generate Knowledge/Ability items using your own API key for testing.")
-    st.caption("→ Sandbox with your own API key")
-    if st.button("Open Try It Yourself →", use_container_width=True, type="secondary", key="byo"):
-        st.switch_page("pages/02_Try_It_Yourself.py")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col3:
-    st.markdown("<div class='action-card'>", unsafe_allow_html=True)
-    st.markdown("### ⚙️ Admin Tools")
-    st.markdown("Process PDFs/Markdown, run extraction pipeline, and manage database content.")
-    st.caption("→ Power tools for data management")
-    if st.button("Open Admin Tools →", use_container_width=True, type="secondary", key="admin"):
-        st.switch_page("pages/04_Admin_Tools.py")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-st.divider()
-
-# ============================================================================
-# System Snapshot - Lightweight Status & Metrics
+# SYSTEM SNAPSHOT - At the top
 # ============================================================================
 st.markdown("## 📊 System Snapshot")
 
-# Lightweight environment status check (no DB calls for status badges)
+# Cached functions
 @st.cache_data(ttl=60)
 def get_env_status():
     return {
@@ -357,7 +318,6 @@ def get_env_status():
         "anthropic": bool(os.getenv("ANTHROPIC_API_KEY")),
     }
 
-# Database metrics with caching and fallback
 @st.cache_data(ttl=60)
 def get_database_metrics():
     try:
@@ -391,7 +351,6 @@ def get_database_metrics():
     except Exception:
         pass
     
-    # Fallback if DB unavailable
     return {
         "afscs": 0,
         "total_ksas": 0,
@@ -403,7 +362,18 @@ def get_database_metrics():
 status = get_env_status()
 metrics = get_database_metrics()
 
-# Connection Status Badges
+# Database Metrics FIRST
+st.markdown("**Database Metrics:**")
+m1, m2, m3, m4, m5 = st.columns(5)
+m1.metric("AFSCs Loaded", metrics["afscs"], help="Number of AFSC nodes in graph")
+m2.metric("Total KSAs", metrics["total_ksas"], help="All Knowledge, Skills, and Abilities")
+m3.metric("Knowledge", metrics["knowledge"])
+m4.metric("Skills", metrics["skills"])
+m5.metric("Abilities", metrics["abilities"])
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Connection Status BELOW
 st.markdown("**Connection Status:**")
 badge_html = ""
 if status["neo4j"]:
@@ -428,55 +398,116 @@ else:
 
 st.markdown(badge_html, unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Database Metrics
-st.markdown("**Database Metrics:**")
-m1, m2, m3, m4, m5 = st.columns(5)
-m1.metric("AFSCs Loaded", metrics["afscs"], help="Number of AFSC nodes in graph")
-m2.metric("Total KSAs", metrics["total_ksas"], help="All Knowledge, Skills, and Abilities")
-m3.metric("Knowledge", metrics["knowledge"])
-m4.metric("Skills", metrics["skills"])
-m5.metric("Abilities", metrics["abilities"])
-
-st.divider()
+st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
 
 # ============================================================================
-# How It Works - Simple Visual
+# WHAT WOULD YOU LIKE TO DO?
+# ============================================================================
+st.markdown("## 🚀 What would you like to do?")
+st.markdown("<p style='color: #6B7280; font-size: 1.05rem; margin-bottom: 2rem;'>Choose your workflow below</p>", unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns(3, gap="large")
+
+with col1:
+    with st.container():
+        st.markdown("### 🔍 Explore KSAs")
+        st.markdown("Browse AFSCs, view extracted Knowledge, Skills, and Abilities, and find overlaps between specialties.")
+        st.caption("→ Read-only insights & cross-AFSC analysis")
+        if st.button("Open Explore KSAs →", use_container_width=True, type="primary", key="explore"):
+            st.switch_page("pages/03_Explore_KSAs.py")
+
+with col2:
+    with st.container():
+        st.markdown("### 🔑 Try It Yourself")
+        st.markdown("Paste AFSC text and generate Knowledge/Ability items using your own API key for testing.")
+        st.caption("→ Sandbox with your own API key")
+        if st.button("Open Try It Yourself →", use_container_width=True, type="secondary", key="byo"):
+            st.switch_page("pages/02_Try_It_Yourself.py")
+
+with col3:
+    with st.container():
+        st.markdown("### ⚙️ Admin Tools")
+        st.markdown("Process PDFs/Markdown, run extraction pipeline, and manage database content.")
+        st.caption("→ Power tools for data management")
+        if st.button("Open Admin Tools →", use_container_width=True, type="secondary", key="admin"):
+            st.switch_page("pages/04_Admin_Tools.py")
+
+st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
+
+# ============================================================================
+# HOW IT WORKS - 6 Steps with Boxes
 # ============================================================================
 st.markdown("## 🔄 How it works (at a glance)")
 
-s1, s2, s3, s4, s5 = st.columns([1.3, 0.2, 1.3, 0.2, 1.3])
-with s1:
+# 6-step pipeline with boxes
+col1, arr1, col2, arr2, col3, arr3, col4, arr4, col5, arr5, col6 = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
+
+with col1:
     st.markdown("""
-    <div style='text-align: center; padding: 16px;'>
-        <div style='font-size: 3rem; margin-bottom: 0.5rem;'>📄</div>
-        <h4 style='color: #00539B; margin-bottom: 0.5rem;'>Ingest</h4>
-        <p style='color: #6B7280; font-size: 0.95rem;'>Load AFOCD/AFECD text (PDF or Markdown)</p>
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>📄</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>1. Ingest</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>Load AFOCD/AFECD documents</p>
     </div>
     """, unsafe_allow_html=True)
 
-with s2:
-    st.markdown("<h3 style='text-align: center; color: #00539B;'>→</h3>", unsafe_allow_html=True)
+with arr1:
+    st.markdown("<h2 style='text-align: center; color: #00539B; margin-top: 60px;'>→</h2>", unsafe_allow_html=True)
 
-with s3:
+with col2:
     st.markdown("""
-    <div style='text-align: center; padding: 16px;'>
-        <div style='font-size: 3rem; margin-bottom: 0.5rem;'>🤖</div>
-        <h4 style='color: #00539B; margin-bottom: 0.5rem;'>Extract</h4>
-        <p style='color: #6B7280; font-size: 0.95rem;'>Parse baseline KSAs using LAiSER rules</p>
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🧹</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>2. Preprocess</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>Clean & normalize text</p>
     </div>
     """, unsafe_allow_html=True)
 
-with s4:
-    st.markdown("<h3 style='text-align: center; color: #00539B;'>→</h3>", unsafe_allow_html=True)
+with arr2:
+    st.markdown("<h2 style='text-align: center; color: #00539B; margin-top: 60px;'>→</h2>", unsafe_allow_html=True)
 
-with s5:
+with col3:
     st.markdown("""
-    <div style='text-align: center; padding: 16px;'>
-        <div style='font-size: 3rem; margin-bottom: 0.5rem;'>✨</div>
-        <h4 style='color: #00539B; margin-bottom: 0.5rem;'>Enhance</h4>
-        <p style='color: #6B7280; font-size: 0.95rem;'>Refine with LLM, store to Neo4j</p>
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🤖</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>3. Extract</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>LAiSER skill extraction</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with arr3:
+    st.markdown("<h2 style='text-align: center; color: #00539B; margin-top: 60px;'>→</h2>", unsafe_allow_html=True)
+
+with col4:
+    st.markdown("""
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>✨</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>4. Enhance</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>LLM K/A generation</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with arr4:
+    st.markdown("<h2 style='text-align: center; color: #00539B; margin-top: 60px;'>→</h2>", unsafe_allow_html=True)
+
+with col5:
+    st.markdown("""
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>💾</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>5. Store</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>Neo4j graph database</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with arr5:
+    st.markdown("<h2 style='text-align: center; color: #00539B; margin-top: 60px;'>→</h2>", unsafe_allow_html=True)
+
+with col6:
+    st.markdown("""
+    <div class='pipeline-step'>
+        <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🌐</div>
+        <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>6. Explore</h4>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>Interactive web interface</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -494,10 +525,10 @@ with st.expander("See detailed pipeline steps"):
     **Performance:** ~5-10 seconds per AFSC | **Accuracy:** 85%+ precision on validated samples
     """)
 
-st.divider()
+st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
 
 # ============================================================================
-# Learn More - Consolidated Section
+# LEARN MORE
 # ============================================================================
 with st.expander("📖 Learn More (About • KSA Definitions • Tech Stack • Configuration)"):
     st.markdown("### About This Project")
