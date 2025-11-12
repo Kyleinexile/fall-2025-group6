@@ -45,8 +45,8 @@ if bg_image_base64:
     /* Streamlit paints the app inside this container. Put the image here. */
     [data-testid="stAppViewContainer"] {{
         background: 
-            linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)),
-            url('data:image/jpeg;base64,{bg_image_base64}') center / cover no-repeat fixed !important;
+            linear-gradient(rgba(255,255,255,0.93), rgba(255,255,255,0.93)),
+            url('data:image/jpeg;base64,{bg_image_base64}') 55% center / cover no-repeat fixed !important;
     }}
 
     /* Make header/toolbar transparent so the bg shows through */
