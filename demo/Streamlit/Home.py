@@ -270,45 +270,7 @@ if not st.session_state.entered:
 # MAIN APPLICATION
 # ============================================================================
 
-# Header
-st.markdown("""
-<h1 style='font-size: 2.75rem; margin-bottom: 0.5rem; font-weight: 800;'>
-    ✈️ USAF KSA Extraction Pipeline
-</h1>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<p style='font-size: 1.15rem; color: #6B7280; margin-bottom: 0.5rem; line-height: 1.5;'>
-    Map Air Force Specialty Codes to transferable <strong>Knowledge, Skills, and Abilities</strong> for analysis and career planning.
-</p>
-""", unsafe_allow_html=True)
-
-st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
-
-# First-time helper
-if "hide_getting_started" not in st.session_state:
-    st.session_state.hide_getting_started = False
-
-if not st.session_state.hide_getting_started:
-    with st.container():
-        st.info(
-            "**First time here?** Start with **Explore KSAs** to browse existing data. "
-            "Want to test extraction? Use **Try It Yourself** with your own API key. "
-            "Admins can process documents in **Admin Tools**.",
-            icon="🧭"
-        )
-        if st.checkbox("Don't show this again", key="hide_gs_checkbox"):
-            st.session_state.hide_getting_started = True
-            st.rerun()
-
-st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
-
-# ============================================================================
-# SYSTEM SNAPSHOT - At the top
-# ============================================================================
-st.markdown("## 📊 System Snapshot")
-
-# Cached functions
+# Cached functions for status/metrics
 @st.cache_data(ttl=60)
 def get_env_status():
     return {
@@ -359,44 +321,128 @@ def get_database_metrics():
         "abilities": 0
     }
 
+# Fetch data once
 status = get_env_status()
 metrics = get_database_metrics()
 
-# Database Metrics FIRST
-st.markdown("**Database Metrics:**")
-m1, m2, m3, m4, m5 = st.columns(5)
-m1.metric("AFSCs Loaded", metrics["afscs"], help="Number of AFSC nodes in graph")
-m2.metric("Total KSAs", metrics["total_ksas"], help="All Knowledge, Skills, and Abilities")
-m3.metric("Knowledge", metrics["knowledge"])
-m4.metric("Skills", metrics["skills"])
-m5.metric("Abilities", metrics["abilities"])
+# ============================================================================
+# SIDEBAR - System Status (Option 1)
+# ============================================================================
+with st.sidebar:
+    st.markdown("### 📊 System Status")
+    st.markdown("<hr style='border-top: 2px solid #E5E7EB; margin: 1rem 0;'>", unsafe_allow_html=True)
+    
+    # Database Metrics
+    st.markdown("**Database Metrics:**")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.metric("AFSCs", metrics["afscs"])
+        st.metric("Knowledge", metrics["knowledge"])
+    with col_b:
+        st.metric("Total KSAs", metrics["total_ksas"])
+        st.metric("Skills", metrics["skills"])
+    
+    st.metric("Abilities", metrics["abilities"])
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Connection Status
+    st.markdown("**Connections:**")
+    
+    # Neo4j
+    if status["neo4j"]:
+        st.markdown("✅ Neo4j Database")
+    else:
+        st.markdown("❌ Neo4j Database")
+    
+    # Gemini
+    if status["gemini"]:
+        st.markdown("✅ Gemini API")
+    else:
+        st.markdown("⚠️ Gemini API")
+    
+    # OpenAI
+    if status["openai"]:
+        st.markdown("✅ OpenAI API")
+    else:
+        st.markdown("⚠️ OpenAI API")
+    
+    # Anthropic
+    if status["anthropic"]:
+        st.markdown("✅ Anthropic API")
+    else:
+        st.markdown("⚠️ Anthropic API")
 
-st.markdown("<br>", unsafe_allow_html=True)
+# Header
+st.markdown("""
+<h1 style='font-size: 2.75rem; margin-bottom: 0.5rem; font-weight: 800;'>
+    ✈️ USAF KSA Extraction Pipeline
+</h1>
+""", unsafe_allow_html=True)
 
-# Connection Status BELOW
-st.markdown("**Connection Status:**")
-badge_html = ""
-if status["neo4j"]:
-    badge_html += "<span class='status-badge status-success'>✅ Neo4j Database</span>"
-else:
-    badge_html += "<span class='status-badge status-error'>❌ Neo4j Database</span>"
+st.markdown("""
+<p style='font-size: 1.15rem; color: #6B7280; margin-bottom: 0.5rem; line-height: 1.5;'>
+    Map Air Force Specialty Codes to transferable <strong>Knowledge, Skills, and Abilities</strong> for analysis and career planning.
+</p>
+""", unsafe_allow_html=True)
 
-if status["gemini"]:
-    badge_html += "<span class='status-badge status-success'>✅ Gemini API</span>"
-else:
-    badge_html += "<span class='status-badge status-warning'>⚠️ Gemini API</span>"
+st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
 
-if status["openai"]:
-    badge_html += "<span class='status-badge status-success'>✅ OpenAI API</span>"
-else:
-    badge_html += "<span class='status-badge status-warning'>⚠️ OpenAI API</span>"
+# First-time helper
+if "hide_getting_started" not in st.session_state:
+    st.session_state.hide_getting_started = False
 
-if status["anthropic"]:
-    badge_html += "<span class='status-badge status-success'>✅ Anthropic API</span>"
-else:
-    badge_html += "<span class='status-badge status-warning'>⚠️ Anthropic API</span>"
+if not st.session_state.hide_getting_started:
+    with st.container():
+        st.info(
+            "**First time here?** Start with **Explore KSAs** to browse existing data. "
+            "Want to test extraction? Use **Try It Yourself** with your own API key. "
+            "Admins can process documents in **Admin Tools**.",
+            icon="🧭"
+        )
+        if st.checkbox("Don't show this again", key="hide_gs_checkbox"):
+            st.session_state.hide_getting_started = True
+            st.rerun()
 
-st.markdown(badge_html, unsafe_allow_html=True)
+# ============================================================================
+# BANNER - System Status (Option 2)
+# ============================================================================
+st.markdown(f"""
+<div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
+            padding: 24px; border-radius: 12px; color: white; margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2);'>
+    <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;'>
+        <div style='text-align: center; padding: 10px;'>
+            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["afscs"]}</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>AFSCs Loaded</p>
+        </div>
+        <div style='text-align: center; padding: 10px;'>
+            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["total_ksas"]}</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Total KSAs</p>
+        </div>
+        <div style='text-align: center; padding: 10px;'>
+            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["knowledge"]}</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Knowledge</p>
+        </div>
+        <div style='text-align: center; padding: 10px;'>
+            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["skills"]}</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Skills</p>
+        </div>
+        <div style='text-align: center; padding: 10px;'>
+            <h2 style='margin: 0; color: white; font-size: 2.5rem; font-weight: 800;'>{metrics["abilities"]}</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Abilities</p>
+        </div>
+    </div>
+    <div style='text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);'>
+        <span style='font-size: 0.85rem; opacity: 0.9;'>
+            {'✅ Neo4j' if status["neo4j"] else '❌ Neo4j'} • 
+            {'✅ Gemini' if status["gemini"] else '⚠️ Gemini'} • 
+            {'✅ OpenAI' if status["openai"] else '⚠️ OpenAI'} • 
+            {'✅ Anthropic' if status["anthropic"] else '⚠️ Anthropic'}
+        </span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
 
@@ -437,7 +483,7 @@ st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3re
 # ============================================================================
 # HOW IT WORKS - 6 Steps with Boxes
 # ============================================================================
-st.markdown("## 🔄 How it works (at a glance)")
+st.markdown("## 🔄 How it works")
 
 # 6-step pipeline with boxes
 col1, arr1, col2, arr2, col3, arr3, col4, arr4, col5, arr5, col6 = st.columns([1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1, 0.15, 1])
