@@ -435,52 +435,43 @@ st.markdown("<p style='color: #6B7280; font-size: 1.05rem; margin-bottom: 2rem;'
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='card-icon'>🔍</span>", unsafe_allow_html=True)
-    st.markdown("### Explore KSAs")
-    st.markdown("Query, filter, and analyze extracted Knowledge, Skills, and Abilities across all AFSCs")
-    st.markdown("**Features:**")
-    st.markdown("• Search by AFSC with full titles")
-    st.markdown("• Filter by type and confidence")
-    st.markdown("• Find overlapping skills")
-    st.markdown("• Export to CSV")
-    st.markdown("<p class='helper-text'>→ Read-only insights & analysis</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("→ Explore KSAs", use_container_width=True, type="primary", key="explore"):
-        st.switch_page("pages/03_Explore_KSAs.py")
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 🔍 Explore KSAs")
+        st.markdown("Query, filter, and analyze extracted Knowledge, Skills, and Abilities across all AFSCs")
+        st.markdown("**Features:**")
+        st.markdown("• Search by AFSC with full titles")
+        st.markdown("• Filter by type and confidence")
+        st.markdown("• Find overlapping skills")
+        st.markdown("• Export to CSV")
+        st.caption("→ Read-only insights & analysis")
+        if st.button("→ Explore KSAs", use_container_width=True, type="primary", key="explore"):
+            st.switch_page("pages/03_Explore_KSAs.py")
 
 with col2:
-    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='card-icon'>🔑</span>", unsafe_allow_html=True)
-    st.markdown("### Try It Yourself")
-    st.markdown("Run KSA extraction on your own AFSC text using your API key")
-    st.markdown("**Benefits:**")
-    st.markdown("• Bring your own API key")
-    st.markdown("• Test with custom text")
-    st.markdown("• No quota limits")
-    st.markdown("• Session-only storage")
-    st.markdown("<p class='helper-text'>→ Sandbox with your own API key</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("→ Try It Yourself", use_container_width=True, type="secondary", key="byo"):
-        st.switch_page("pages/02_Try_It_Yourself.py")
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### 🔑 Try It Yourself")
+        st.markdown("Run KSA extraction on your own AFSC text using your API key")
+        st.markdown("**Benefits:**")
+        st.markdown("• Bring your own API key")
+        st.markdown("• Test with custom text")
+        st.markdown("• No quota limits")
+        st.markdown("• Session-only storage")
+        st.caption("→ Sandbox with your own API key")
+        if st.button("→ Try It Yourself", use_container_width=True, type="secondary", key="byo"):
+            st.switch_page("pages/02_Try_It_Yourself.py")
 
 with col3:
-    st.markdown("<div class='nav-card'>", unsafe_allow_html=True)
-    st.markdown("<span class='card-icon'>⚙️</span>", unsafe_allow_html=True)
-    st.markdown("### Admin Tools")
-    st.markdown("Browse existing documents and process new AFSC text through the extraction pipeline")
-    st.markdown("**Capabilities:**")
-    st.markdown("• View all source documents")
-    st.markdown("• Upload new AFSC data")
-    st.markdown("• Run LAiSER + LLM pipeline")
-    st.markdown("• Manage database content")
-    st.markdown("<p class='helper-text'>→ Power tools for data management</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("→ Admin Tools", use_container_width=True, type="secondary", key="admin"):
-        st.switch_page("pages/04_Admin_Tools.py")
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("### ⚙️ Admin Tools")
+        st.markdown("Browse existing documents and process new AFSC text through the extraction pipeline")
+        st.markdown("**Capabilities:**")
+        st.markdown("• View all source documents")
+        st.markdown("• Upload new AFSC data")
+        st.markdown("• Run LAiSER + LLM pipeline")
+        st.markdown("• Manage database content")
+        st.caption("→ Power tools for data management")
+        if st.button("→ Admin Tools", use_container_width=True, type="secondary", key="admin"):
+            st.switch_page("pages/04_Admin_Tools.py")
 
 st.divider()
 
@@ -569,48 +560,58 @@ with st.expander("🔄 Pipeline Architecture", expanded=False):
     Our system combines multiple technologies for comprehensive KSA extraction:
     """)
     
-    st.code("""
-┌─────────────────────────────────────────────────────────┐
-│ 1. INPUT: AFSC Description (PDF/Text)                  │
-│    └─ Air Force Specialty Code documentation           │
-└────────────────┬────────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│ 2. PREPROCESSING: Text Cleaning                        │
-│    └─ Remove artifacts, normalize structure            │
-└────────────────┬────────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│ 3. LAiSER: Skill Extraction                            │
-│    • Pattern-based phrase detection                     │
-│    • ESCO/LAiSER taxonomy matching                      │
-│    • Confidence scoring                                 │
-│    OUTPUT: 25-30 Skills with taxonomy IDs               │
-└────────────────┬────────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│ 4. LLM ENHANCEMENT: Knowledge + Ability Generation     │
-│    • Context-aware K/A generation                       │
-│    • Dynamic hints from extracted skills                │
-│    • Deduplication and sanitization                     │
-│    OUTPUT: 3-6 Knowledge + Ability items                │
-└────────────────┬────────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│ 5. STORAGE: Neo4j Graph Database                       │
-│    • AFSC nodes with titles                             │
-│    • KSA nodes (deduplicated)                           │
-│    • REQUIRES relationships                             │
-│    • ALIGNS_TO skill taxonomy                           │
-└────────────────┬────────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────────┐
-│ 6. INTERFACE: Interactive Exploration                  │
-│    • Search and filter capabilities                     │
-│    • Cross-AFSC comparison                              │
-│    • Export functionality                               │
-└─────────────────────────────────────────────────────────┘
-    """, language="text")
+    # Mermaid Flowchart Option
+    st.markdown("#### Visual Flow")
+    st.markdown("""
+    ```mermaid
+    graph TD
+        A[📄 INPUT<br/>AFSC Documentation<br/>PDF/Text] --> B[🧹 PREPROCESSING<br/>Text Cleaning<br/>Normalize Structure]
+        B --> C[🤖 LAiSER<br/>Skill Extraction<br/>25-30 Skills + ESCO IDs]
+        C --> D[✨ LLM ENHANCEMENT<br/>K/A Generation<br/>3-6 Items via Gemini/Claude]
+        D --> E[💾 NEO4J STORAGE<br/>Graph Database<br/>Relationships + Taxonomy]
+        E --> F[🌐 WEB INTERFACE<br/>Interactive Exploration<br/>Cross-AFSC Analysis]
+        
+        style A fill:#E3F2FD,stroke:#1976D2,stroke-width:3px
+        style B fill:#FFF9C4,stroke:#F57C00,stroke-width:3px
+        style C fill:#C8E6C9,stroke:#388E3C,stroke-width:3px
+        style D fill:#F8BBD0,stroke:#C2185B,stroke-width:3px
+        style E fill:#D1C4E9,stroke:#512DA8,stroke-width:3px
+        style F fill:#FFCCBC,stroke:#D84315,stroke-width:3px
+    ```
+    """)
+    
+    st.markdown("---")
+    
+    # Visual Step Cards Option
+    st.markdown("#### Detailed Steps")
+    
+    steps = [
+        ("📄", "INPUT", "AFSC Description", "Air Force Specialty Code documentation in PDF or text format"),
+        ("🧹", "PREPROCESSING", "Text Cleaning", "Remove artifacts, normalize structure, prepare for analysis"),
+        ("🤖", "LAiSER", "Skill Extraction", "Pattern-based detection → 25-30 skills with ESCO taxonomy IDs"),
+        ("✨", "LLM ENHANCEMENT", "K/A Generation", "Context-aware generation → 3-6 knowledge & ability items"),
+        ("💾", "NEO4J STORAGE", "Graph Database", "Structured nodes, relationships, and taxonomy alignment"),
+        ("🌐", "WEB INTERFACE", "Interactive Exploration", "Search, filter, analyze, and export functionality")
+    ]
+    
+    for i, (icon, title, subtitle, desc) in enumerate(steps):
+        st.markdown(f"""
+        <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
+                    color: white; padding: 20px; border-radius: 12px; margin-bottom: 12px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 2.5rem; margin-right: 20px;'>{icon}</span>
+                <div style='flex: 1;'>
+                    <h4 style='margin: 0; color: white; font-size: 1.1rem;'>Step {i+1}: {title}</h4>
+                    <p style='margin: 4px 0 8px 0; font-weight: 600; color: #FFF; font-size: 1rem;'>{subtitle}</p>
+                    <p style='margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.4;'>{desc}</p>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if i < len(steps) - 1:
+            st.markdown("<div style='text-align: center; margin: -4px 0; font-size: 1.5rem; color: #00539B;'>⬇️</div>", unsafe_allow_html=True)
 
 # Tech Stack
 with st.expander("🔧 Technology Stack", expanded=False):
