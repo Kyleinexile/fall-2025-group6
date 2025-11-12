@@ -14,23 +14,17 @@ st.set_page_config(
 )
 
 # ============================================================================
-# ENHANCED CSS - Air Force Theme with Better UX
+# CUSTOM CSS - Air Force Theme & Professional Styling
 # ============================================================================
 st.markdown("""
 <style>
     /* Import Professional Font */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* Global Font & Spacing */
+    /* Global Font & Typography */
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-    }
-    
-    /* Better Base Typography */
-    p {
         font-size: 15px;
-        line-height: 1.6;
-        color: #4B5563;
     }
     
     /* Air Force Blue Theme - Aggressive Button Styling */
@@ -41,17 +35,18 @@ st.markdown("""
         color: #FFFFFF !important;
         border: none !important;
         font-weight: 600 !important;
-        font-size: 16px !important;
         padding: 0.75rem 1.5rem !important;
+        font-size: 16px !important;
         transition: all 0.3s ease !important;
+        border-radius: 8px !important;
     }
     .stButton>button[kind="primary"]:hover,
     button[kind="primary"]:hover,
     .stButton > button[data-testid="baseButton-primary"]:hover {
         background-color: #003D7A !important;
         color: #FFFFFF !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 83, 155, 0.4) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 83, 155, 0.4) !important;
     }
     .stButton>button[kind="primary"] p,
     .stButton>button[kind="primary"] span,
@@ -66,9 +61,10 @@ st.markdown("""
         border: 2px solid #00539B !important;
         color: #00539B !important;
         font-weight: 600 !important;
-        font-size: 16px !important;
         padding: 0.75rem 1.5rem !important;
+        font-size: 16px !important;
         transition: all 0.3s ease !important;
+        border-radius: 8px !important;
     }
     .stButton>button[kind="secondary"]:hover,
     button[kind="secondary"]:hover,
@@ -76,8 +72,8 @@ st.markdown("""
         background-color: #00539B !important;
         color: #FFFFFF !important;
         border: 2px solid #00539B !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 83, 155, 0.3) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 83, 155, 0.3) !important;
     }
     .stButton>button[kind="secondary"] p,
     .stButton>button[kind="secondary"] span,
@@ -85,89 +81,73 @@ st.markdown("""
         color: inherit !important;
     }
     
-    /* Enhanced Metrics */
+    /* Metrics Styling - Bigger and Bolder */
     [data-testid="stMetricValue"] {
-        font-size: 42px !important;
-        font-weight: 800 !important;
-        color: #00539B !important;
+        font-size: 42px;
+        font-weight: 800;
+        color: #00539B;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        color: #6B7280 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
+        font-size: 14px;
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    /* Headers with Better Hierarchy */
+    /* Headers - Better Hierarchy */
     h1 {
         color: #1F2937;
         font-weight: 800;
-        font-size: 2.75rem;
         letter-spacing: -0.5px;
-        margin-bottom: 0.5rem;
     }
     h2 {
         color: #374151;
         font-weight: 700;
-        font-size: 1.875rem;
         margin-top: 3rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
     h3 {
         color: #1F2937;
-        font-weight: 700;
-        font-size: 1.25rem;
-        margin-bottom: 0.5rem;
+        font-weight: 600;
     }
     
-    /* Better Dividers */
+    /* Dividers */
     hr {
         margin: 3rem 0;
         border: none;
         border-top: 2px solid #E5E7EB;
     }
     
-    /* Enhanced Card Styling */
-    .nav-card {
-        padding: 28px;
-        border-radius: 16px;
-        border: 2px solid #E5E7EB;
-        background: #FAFAFA;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    .nav-card:hover {
-        border-color: #00539B;
-        background: white;
-        box-shadow: 0 12px 32px rgba(0, 83, 155, 0.15);
-        transform: translateY(-6px);
+    /* Better Typography */
+    p {
+        line-height: 1.6;
+        color: #4B5563;
     }
     
-    /* Card Icons */
-    .card-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        display: block;
+    /* Loading Skeleton */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s ease-in-out infinite;
+        height: 80px;
+        border-radius: 8px;
+    }
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
     }
     
-    /* Helper Text */
-    .helper-text {
-        font-size: 13px;
-        color: #6B7280;
-        font-style: italic;
-        margin-top: 0.5rem;
-    }
-    
-    /* Status Badge Enhanced */
+    /* Status Badge - Larger and More Prominent */
     .status-badge {
         display: inline-block;
-        padding: 6px 14px;
-        border-radius: 20px;
+        padding: 6px 16px;
+        border-radius: 16px;
         font-size: 13px;
         font-weight: 700;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
+        margin-right: 8px;
+        margin-bottom: 8px;
     }
     .status-success {
         background-color: #D1FAE5;
@@ -177,22 +157,13 @@ st.markdown("""
         background-color: #FEF3C7;
         color: #92400E;
     }
+    .status-error {
+        background-color: #FEE2E2;
+        color: #991B1B;
+    }
     .status-info {
         background-color: #DBEAFE;
         color: #1E40AF;
-    }
-    
-    /* Loading Skeleton */
-    .skeleton {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading 1.5s ease-in-out infinite;
-        border-radius: 4px;
-        height: 60px;
-    }
-    @keyframes loading {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
     }
     
     /* Splash Screen Animation */
@@ -255,22 +226,20 @@ if not st.session_state.entered:
         else:
             st.info("📸 Air Force image: assets/air force.jpg")
         
-        # Title
+        # Title and Description
         st.markdown("""
-        <h1 style='text-align: center; font-size: 3.5rem; font-weight: 800; 
-                   color: #00539B; margin-bottom: 2rem;'>
+        <h1 style='text-align: center; font-size: 3.2rem; font-weight: 800; 
+                   color: #00539B; margin-bottom: 2rem; line-height: 1.2;'>
             Military Knowledge, Skills and Abilities (KSA) Pipeline
         </h1>
         """, unsafe_allow_html=True)
         
-        # Enter Button - Moved Up
-        st.markdown("<br>", unsafe_allow_html=True)
+        # Enter Button - Prominently Placed
         if st.button("🚀 Enter Application", type="primary", use_container_width=True):
             st.session_state.entered = True
             st.rerun()
         
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("<hr style='margin: 2rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
         # Key Features - Moved to Middle
         col_a, col_b, col_c = st.columns(3)
@@ -280,7 +249,7 @@ if not st.session_state.entered:
             <div style='text-align: center; padding: 24px;'>
                 <div style='font-size: 3.5rem; margin-bottom: 1rem;'>🤖</div>
                 <h3 style='color: #00539B; font-size: 1.3rem; margin-bottom: 0.75rem; font-weight: 700;'>AI-Powered</h3>
-                <p style='color: #6B7280; font-size: 1rem; line-height: 1.5;'>LAiSER + LLM extraction</p>
+                <p style='color: #6B7280; font-size: 1rem; line-height: 1.5;'>GWU's LAiSER + LLM extraction</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -317,7 +286,7 @@ if not st.session_state.entered:
     st.stop()
 
 # ============================================================================
-# MAIN APPLICATION - Enhanced UX
+# MAIN APPLICATION - Enhanced UX with Merged Sections
 # ============================================================================
 
 # Header
@@ -336,137 +305,185 @@ st.markdown("""
 st.caption("Capstone Project | MS Data Science | George Washington University | 2025")
 st.divider()
 
-# Live Database Stats with Loading State
-st.markdown("## 📊 Current Database Status")
+# ============================================================================
+# MERGED SECTION: Dashboard Overview + Quick Access
+# ============================================================================
+st.markdown("## 📊 Dashboard Overview & Quick Access")
+st.markdown("<p style='color: #6B7280; font-size: 1.05rem; margin-bottom: 2rem;'>Current system status and navigation</p>", unsafe_allow_html=True)
 
-# Create placeholder for loading state
-stats_placeholder = st.empty()
+# Two-column layout: Status on left, Navigation on right
+col_status, col_nav = st.columns([1, 2], gap="large")
 
-try:
-    NEO4J_URI = os.getenv("NEO4J_URI", "")
-    NEO4J_USER = os.getenv("NEO4J_USER", "")
-    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
-    NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
+with col_status:
+    st.markdown("### System Status")
     
-    if all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]):
-        # Show loading skeleton
-        with stats_placeholder.container():
-            cols = st.columns(6)
-            for col in cols:
-                with col:
-                    st.markdown('<div class="skeleton"></div>', unsafe_allow_html=True)
+    # Create placeholder for loading state
+    stats_placeholder = st.empty()
+    
+    try:
+        NEO4J_URI = os.getenv("NEO4J_URI", "")
+        NEO4J_USER = os.getenv("NEO4J_USER", "")
+        NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
+        NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
+        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
         
-        # Fetch data
-        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
-        with driver.session(database=NEO4J_DATABASE) as session:
-            result = session.run("""
-                MATCH (a:AFSC)
-                OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
-                OPTIONAL MATCH (k)-[:ALIGNS_TO]->(e:ESCOSkill)
-                RETURN 
-                    count(DISTINCT a) as afscs,
-                    count(DISTINCT k) as total_ksas,
-                    count(DISTINCT CASE WHEN k.type = 'knowledge' THEN k END) as knowledge,
-                    count(DISTINCT CASE WHEN k.type = 'skill' THEN k END) as skills,
-                    count(DISTINCT CASE WHEN k.type = 'ability' THEN k END) as abilities,
-                    count(DISTINCT e) as esco_aligned
-            """).single()
-            
-            # Replace skeleton with actual metrics
+        if all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]):
+            # Show loading skeleton
             with stats_placeholder.container():
-                m1, m2, m3, m4, m5, m6 = st.columns(6)
-                m1.metric("AFSCs", result["afscs"] or 0)
-                m2.metric("Total KSAs", result["total_ksas"] or 0)
-                m3.metric("Knowledge", result["knowledge"] or 0)
-                m4.metric("Skills", result["skills"] or 0)
-                m5.metric("Abilities", result["abilities"] or 0)
-                m6.metric("Aligned", result["esco_aligned"] or 0)
+                st.markdown('<div class="skeleton"></div>', unsafe_allow_html=True)
             
-        driver.close()
-        
-        # Status Badge with Icon
-        st.markdown("""
-        <div style='margin-top: 1.5rem;'>
-            <span class='status-badge status-success'>✅ Database Connected</span>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
+            # Fetch data
+            driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+            with driver.session(database=NEO4J_DATABASE) as session:
+                result = session.run("""
+                    MATCH (a:AFSC)
+                    OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
+                    OPTIONAL MATCH (k)-[:ALIGNS_TO]->(e:ESCOSkill)
+                    RETURN 
+                        count(DISTINCT a) as afscs,
+                        count(DISTINCT k) as total_ksas,
+                        count(DISTINCT CASE WHEN k.type = 'knowledge' THEN k END) as knowledge,
+                        count(DISTINCT CASE WHEN k.type = 'skill' THEN k END) as skills,
+                        count(DISTINCT CASE WHEN k.type = 'ability' THEN k END) as abilities,
+                        count(DISTINCT e) as esco_aligned
+                """).single()
+                
+                # Replace skeleton with actual metrics
+                with stats_placeholder.container():
+                    st.markdown("**Database Metrics:**")
+                    m1, m2 = st.columns(2)
+                    m1.metric("AFSCs", result["afscs"] or 0)
+                    m2.metric("Total KSAs", result["total_ksas"] or 0)
+                    
+                    m3, m4, m5 = st.columns(3)
+                    m3.metric("K", result["knowledge"] or 0)
+                    m4.metric("S", result["skills"] or 0)
+                    m5.metric("A", result["abilities"] or 0)
+                    
+                    st.metric("ESCO Aligned", result["esco_aligned"] or 0)
+            
+            driver.close()
+            
+            # Connection Status Badges
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("**Connection Status:**")
+            st.markdown("<span class='status-badge status-success'>✅ Neo4j Database</span>", unsafe_allow_html=True)
+            
+            # API Key Status
+            if GEMINI_API_KEY:
+                st.markdown("<span class='status-badge status-success'>✅ Gemini API</span>", unsafe_allow_html=True)
+            else:
+                st.markdown("<span class='status-badge status-error'>❌ Gemini API</span>", unsafe_allow_html=True)
+            
+            if OPENAI_API_KEY:
+                st.markdown("<span class='status-badge status-success'>✅ OpenAI API</span>", unsafe_allow_html=True)
+            else:
+                st.markdown("<span class='status-badge status-warning'>⚠️ OpenAI API</span>", unsafe_allow_html=True)
+            
+            if ANTHROPIC_API_KEY:
+                st.markdown("<span class='status-badge status-success'>✅ Anthropic API</span>", unsafe_allow_html=True)
+            else:
+                st.markdown("<span class='status-badge status-warning'>⚠️ Anthropic API</span>", unsafe_allow_html=True)
+                
+        else:
+            with stats_placeholder.container():
+                st.warning("⚠️ Neo4j connection not configured")
+                st.markdown("<span class='status-badge status-warning'>⚠️ Configuration Required</span>", unsafe_allow_html=True)
+            
+    except Exception as e:
         with stats_placeholder.container():
-            st.warning("⚠️ Neo4j connection not configured")
-            st.markdown("<span class='status-badge status-warning'>⚠️ Configuration Required</span>", unsafe_allow_html=True)
-            st.info("💡 **Next Step:** Configure database credentials in your `.env` file")
-        
-except Exception as e:
-    with stats_placeholder.container():
-        st.error(f"❌ Could not load database stats: {str(e)[:100]}")
-        st.markdown("<span class='status-badge status-warning'>⚠️ Connection Error</span>", unsafe_allow_html=True)
+            st.error(f"❌ Could not load database stats: {str(e)[:100]}")
+            st.markdown("<span class='status-badge status-error'>❌ Connection Error</span>", unsafe_allow_html=True)
 
-st.divider()
-
-# How It Works - New Expander
-with st.expander("ℹ️ How It Works", expanded=False):
-    st.markdown("""
-    ### 3-Step Process
+with col_nav:
+    st.markdown("### Quick Navigation")
+    st.markdown("<p style='color: #6B7280; margin-bottom: 1.5rem;'>Choose your workflow</p>", unsafe_allow_html=True)
     
-    **1. Extract** → LAiSER identifies skills from AFSC documentation using pattern matching and ESCO taxonomy alignment
-    
-    **2. Enhance** → LLMs (Gemini/Claude) generate complementary Knowledge and Ability statements based on extracted skills
-    
-    **3. Store** → Neo4j graph database enables cross-AFSC analysis, overlap detection, and civilian skill mapping
-    
-    ---
-    
-    **Average Processing:** ~5-10 seconds per AFSC | **Accuracy:** 85%+ precision on validated samples
-    """)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Navigation Cards with Enhanced Styling
-st.markdown("## 🚀 Quick Access")
-st.markdown("<p style='color: #6B7280; font-size: 1.05rem; margin-bottom: 2rem;'>Choose your workflow below</p>", unsafe_allow_html=True)
-
-col1, col2, col3 = st.columns(3, gap="large")
-
-with col1:
+    # Card 1: Explore KSAs
     with st.container():
-        st.markdown("### 🔍 Explore KSAs")
-        st.markdown("Query, filter, and analyze extracted Knowledge, Skills, and Abilities across all AFSCs")
-        st.markdown("**Features:**")
-        st.markdown("• Search by AFSC with full titles")
-        st.markdown("• Filter by type and confidence")
-        st.markdown("• Find overlapping skills")
-        st.markdown("• Export to CSV")
+        st.markdown("#### 🔍 Explore KSAs")
+        st.markdown("Query and analyze Knowledge, Skills, and Abilities across all AFSCs")
         st.caption("→ Read-only insights & analysis")
         if st.button("→ Explore KSAs", use_container_width=True, type="primary", key="explore"):
             st.switch_page("pages/03_Explore_KSAs.py")
-
-with col2:
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Card 2: Try It Yourself
     with st.container():
-        st.markdown("### 🔑 Try It Yourself")
-        st.markdown("Run KSA extraction on your own AFSC text using your API key")
-        st.markdown("**Benefits:**")
-        st.markdown("• Bring your own API key")
-        st.markdown("• Test with custom text")
-        st.markdown("• No quota limits")
-        st.markdown("• Session-only storage")
+        st.markdown("#### 🔑 Try It Yourself")
+        st.markdown("Test KSA extraction with your own API key and AFSC text")
         st.caption("→ Sandbox with your own API key")
         if st.button("→ Try It Yourself", use_container_width=True, type="secondary", key="byo"):
             st.switch_page("pages/02_Try_It_Yourself.py")
-
-with col3:
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Card 3: Admin Tools
     with st.container():
-        st.markdown("### ⚙️ Admin Tools")
-        st.markdown("Browse existing documents and process new AFSC text through the extraction pipeline")
-        st.markdown("**Capabilities:**")
-        st.markdown("• View all source documents")
-        st.markdown("• Upload new AFSC data")
-        st.markdown("• Run LAiSER + LLM pipeline")
-        st.markdown("• Manage database content")
+        st.markdown("#### ⚙️ Admin Tools")
+        st.markdown("Manage documents and process new AFSC data through the pipeline")
         st.caption("→ Power tools for data management")
         if st.button("→ Admin Tools", use_container_width=True, type="secondary", key="admin"):
             st.switch_page("pages/04_Admin_Tools.py")
 
 st.divider()
+
+# ============================================================================
+# MERGED SECTION: Pipeline Architecture + How It Works
+# ============================================================================
+with st.expander("🔄 Pipeline Architecture & How It Works", expanded=False):
+    st.markdown("### How the Pipeline Works")
+    
+    st.markdown("""
+    Our extraction pipeline combines AI technologies to automatically identify and classify military skills:
+    
+    **3-Step Process:**
+    
+    1. **Extract** → GWU's LAiSER identifies skills from AFSC documentation using pattern matching and ESCO taxonomy alignment
+    
+    2. **Enhance** → LLMs (Gemini/Claude) generate complementary Knowledge and Ability statements based on extracted skills
+    
+    3. **Store** → Neo4j graph database enables cross-AFSC analysis, overlap detection, and civilian skill mapping
+    
+    ---
+    
+    **Performance:** ~5-10 seconds per AFSC | **Accuracy:** 85%+ precision on validated samples
+    """)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### Detailed Pipeline Steps")
+    
+    # Visual Step Cards with centered white text
+    steps = [
+        ("📄", "INPUT", "AFSC Documentation", "Source: Official AFOCD (Enlisted) and AFECD (Officer) publications providing detailed specialty descriptions"),
+        ("🧹", "PREPROCESSING", "Text Cleaning", "Removes headers, footers, page numbers, and formatting artifacts; normalizes structure and prepares for analysis"),
+        ("🤖", "LAiSER EXTRACTION", "Skill Extraction", "Pattern detection identifies skill phrases; ESCO taxonomy provides standardized skill codes (25-30 skills per AFSC)"),
+        ("✨", "LLM ENHANCEMENT", "K/A Generation", "Gemini 1.5 Flash or Claude Sonnet 4 generate Knowledge and Ability items based on extracted skills (3-6 items)"),
+        ("💾", "NEO4J STORAGE", "Graph Database", "Structured storage with AFSC nodes, KSA nodes, and relationships; enables career path mapping and overlap analysis"),
+        ("🌐", "WEB INTERFACE", "Interactive Exploration", "Streamlit interface provides search, filtering, export, and cross-AFSC comparison capabilities")
+    ]
+    
+    for i, (icon, title, subtitle, desc) in enumerate(steps):
+        st.markdown(f"""
+        <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
+                    color: white; padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    box-shadow: 0 4px 12px rgba(0, 83, 155, 0.2);'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 3rem; margin-right: 24px; text-align: center; min-width: 60px;'>{icon}</span>
+                <div style='text-align: center; flex-grow: 1;'>
+                    <h4 style='margin: 0; color: white; font-weight: 700; font-size: 1.2rem;'>Step {i+1}: {title}</h4>
+                    <p style='margin: 8px 0; font-weight: 600; color: #FFF; font-size: 1.05rem;'>{subtitle}</p>
+                    <p style='margin: 0; font-size: 14px; color: #FFF; line-height: 1.5;'>{desc}</p>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if i < len(steps) - 1:
+            st.markdown("<div style='text-align: center; margin: 8px 0; font-size: 1.5rem;'>⬇️</div>", unsafe_allow_html=True)
 
 # About Project (Collapsible)
 with st.expander("📖 About This Project", expanded=False):
@@ -480,7 +497,7 @@ with st.expander("📖 About This Project", expanded=False):
     
     ### Solution
     This pipeline automates KSA extraction using:
-    - **LAiSER** - Skill extraction with ESCO/LAiSER taxonomy alignment
+    - **GWU's LAiSER** - Skill extraction with ESCO/LAiSER taxonomy alignment
     - **LLM Enhancement** - Knowledge and Ability generation via Gemini/Claude
     - **Neo4j Graph** - Structured storage enabling overlap analysis
     - **Streamlit Interface** - Professional web-based exploration tool
@@ -545,40 +562,6 @@ with st.expander("📚 What are KSAs?", expanded=False):
         - Performance enablers
         """)
 
-# Pipeline Architecture
-with st.expander("🔄 Pipeline Architecture", expanded=False):
-    st.markdown("""
-    ### Extraction Pipeline
-    
-    Our system combines multiple technologies for comprehensive KSA extraction:
-    """)
-    
-    steps = [
-        ("📄", "INPUT", "AFSC Description", "Source documents from AFOCD (Air Force Officer Classification Directory) and AFECD (Air Force Enlisted Classification Directory) in PDF or text format"),
-        ("🧹", "PREPROCESSING", "Text Cleaning", "Remove formatting artifacts, headers, footers, and page numbers. Normalize text structure and prepare clean content for analysis"),
-        ("🤖", "LAiSER", "Skill Extraction", "Pattern-based phrase detection identifies 25-30 skills per AFSC. Each skill is matched to ESCO (European Skills/Competences) taxonomy for standardized classification"),
-        ("✨", "LLM ENHANCEMENT", "K/A Generation", "Large Language Models (Gemini/Claude) analyze extracted skills to generate 3-6 complementary Knowledge and Ability statements with contextual understanding"),
-        ("💾", "NEO4J STORAGE", "Graph Database", "Store AFSCs as nodes with KSA relationships. Enable cross-AFSC queries, overlap analysis, and taxonomy alignment for career path mapping"),
-        ("🌐", "WEB INTERFACE", "Interactive Exploration", "Search by AFSC code or title, filter by type and confidence, analyze skill overlaps across specialties, and export results to CSV for further analysis")
-    ]
-    
-    for i, (icon, title, subtitle, desc) in enumerate(steps):
-        st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
-                    color: white; padding: 24px; border-radius: 12px; margin-bottom: 12px;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;'>
-            <div style='margin-bottom: 16px;'>
-                <span style='font-size: 3rem; display: block; margin-bottom: 12px;'>{icon}</span>
-                <h4 style='margin: 0; color: white; font-size: 1.2rem; font-weight: 700;'>Step {i+1}: {title}</h4>
-                <p style='margin: 8px 0 12px 0; font-weight: 600; color: white; font-size: 1.05rem;'>{subtitle}</p>
-                <p style='margin: 0; font-size: 15px; color: white; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto;'>{desc}</p>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if i < len(steps) - 1:
-            st.markdown("<div style='text-align: center; margin: -4px 0; font-size: 1.5rem; color: #00539B;'>⬇️</div>", unsafe_allow_html=True)
-
 # Tech Stack
 with st.expander("🔧 Technology Stack", expanded=False):
     col_tech1, col_tech2, col_tech3 = st.columns(3)
@@ -586,9 +569,9 @@ with st.expander("🔧 Technology Stack", expanded=False):
     with col_tech1:
         st.markdown("### 🤖 AI/ML Components")
         st.markdown("""
-        - **LAiSER** - Skill extraction & taxonomy mapping
+        - **LAiSER (GWU)** - Skill extraction & taxonomy mapping
         - **Google Gemini 1.5 Flash** - Primary LLM
-        - **Anthropic Claude Sonnet 4.5** - Fallback LLM
+        - **Anthropic Claude Sonnet 4** - Fallback LLM
         - **Pattern Matching** - Intelligent fallback
         """)
     
@@ -628,15 +611,16 @@ User: {os.getenv('NEO4J_USER', 'Not set')}
 LAiSER Mode: {os.getenv('USE_LAISER', 'Not set')}
 Gemini API: {'✅ Set' if os.getenv('GEMINI_API_KEY') else '❌ Not set'}
 OpenAI API: {'✅ Set' if os.getenv('OPENAI_API_KEY') else '❌ Not set'}
+Anthropic API: {'✅ Set' if os.getenv('ANTHROPIC_API_KEY') else '❌ Not set'}
         """)
 
 st.divider()
 
 # Footer with Enhanced Styling
 st.markdown("""
-<div style='text-align: center; padding: 2.5rem 0; color: #6B7280; font-size: 0.95rem;'>
-    <p style='margin-bottom: 0.75rem;'>
-        <strong style='color: #00539B; font-size: 1.05rem;'>🚀 USAF KSA Extraction Pipeline</strong>
+<div style='text-align: center; padding: 2rem 0; color: #6B7280; font-size: 0.9rem;'>
+    <p style='margin-bottom: 0.5rem;'>
+        <strong style='color: #00539B;'>🚀 USAF KSA Extraction Pipeline</strong>
     </p>
     <p style='margin: 0;'>
         Capstone Project 2025 | George Washington University | MS Data Science
