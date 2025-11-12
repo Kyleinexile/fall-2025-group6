@@ -371,24 +371,24 @@ st.markdown(f"""
             box-shadow: 0 2px 8px rgba(0, 83, 155, 0.15);'>
     <div style='display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px;'>
         <div style='display: flex; align-items: baseline; gap: 8px;'>
-            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs:</span>
-            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["afscs"]}</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>AFSCs:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["afscs"]}</span>
         </div>
         <div style='display: flex; align-items: baseline; gap: 8px;'>
-            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs:</span>
-            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["total_ksas"]}</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Total KSAs:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["total_ksas"]}</span>
         </div>
         <div style='display: flex; align-items: baseline; gap: 8px;'>
-            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge:</span>
-            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["knowledge"]}</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Knowledge:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["knowledge"]}</span>
         </div>
         <div style='display: flex; align-items: baseline; gap: 8px;'>
-            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Skills:</span>
-            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["skills"]}</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Skills:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["skills"]}</span>
         </div>
         <div style='display: flex; align-items: baseline; gap: 8px;'>
-            <span style='color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities:</span>
-            <span style='color: white; font-size: 1.8rem; font-weight: 800;'>{metrics["abilities"]}</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 600; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.5px;'>Abilities:</span>
+            <span style='color: white; font-size: 1.1rem; font-weight: 800;'>{metrics["abilities"]}</span>
         </div>
     </div>
 </div>
