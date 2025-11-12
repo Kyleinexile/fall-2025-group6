@@ -255,7 +255,7 @@ if not st.session_state.entered:
         else:
             st.info("📸 Air Force image: assets/air force.jpg")
         
-        # Title and Description
+        # Title and Subtitle
         st.markdown("""
         <h1 style='text-align: center; font-size: 3.5rem; font-weight: 800; 
                    color: #00539B; margin-bottom: 0.5rem;'>
@@ -265,25 +265,21 @@ if not st.session_state.entered:
         
         st.markdown("""
         <h3 style='text-align: center; font-weight: 400; color: #6B7280; 
-                   font-size: 1.5rem; margin-top: 0; margin-bottom: 2.5rem;'>
-            Translating Military Skills to Civilian Careers
+                   font-size: 1.5rem; margin-top: 0; margin-bottom: 2rem;'>
+            Knowledge, Skills and Abilities (KSA)
         </h3>
         """, unsafe_allow_html=True)
         
+        # Enter Button - Moved Up
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🚀 Enter Application", type="primary", use_container_width=True):
+            st.session_state.entered = True
+            st.rerun()
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("<hr style='margin: 2rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
-        # Project Description
-        st.markdown("""
-        <div style='text-align: center; font-size: 1.15em; color: #4B5563; margin-bottom: 2.5rem;'>
-            <p style='margin-bottom: 0.75rem; font-size: 1.1em;'>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
-            <p style='font-weight: 600; color: #00539B; margin-bottom: 0.75rem; font-size: 1.05em;'>MS Data Science Capstone Project</p>
-            <p style='color: #6B7280;'>George Washington University | 2025</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
-        
-        # Key Features with Enhanced Icons
+        # Key Features - Moved to Middle
         col_a, col_b, col_c = st.columns(3)
         
         with col_a:
@@ -313,12 +309,16 @@ if not st.session_state.entered:
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
-        # Enter Button - Larger and More Prominent
-        if st.button("🚀 Enter Application", type="primary", use_container_width=True):
-            st.session_state.entered = True
-            st.rerun()
+        # Project Description - Moved to Bottom
+        st.markdown("""
+        <div style='text-align: center; font-size: 1.15em; color: #4B5563; margin-bottom: 2.5rem;'>
+            <p style='margin-bottom: 0.75rem; font-size: 1.1em;'>Automated extraction and analysis of Air Force Specialty Code knowledge requirements</p>
+            <p style='font-weight: 600; color: #00539B; margin-bottom: 0.75rem; font-size: 1.05em;'>MS Data Science Capstone Project</p>
+            <p style='color: #6B7280;'>George Washington University | 2025</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
@@ -559,31 +559,6 @@ with st.expander("🔄 Pipeline Architecture", expanded=False):
     
     Our system combines multiple technologies for comprehensive KSA extraction:
     """)
-    
-    # Mermaid Flowchart Option
-    st.markdown("#### Visual Flow")
-    st.markdown("""
-    ```mermaid
-    graph TD
-        A[📄 INPUT<br/>AFSC Documentation<br/>PDF/Text] --> B[🧹 PREPROCESSING<br/>Text Cleaning<br/>Normalize Structure]
-        B --> C[🤖 LAiSER<br/>Skill Extraction<br/>25-30 Skills + ESCO IDs]
-        C --> D[✨ LLM ENHANCEMENT<br/>K/A Generation<br/>3-6 Items via Gemini/Claude]
-        D --> E[💾 NEO4J STORAGE<br/>Graph Database<br/>Relationships + Taxonomy]
-        E --> F[🌐 WEB INTERFACE<br/>Interactive Exploration<br/>Cross-AFSC Analysis]
-        
-        style A fill:#E3F2FD,stroke:#1976D2,stroke-width:3px
-        style B fill:#FFF9C4,stroke:#F57C00,stroke-width:3px
-        style C fill:#C8E6C9,stroke:#388E3C,stroke-width:3px
-        style D fill:#F8BBD0,stroke:#C2185B,stroke-width:3px
-        style E fill:#D1C4E9,stroke:#512DA8,stroke-width:3px
-        style F fill:#FFCCBC,stroke:#D84315,stroke-width:3px
-    ```
-    """)
-    
-    st.markdown("---")
-    
-    # Visual Step Cards Option
-    st.markdown("#### Detailed Steps")
     
     steps = [
         ("📄", "INPUT", "AFSC Description", "Air Force Specialty Code documentation in PDF or text format"),
