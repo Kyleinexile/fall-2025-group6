@@ -255,19 +255,12 @@ if not st.session_state.entered:
         else:
             st.info("📸 Air Force image: assets/air force.jpg")
         
-        # Title and Subtitle
+        # Title
         st.markdown("""
         <h1 style='text-align: center; font-size: 3.5rem; font-weight: 800; 
-                   color: #00539B; margin-bottom: 0.5rem;'>
-            USAF KSA Extraction Pipeline
+                   color: #00539B; margin-bottom: 2rem;'>
+            Military Knowledge, Skills and Abilities (KSA) Pipeline
         </h1>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <h3 style='text-align: center; font-weight: 400; color: #6B7280; 
-                   font-size: 1.5rem; margin-top: 0; margin-bottom: 2rem;'>
-            Knowledge, Skills and Abilities (KSA)
-        </h3>
         """, unsafe_allow_html=True)
         
         # Enter Button - Moved Up
@@ -561,26 +554,24 @@ with st.expander("🔄 Pipeline Architecture", expanded=False):
     """)
     
     steps = [
-        ("📄", "INPUT", "AFSC Description", "Air Force Specialty Code documentation in PDF or text format"),
-        ("🧹", "PREPROCESSING", "Text Cleaning", "Remove artifacts, normalize structure, prepare for analysis"),
-        ("🤖", "LAiSER", "Skill Extraction", "Pattern-based detection → 25-30 skills with ESCO taxonomy IDs"),
-        ("✨", "LLM ENHANCEMENT", "K/A Generation", "Context-aware generation → 3-6 knowledge & ability items"),
-        ("💾", "NEO4J STORAGE", "Graph Database", "Structured nodes, relationships, and taxonomy alignment"),
-        ("🌐", "WEB INTERFACE", "Interactive Exploration", "Search, filter, analyze, and export functionality")
+        ("📄", "INPUT", "AFSC Description", "Source documents from AFOCD (Air Force Officer Classification Directory) and AFECD (Air Force Enlisted Classification Directory) in PDF or text format"),
+        ("🧹", "PREPROCESSING", "Text Cleaning", "Remove formatting artifacts, headers, footers, and page numbers. Normalize text structure and prepare clean content for analysis"),
+        ("🤖", "LAiSER", "Skill Extraction", "Pattern-based phrase detection identifies 25-30 skills per AFSC. Each skill is matched to ESCO (European Skills/Competences) taxonomy for standardized classification"),
+        ("✨", "LLM ENHANCEMENT", "K/A Generation", "Large Language Models (Gemini/Claude) analyze extracted skills to generate 3-6 complementary Knowledge and Ability statements with contextual understanding"),
+        ("💾", "NEO4J STORAGE", "Graph Database", "Store AFSCs as nodes with KSA relationships. Enable cross-AFSC queries, overlap analysis, and taxonomy alignment for career path mapping"),
+        ("🌐", "WEB INTERFACE", "Interactive Exploration", "Search by AFSC code or title, filter by type and confidence, analyze skill overlaps across specialties, and export results to CSV for further analysis")
     ]
     
     for i, (icon, title, subtitle, desc) in enumerate(steps):
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #00539B 0%, #003D7A 100%); 
-                    color: white; padding: 20px; border-radius: 12px; margin-bottom: 12px;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>
-            <div style='display: flex; align-items: center;'>
-                <span style='font-size: 2.5rem; margin-right: 20px;'>{icon}</span>
-                <div style='flex: 1;'>
-                    <h4 style='margin: 0; color: white; font-size: 1.1rem;'>Step {i+1}: {title}</h4>
-                    <p style='margin: 4px 0 8px 0; font-weight: 600; color: #FFF; font-size: 1rem;'>{subtitle}</p>
-                    <p style='margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.4;'>{desc}</p>
-                </div>
+                    color: white; padding: 24px; border-radius: 12px; margin-bottom: 12px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;'>
+            <div style='margin-bottom: 16px;'>
+                <span style='font-size: 3rem; display: block; margin-bottom: 12px;'>{icon}</span>
+                <h4 style='margin: 0; color: white; font-size: 1.2rem; font-weight: 700;'>Step {i+1}: {title}</h4>
+                <p style='margin: 8px 0 12px 0; font-weight: 600; color: white; font-size: 1.05rem;'>{subtitle}</p>
+                <p style='margin: 0; font-size: 15px; color: white; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto;'>{desc}</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
