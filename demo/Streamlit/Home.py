@@ -26,6 +26,9 @@ current_dir = Path(__file__).parent
 bg_image_path = current_dir / "assets" / "AFDOGGO.jpg"
 bg_image_base64 = get_base64_image(bg_image_path)
 
+# Debug: Uncomment to verify image loading
+# st.sidebar.caption(f"🖼️ Background loaded: {bool(bg_image_base64)}")
+
 st.set_page_config(
     page_title="USAF KSA Explorer",
     page_icon="✈️",
@@ -34,31 +37,32 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - Air Force Theme & Professional Styling (with transparent bg)
+# CUSTOM CSS - Transparent overlay + full-page background
 # ============================================================================
 background_css = ""
 if bg_image_base64:
     background_css = f"""
-    /* Full-page background image with overlay */
-    body {{
-        background-image: url('data:image/jpeg;base64,{bg_image_base64}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+    /* Streamlit paints the app inside this container. Put the image here. */
+    [data-testid="stAppViewContainer"] {{
+        background: 
+            linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)),
+            url('data:image/jpeg;base64,{bg_image_base64}') center / cover no-repeat fixed !important;
     }}
 
-    /* Semi-transparent white overlay for readability */
-    .stApp::before {{
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.90);
-        z-index: -1;
-        pointer-events: none;
+    /* Make header/toolbar transparent so the bg shows through */
+    [data-testid="stHeader"] {{
+        background: transparent !important;
+    }}
+
+    /* Optional: soften sidebar so bg subtly shows */
+    [data-testid="stSidebar"] {{
+        background: rgba(255,255,255,0.92) !important;
+        backdrop-filter: blur(2px);
+    }}
+
+    /* Ensure main content area doesn't reintroduce a solid background */
+    .main .block-container {{
+        background: transparent !important;
     }}
     """
 
