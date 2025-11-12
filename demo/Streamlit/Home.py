@@ -21,6 +21,28 @@ st.markdown("""
     /* Import Professional Font */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
+    /* Semi-transparent Background Image */
+    .main {
+        background-image: url('assets/AFDOGGO.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
+    }
+    
+    .main::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.95);
+        z-index: -1;
+        pointer-events: none;
+    }
+    
     /* Global Font & Typography */
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
