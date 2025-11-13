@@ -1,4 +1,4 @@
-import sys, pathlib, os, time
+import sys, pathlib, os, io, re, time
 from typing import Optional
 
 # Path setup
@@ -8,7 +8,9 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 import pandas as pd
+import requests
 import streamlit as st
+from pypdf import PdfReader
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,31 +19,141 @@ load_dotenv()
 from afsc_pipeline.preprocess import clean_afsc_text
 from afsc_pipeline.extract_laiser import extract_ksa_items
 
-st.set_page_config(page_title="Try It Yourself", page_icon="🔑", layout="wide")
+# Paths
+DOCS_ROOTS = [
+    pathlib.Path("/workspaces/docs_text"),
+    SRC / "docs_text",
+]
+
+def _first_existing(*paths):
+    for p in paths:
+        if p.exists():
+            return p
+    return paths[-1]
+
+DOCS_ROOT = _first_existing(*DOCS_ROOTS)
+DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
+
+# PDF Sources
+SOURCES = {
+    "AFECD (Enlisted)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFECD%202025%20Split.pdf",
+    "AFOCD (Officer)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFOCD%202025%20Split.pdf",
+}
+
+st.set_page_config(page_title="Try It Yourself", page_icon="🔬", layout="wide")
+
+# Custom CSS for Air Force Blue theme and large buttons
+st.markdown("""
+<style>
+    /* Air Force Blue theme */
+    .stButton > button {
+        font-size: 16px !important;
+        padding: 12px 24px !important;
+        font-weight: 600 !important;
+    }
+    
+    .stButton > button[kind="primary"] {
+        background-color: #004785 !important;
+        border: none !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        background-color: #003366 !important;
+    }
+    
+    /* Step headers */
+    .step-header {
+        background: linear-gradient(90deg, #004785 0%, #0066cc 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 24px 0 16px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Section dividers */
+    hr {
+        margin: 32px 0;
+        border: none;
+        height: 3px;
+        background: linear-gradient(90deg, #004785 0%, transparent 100%);
+    }
+    
+    /* Metric styling */
+    [data-testid="stMetricValue"] {
+        font-size: 28px;
+        font-weight: 700;
+        color: #004785;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Initialize session state
 if "user_api_key" not in st.session_state:
     st.session_state.user_api_key = None
 if "user_provider" not in st.session_state:
     st.session_state.user_provider = None
+if "loaded_afsc_code" not in st.session_state:
+    st.session_state.loaded_afsc_code = ""
+if "loaded_afsc_text" not in st.session_state:
+    st.session_state.loaded_afsc_text = ""
+if "search_results" not in st.session_state:
+    st.session_state.search_results = None
+if "search_info" not in st.session_state:
+    st.session_state.search_info = {}
+
+# Helper Functions
+@st.cache_data(show_spinner=False, ttl=3600)
+def load_pdf_pages(url: str):
+    r = requests.get(url, timeout=60)
+    r.raise_for_status()
+    reader = PdfReader(io.BytesIO(r.content))
+    pages = []
+    for i, p in enumerate(reader.pages):
+        try:
+            text = p.extract_text() or ""
+            text = re.sub(r"[ \t]+\n", "\n", text)
+            text = re.sub(r"\u00ad", "", text)
+            pages.append({"page": i + 1, "text": text})
+        except:
+            pages.append({"page": i + 1, "text": ""})
+    return pages
+
+def highlight_matches(text: str, pattern: str) -> str:
+    try:
+        rx = re.compile(pattern, flags=re.IGNORECASE)
+        return rx.sub(lambda m: f"**`{m.group(0)}`**", text)
+    except:
+        return text
+
+@st.cache_data(ttl=60)
+def get_markdown_index():
+    rows = []
+    for source, folder in DOC_FOLDERS:
+        if folder.exists():
+            for p in folder.glob("*.md"):
+                rows.append({"afsc": p.stem, "source": source, "path": str(p)})
+    return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["afsc", "source", "path"])
 
 # Main UI
-st.title("🔑 Try It Yourself - BYO API Key")
-st.markdown("**Run KSA extraction on your own AFSC text using your API key**")
-st.caption("Your API key is stored in this session only and never saved to our database")
+st.title("🔬 Try It Yourself - Interactive KSA Extraction")
+st.markdown("**Experience the pipeline hands-on with your own API key**")
+st.caption("🔒 Your API key is session-only • No database writes • Results downloadable")
 
 st.divider()
 
-# API Key Configuration
-st.markdown("### 1️⃣ Configure Your API Key")
+# ============ STEP 1: Configure API Key ============
+st.markdown('<div class="step-header">🔑 Step 1: Configure Your API Key</div>', unsafe_allow_html=True)
 
 col_provider, col_key = st.columns([1, 3])
 
 with col_provider:
     provider = st.selectbox(
-        "Provider",
+        "LLM Provider",
         ["openai", "anthropic", "gemini"],
-        help="Choose which LLM provider to use"
+        help="Choose which LLM provider to use for Knowledge/Ability generation"
     )
 
 with col_key:
@@ -55,7 +167,7 @@ with col_key:
         "API Key",
         type="password",
         placeholder=placeholder,
-        help="Your API key is only stored in this browser session"
+        help="Your API key is only stored in this browser session and never saved"
     )
     
     if api_key:
@@ -68,9 +180,9 @@ has_key = st.session_state.user_api_key is not None
 col_status, col_clear = st.columns([3, 1])
 with col_status:
     if has_key:
-        st.success(f"✅ API key loaded for {st.session_state.user_provider}")
+        st.success(f"✅ API key loaded for **{st.session_state.user_provider}**")
     else:
-        st.warning("⚠️ No API key provided")
+        st.warning("⚠️ No API key provided - required for Step 4")
 
 with col_clear:
     if st.button("🗑️ Clear Key", use_container_width=True):
@@ -78,54 +190,245 @@ with col_clear:
         st.session_state.user_provider = None
         st.rerun()
 
+with st.expander("🔐 How to get an API key"):
+    st.markdown("""
+    **Get your API key from these providers:**
+    
+    - **OpenAI**: https://platform.openai.com/api-keys
+    - **Anthropic**: https://console.anthropic.com/settings/keys
+    - **Google Gemini**: https://aistudio.google.com/app/apikey
+    
+    **Privacy & Security:**
+    - ✅ Your API key is stored in browser session only
+    - ✅ Never saved to our servers or database
+    - ✅ Cleared when you close the browser
+    - ✅ You control API costs directly
+    """)
+
 st.divider()
 
-# Text Input
-st.markdown("### 2️⃣ Paste AFSC Text")
+# ============ STEP 2: Search Documentation ============
+st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', unsafe_allow_html=True)
+st.caption("Search through AFOCD (Officer) and AFECD (Enlisted) documents from the repository")
+
+mode = st.radio(
+    "Search Method",
+    ["📄 PDF Search", "📁 Markdown Files"],
+    horizontal=True,
+    help="PDF Search searches full documents, Markdown Files are pre-extracted AFSCs"
+)
+
+if mode == "📄 PDF Search":
+    col_search_left, col_search_right = st.columns([2, 5])
+    
+    with col_search_left:
+        source = st.selectbox("Document", list(SOURCES.keys()))
+        search_mode = st.radio("Search by", ["AFSC Code", "Keywords"])
+        query = st.text_input("Search Query", placeholder="e.g., 1N1X1 or intelligence")
+        
+        with st.expander("⚙️ Search Options"):
+            min_len = st.slider("Excerpt length", 200, 600, 360, 20)
+            max_results = st.slider("Max results", 5, 30, 10)
+        
+        search_btn = st.button("🔍 Search Document", use_container_width=True, type="primary")
+        
+        if st.button("Clear Results", use_container_width=True):
+            st.session_state.search_results = None
+            st.session_state.search_info = {}
+            st.rerun()
+    
+    with col_search_right:
+        if search_btn:
+            if not query.strip():
+                st.warning("⚠️ Enter a search term")
+            else:
+                with st.spinner("🔍 Searching PDF..."):
+                    try:
+                        pages = load_pdf_pages(SOURCES[source])
+                    except Exception as e:
+                        st.error(f"❌ Could not load PDF: {e}")
+                        st.stop()
+                    
+                    # Search logic
+                    if search_mode == "AFSC Code":
+                        pattern = r"\b" + re.escape(query.strip().upper()) + r"\b"
+                    else:
+                        pattern = r"\b" + re.escape(query.strip()) + r"\b"
+                    
+                    matches = []
+                    for pg in pages:
+                        txt = pg["text"]
+                        for m in re.finditer(pattern, txt, flags=re.IGNORECASE):
+                            start = max(0, m.start() - min_len // 2)
+                            end = min(len(txt), m.end() + min_len // 2)
+                            excerpt = txt[start:end].strip()
+                            matches.append({
+                                "page": pg["page"],
+                                "excerpt": excerpt,
+                                "position": m.start()
+                            })
+                    
+                    if not matches:
+                        st.info("No results found")
+                        st.session_state.search_results = None
+                    else:
+                        matches = matches[:max_results]
+                        st.session_state.search_results = matches
+                        st.session_state.search_info = {
+                            "source": source,
+                            "query": query,
+                            "mode": search_mode,
+                            "pattern": pattern
+                        }
+        
+        # Display results
+        if st.session_state.search_results:
+            info = st.session_state.search_info
+            st.success(f"✅ Found {len(st.session_state.search_results)} results for '{info['query']}'")
+            
+            for i, match in enumerate(st.session_state.search_results, 1):
+                with st.container():
+                    st.markdown(f"**Result {i} - Page {match['page']}**")
+                    highlighted = highlight_matches(match['excerpt'], info['pattern'])
+                    st.markdown(highlighted)
+                    
+                    col_a, col_b = st.columns([3, 1])
+                    with col_a:
+                        st.caption(f"📄 {info['source']} • Page {match['page']}")
+                    with col_b:
+                        if st.button(f"→ Load to Text", key=f"load_{i}", use_container_width=True):
+                            st.session_state.loaded_afsc_text = match['excerpt']
+                            st.session_state.loaded_afsc_code = ""
+                            st.success("✅ Loaded! See Step 3 below ↓")
+                            time.sleep(1)
+                            st.rerun()
+                    
+                    if i < len(st.session_state.search_results):
+                        st.markdown("---")
+
+elif mode == "📁 Markdown Files":
+    col_md_left, col_md_right = st.columns([2, 5])
+    
+    with col_md_left:
+        df_index = get_markdown_index()
+        
+        if df_index.empty:
+            st.warning("No markdown files found")
+        else:
+            st.info(f"📁 {len(df_index)} AFSCs available")
+            
+            source_filter = st.multiselect(
+                "Filter by source",
+                df_index["source"].unique().tolist(),
+                default=df_index["source"].unique().tolist()
+            )
+            
+            filtered = df_index[df_index["source"].isin(source_filter)]
+            
+            selected = st.selectbox(
+                "Select AFSC",
+                [""] + filtered["afsc"].tolist(),
+                format_func=lambda x: x if x else "Choose..."
+            )
+    
+    with col_md_right:
+        if selected:
+            try:
+                row = df_index[df_index["afsc"] == selected].iloc[0]
+                content = pathlib.Path(row["path"]).read_text(encoding="utf-8")
+                
+                st.markdown(f"### 📄 {selected}")
+                st.caption(f"Source: {row['source']} • {len(content)} characters")
+                
+                st.text_area(
+                    "Preview",
+                    content[:1000] + ("..." if len(content) > 1000 else ""),
+                    height=200,
+                    disabled=True,
+                    label_visibility="collapsed"
+                )
+                
+                col_a, col_b = st.columns([3, 1])
+                with col_a:
+                    st.caption(f"💾 Full document: {len(content)} chars")
+                with col_b:
+                    if st.button("→ Load to Text", use_container_width=True, type="primary"):
+                        st.session_state.loaded_afsc_text = content
+                        st.session_state.loaded_afsc_code = selected
+                        st.success("✅ Loaded! See Step 3 below ↓")
+                        time.sleep(1)
+                        st.rerun()
+            
+            except Exception as e:
+                st.error(f"❌ Error loading file: {e}")
+        else:
+            st.info("👈 Select an AFSC to view and load")
+
+st.divider()
+
+# ============ STEP 3: Paste/Edit AFSC Text ============
+st.markdown('<div class="step-header">📝 Step 3: Paste or Edit AFSC Text</div>', unsafe_allow_html=True)
+
+# Show loaded indicator
+if st.session_state.loaded_afsc_text:
+    st.info(f"📄 Text loaded from search ({len(st.session_state.loaded_afsc_text)} characters)")
 
 afsc_code = st.text_input(
     "AFSC Code (optional)",
+    value=st.session_state.loaded_afsc_code,
     placeholder="e.g., 14N",
     help="Used for context in LLM prompts"
 )
 
 afsc_text = st.text_area(
     "AFSC Documentation",
+    value=st.session_state.loaded_afsc_text,
     height=300,
-    placeholder="Paste AFSC section text here (duties, responsibilities, specialty qualifications, etc.)...",
-    help="Paste the text from an AFECD or AFOCD document"
+    placeholder="Paste AFSC text here, or use Step 2 to search and load documentation...",
+    help="You can paste text directly or load it from the search above"
 )
+
+if st.button("🗑️ Clear Text", use_container_width=True):
+    st.session_state.loaded_afsc_code = ""
+    st.session_state.loaded_afsc_text = ""
+    st.rerun()
+
+st.divider()
+
+# ============ STEP 4: Run Extraction ============
+st.markdown('<div class="step-header">🚀 Step 4: Run KSA Extraction</div>', unsafe_allow_html=True)
 
 # Settings Sidebar
 with st.sidebar:
     st.markdown("### ⚙️ Extraction Settings")
     
-    st.markdown("**LAiSER Settings**")
-    use_laiser = st.checkbox("Enable LAiSER", value=True, help="Use LAiSER for skill extraction")
-    laiser_topk = st.slider("LAiSER max items", 10, 30, 25)
+    st.markdown("**LAiSER Configuration**")
+    use_laiser = st.checkbox("Enable LAiSER", value=True, help="Use LAiSER for skill extraction with ESCO taxonomy")
+    laiser_topk = st.slider("LAiSER max items", 10, 30, 25, help="Maximum skills to extract from LAiSER")
     
-    st.markdown("**LLM Settings**")
-    max_llm_items = st.slider("Max K/A to generate", 3, 10, 6)
-    temperature = st.slider("Temperature", 0.0, 1.0, 0.2, 0.05)
+    st.markdown("**LLM Configuration**")
+    max_llm_items = st.slider("Max K/A to generate", 3, 10, 6, help="Maximum Knowledge/Ability items to generate")
+    temperature = st.slider("Temperature", 0.0, 1.0, 0.2, 0.05, help="Lower = more focused, Higher = more creative")
     
     st.markdown("---")
     
-    st.markdown("### 💡 Tips")
+    st.markdown("### 💡 Best Practices")
     st.caption("""
-    **Best practices:**
-    - Paste complete AFSC sections
-    - Include duties AND qualifications
-    - Longer text = better results
+    **For optimal results:**
+    - Include complete AFSC sections
+    - Include both duties AND qualifications
+    - Longer text generally yields better results
     - LAiSER finds skills with taxonomy codes
-    - LLM generates knowledge & abilities
+    - LLM generates complementary K/A items
     """)
 
-st.divider()
-
 # Process Button
-st.markdown("### 3️⃣ Run Extraction")
-
 can_run = has_key and afsc_text.strip()
+
+if not has_key:
+    st.warning("⚠️ Configure your API key in Step 1 to enable extraction")
+elif not afsc_text.strip():
+    st.warning("⚠️ Add AFSC text in Step 3 to enable extraction")
 
 if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
     try:
@@ -133,7 +436,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
             # Step 1: Clean
             st.write("🧹 Cleaning text...")
             cleaned_text = clean_afsc_text(afsc_text)
-            st.write(f"   ✓ Cleaned to {len(cleaned_text)} chars")
+            st.write(f"   ✓ Cleaned to {len(cleaned_text)} characters")
             time.sleep(0.2)
             
             # Step 2: LAiSER (if enabled)
@@ -150,7 +453,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
                 
                 try:
                     laiser_items = extract_ksa_items(cleaned_text)
-                    st.write(f"   ✓ Extracted {len(laiser_items)} skills")
+                    st.write(f"   ✓ Extracted {len(laiser_items)} skills with taxonomy codes")
                 finally:
                     # Restore original env
                     if old_use_laiser:
@@ -226,14 +529,14 @@ Requirements:
                         except:
                             pass
                 
-                st.write(f"   ✓ Generated {len(enhanced_items)} K/A items")
+                st.write(f"   ✓ Generated {len(enhanced_items)} Knowledge/Ability items")
                 time.sleep(0.2)
                 
             except Exception as e:
-                st.error(f"LLM call failed: {e}")
+                st.error(f"❌ LLM call failed: {e}")
                 enhanced_items = []
             
-            status.update(label="✅ Complete!", state="complete")
+            status.update(label="✅ Extraction Complete!", state="complete")
         
         # Combine results
         all_items = []
@@ -259,11 +562,11 @@ Requirements:
             })
         
         if not all_items:
-            st.warning("No items extracted. Try enabling LAiSER or adjusting settings.")
+            st.warning("⚠️ No items extracted. Try enabling LAiSER or adjusting settings in the sidebar.")
             st.stop()
         
         # Display Results
-        st.success(f"✅ Extracted {len(all_items)} KSAs")
+        st.success(f"✅ Successfully extracted {len(all_items)} KSAs!")
         st.balloons()
         
         # Metrics
@@ -293,7 +596,7 @@ Requirements:
                 default=['knowledge', 'skill', 'ability']
             )
         with col_filter2:
-            min_conf = st.slider("Min confidence", 0.0, 1.0, 0.0, 0.05)
+            min_conf = st.slider("Minimum confidence", 0.0, 1.0, 0.0, 0.05)
         
         # Apply filters
         filtered_df = df[df['Type'].isin(type_filter)]
@@ -308,7 +611,7 @@ Requirements:
             hide_index=True,
             column_config={
                 "Confidence": st.column_config.NumberColumn(format="%.2f"),
-                "Taxonomy": st.column_config.TextColumn("Taxonomy Code")
+                "Taxonomy": st.column_config.TextColumn("ESCO Code")
             }
         )
         
@@ -320,7 +623,7 @@ Requirements:
         with col_exp1:
             csv = filtered_df.to_csv(index=False)
             st.download_button(
-                "⬇️ Download Filtered CSV",
+                "⬇️ Download Filtered Results",
                 csv,
                 f"{afsc_code or 'extracted'}_ksas.csv",
                 "text/csv",
@@ -330,71 +633,79 @@ Requirements:
         with col_exp2:
             full_csv = df.to_csv(index=False)
             st.download_button(
-                "⬇️ Download All CSV",
+                "⬇️ Download All Results",
                 full_csv,
                 f"{afsc_code or 'extracted'}_ksas_full.csv",
                 "text/csv",
                 use_container_width=True
             )
         
-        st.info("💡 **Note:** These results are NOT saved to the database. This is a demo/testing tool only.")
+        st.info("💡 **Note:** These results are NOT saved to the database. This is a demo/testing tool only. Use Admin Tools for permanent storage.")
         
     except Exception as e:
         st.error(f"❌ Extraction failed: {e}")
         import traceback
-        with st.expander("Error Details"):
+        with st.expander("📋 Error Details"):
             st.code(traceback.format_exc())
 
 # Help Section
-with st.expander("❓ How to Use This Tool"):
+with st.expander("❓ Help & FAQ"):
     st.markdown("""
-    ### Step-by-Step Guide
+    ### How This Tool Works
     
-    1. **Get an API Key**
-       - OpenAI: https://platform.openai.com/api-keys
-       - Anthropic: https://console.anthropic.com/settings/keys
-       - Google Gemini: https://aistudio.google.com/app/apikey
+    This interactive tool lets you experience the full KSA extraction pipeline using your own API credentials:
     
-    2. **Choose Your Provider**
-       - Select from OpenAI, Anthropic, or Gemini
-       - Paste your API key (stored in session only)
+    **Step 1: Configure API Key**
+    - Securely enter your LLM provider credentials
+    - Keys are stored in browser session only
+    - Never saved to our database or servers
     
-    3. **Paste AFSC Text**
-       - Copy text from AFECD/AFOCD documents
-       - Include duties, responsibilities, qualifications
-       - More text = better results
+    **Step 2: Search Documentation**
+    - Browse AFOCD (Officer) and AFECD (Enlisted) documents
+    - Search by AFSC code or keywords
+    - View pre-extracted markdown files
     
-    4. **Run Extraction**
-       - LAiSER extracts skills with taxonomy codes
-       - LLM generates knowledge and abilities
-       - Results display immediately
+    **Step 3: Edit Text**
+    - Load text from search results
+    - Or paste your own AFSC documentation
+    - Edit and refine as needed
     
-    5. **Download Results**
-       - Export as CSV for analysis
-       - Filter by type or confidence
-       - Results are NOT saved to database
+    **Step 4: Extract KSAs**
+    - LAiSER extracts skills with ESCO taxonomy codes
+    - LLM generates complementary knowledge and abilities
+    - Download results as CSV
     
     ### Privacy & Security
     
-    - ✅ Your API key is stored in browser session only
-    - ✅ Never saved to our servers or database
-    - ✅ Cleared when you close the browser
-    - ✅ You control API costs directly
+    - ✅ Your API key is session-only storage
+    - ✅ No data written to our database
+    - ✅ You control your API usage and costs
+    - ✅ Results can be downloaded but not permanently stored
     
     ### Comparison with Admin Tools
     
-    **This Tool (BYO-API):**
-    - No database writes
-    - Use your own API key
-    - Immediate results
-    - Download only
+    | Feature | Try It Yourself | Admin Tools |
+    |---------|----------------|-------------|
+    | API Key | Your own (BYO) | System credentials |
+    | Database | No writes | Full integration |
+    | Results | Download only | Permanent storage |
+    | Access | Public demo | Admin only |
+    | Use Case | Testing/demos | Production ingestion |
     
-    **Admin Tools:**
-    - Writes to database
-    - Uses system credentials
-    - Permanent storage
-    - Full pipeline integration
+    ### Getting API Keys
+    
+    - **OpenAI**: https://platform.openai.com/api-keys
+    - **Anthropic**: https://console.anthropic.com/settings/keys
+    - **Google Gemini**: https://aistudio.google.com/app/apikey
+    
+    ### Tips for Best Results
+    
+    1. Use complete AFSC sections (not fragments)
+    2. Include both duties and qualifications
+    3. More context = better extraction quality
+    4. Enable LAiSER for taxonomy-aligned skills
+    5. Adjust temperature for creativity vs. precision
     """)
 
 st.divider()
-st.caption("🔑 Try It Yourself | No database writes | Session-only API keys")
+st.caption("🔬 Try It Yourself | Session-only API keys | No database writes | Download results only")
