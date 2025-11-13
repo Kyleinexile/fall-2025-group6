@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # -------------------------
 LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()  # Default to OpenAI
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
-LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-sonnet-20240229")
+LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
 LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
 
 # API Keys
