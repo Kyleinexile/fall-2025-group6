@@ -1,4 +1,4 @@
-import sys, pathlib, os, io, re, time
+import sys, pathlib, os, io, re, time, textwrap
 from typing import Optional
 
 # Path setup
@@ -260,38 +260,49 @@ if search_btn:
             except Exception as e:
                 st.error(f"❌ Could not load PDF: {e}")
                 st.stop()
-            
-            # Search logic
-            if search_mode == "AFSC Code":
-                pattern = r"\b" + re.escape(query.strip().upper()) + r"\b"
-            else:
-                pattern = r"\b" + re.escape(query.strip()) + r"\b"
-            
-            matches = []
-            for pg in pages:
-                txt = pg["text"]
-                for m in re.finditer(pattern, txt, flags=re.IGNORECASE):
+        
+        # Build pattern - RESTORED FROM ADMIN TOOLS
+        if search_mode == "AFSC Code":
+            pattern = rf"(?i)\b{re.escape(query.strip().upper())}[A-Z0-9]*\b"
+        else:
+            pattern = re.escape(query) if not any(c in query for c in ".*?+[]()") else query
+        
+        # Search with better implementation
+        hits = []
+        try:
+            rx = re.compile(pattern, flags=re.IGNORECASE)
+            for rec in pages:
+                if not rec["text"]:
+                    continue
+                for m in rx.finditer(rec["text"]):
                     start = max(0, m.start() - min_len // 2)
-                    end = min(len(txt), m.end() + min_len // 2)
-                    excerpt = txt[start:end].strip()
-                    matches.append({
-                        "page": pg["page"],
-                        "excerpt": excerpt,
-                        "position": m.start()
+                    end = min(len(rec["text"]), m.end() + min_len // 2)
+                    snippet = rec["text"][start:end].replace("\n", " ")
+                    snippet = textwrap.shorten(snippet, width=min_len, placeholder="...")
+                    hits.append({
+                        "page": rec["page"],
+                        "snippet": snippet,
+                        "full": rec["text"]  # Store full page for loading
                     })
-            
-            if not matches:
-                st.info("ℹ️ No results found. Try different keywords or check spelling.")
-                st.session_state.search_results = None
-            else:
-                matches = matches[:max_results]
-                st.session_state.search_results = matches
-                st.session_state.search_info = {
-                    "source": source,
-                    "query": query,
-                    "mode": search_mode,
-                    "pattern": pattern
-                }
+                    if len(hits) >= max_results:
+                        break
+                if len(hits) >= max_results:
+                    break
+        except Exception as e:
+            st.error(f"❌ Search error: {e}")
+            st.stop()
+        
+        if not hits:
+            st.info("ℹ️ No results found. Try different keywords or check spelling.")
+            st.session_state.search_results = None
+        else:
+            st.session_state.search_results = hits
+            st.session_state.search_info = {
+                "source": source,
+                "query": query,
+                "mode": search_mode,
+                "pattern": pattern
+            }
 
 # Display results
 if st.session_state.search_results:
@@ -304,18 +315,31 @@ if st.session_state.search_results:
         # Result card with better styling
         st.markdown(f"#### 📄 Result {i} • Page {match['page']}")
         
-        # Highlighted excerpt
-        highlighted = highlight_matches(match['excerpt'], info['pattern'])
+        # Highlighted snippet
+        highlighted = highlight_matches(match['snippet'], info['pattern'])
         st.markdown(highlighted)
         
-        # Action button
-        col_info, col_load = st.columns([4, 1])
+        # Expandable full page view
+        with st.expander("📖 View Full Page"):
+            display_text = match["full"][:10000] + "\n..." if len(match["full"]) > 10000 else match["full"]
+            st.text(display_text)
+        
+        # Action buttons
+        col_info, col_download, col_load = st.columns([3, 1, 1])
         with col_info:
             st.caption(f"Source: {info['source']} • Page {match['page']}")
+        with col_download:
+            st.download_button(
+                "⬇️ Download",
+                match["full"],
+                f"page_{match['page']}.txt",
+                key=f"dl_{i}",
+                use_container_width=True
+            )
         with col_load:
             # Load button
             if st.button("✅ Load", key=f"load_{i}", use_container_width=True, type="secondary"):
-                st.session_state.loaded_afsc_text = match['excerpt']
+                st.session_state.loaded_afsc_text = match["full"]  # Load FULL text, not snippet
                 st.session_state.loaded_afsc_code = ""
                 st.success("✅ Text loaded! See Step 3 below ↓")
                 time.sleep(1.5)
