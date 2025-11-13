@@ -61,6 +61,17 @@ st.markdown("""
         background-color: #003366 !important;
     }
     
+    /* Green button for extract action */
+    .stButton > button[data-testid="baseButton-primary"].extract-button {
+        background-color: #28a745 !important;
+        color: white !important;
+        border: none !important;
+    }
+    
+    .stButton > button[data-testid="baseButton-primary"].extract-button:hover {
+        background-color: #218838 !important;
+    }
+    
     /* Step headers */
     .step-header {
         background: linear-gradient(90deg, #004785 0%, #0066cc 100%);
@@ -140,12 +151,14 @@ def get_markdown_index():
 # Main UI
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
 st.markdown("**Experience the pipeline hands-on with your own API key**")
-st.caption("🔒 Your API key is session-only • No database writes • Results downloadable")
 
 st.divider()
 
 # ============ STEP 1: Configure API Key ============
 st.markdown('<div class="step-header">🔑 Step 1: Configure Your API Key</div>', unsafe_allow_html=True)
+
+# Prominent privacy notice
+st.info("🔒 **Privacy Notice:** Your API key is stored in browser session only. Never saved to our servers or database. Cleared when you close the browser.")
 
 col_provider, col_key = st.columns([1, 3])
 
@@ -166,8 +179,7 @@ with col_key:
     api_key = st.text_input(
         "API Key",
         type="password",
-        placeholder=placeholder,
-        help="Your API key is only stored in this browser session and never saved"
+        placeholder=placeholder
     )
     
     if api_key:
@@ -197,172 +209,120 @@ with st.expander("🔐 How to get an API key"):
     - **OpenAI**: https://platform.openai.com/api-keys
     - **Anthropic**: https://console.anthropic.com/settings/keys
     - **Google Gemini**: https://aistudio.google.com/app/apikey
-    
-    **Privacy & Security:**
-    - ✅ Your API key is stored in browser session only
-    - ✅ Never saved to our servers or database
-    - ✅ Cleared when you close the browser
-    - ✅ You control API costs directly
     """)
 
 st.divider()
 
 # ============ STEP 2: Search Documentation ============
 st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', unsafe_allow_html=True)
-st.caption("Search through AFOCD (Officer) and AFECD (Enlisted) documents from the repository")
+st.markdown("Search through **AFOCD (Officer)** and **AFECD (Enlisted)** documents from the repository")
 
-mode = st.radio(
-    "Search Method",
-    ["📄 PDF Search", "📁 Markdown Files"],
-    horizontal=True,
-    help="PDF Search searches full documents, Markdown Files are pre-extracted AFSCs"
+# Search interface - cleaner, more prominent layout
+col_doc, col_mode = st.columns([2, 1])
+with col_doc:
+    source = st.selectbox("📄 Select Document", list(SOURCES.keys()))
+with col_mode:
+    search_mode = st.radio("Search by", ["AFSC Code", "Keywords"], horizontal=True, label_visibility="collapsed")
+
+# Large, prominent search box
+query = st.text_input(
+    "🔍 Search Query",
+    placeholder="Try: 14N, 1N1X1, pilot, intelligence, cyber...",
+    help="Enter an AFSC code (e.g., 14N, 1N1X1) or keywords (e.g., intelligence, pilot)"
 )
 
-if mode == "📄 PDF Search":
-    col_search_left, col_search_right = st.columns([2, 5])
-    
-    with col_search_left:
-        source = st.selectbox("Document", list(SOURCES.keys()))
-        search_mode = st.radio("Search by", ["AFSC Code", "Keywords"])
-        query = st.text_input("Search Query", placeholder="e.g., 1N1X1 or intelligence")
-        
-        with st.expander("⚙️ Search Options"):
-            min_len = st.slider("Excerpt length", 200, 600, 360, 20)
-            max_results = st.slider("Max results", 5, 30, 10)
-        
-        search_btn = st.button("🔍 Search Document", use_container_width=True, type="primary")
-        
-        if st.button("Clear Results", use_container_width=True):
-            st.session_state.search_results = None
-            st.session_state.search_info = {}
-            st.rerun()
-    
-    with col_search_right:
-        if search_btn:
-            if not query.strip():
-                st.warning("⚠️ Enter a search term")
-            else:
-                with st.spinner("🔍 Searching PDF..."):
-                    try:
-                        pages = load_pdf_pages(SOURCES[source])
-                    except Exception as e:
-                        st.error(f"❌ Could not load PDF: {e}")
-                        st.stop()
-                    
-                    # Search logic
-                    if search_mode == "AFSC Code":
-                        pattern = r"\b" + re.escape(query.strip().upper()) + r"\b"
-                    else:
-                        pattern = r"\b" + re.escape(query.strip()) + r"\b"
-                    
-                    matches = []
-                    for pg in pages:
-                        txt = pg["text"]
-                        for m in re.finditer(pattern, txt, flags=re.IGNORECASE):
-                            start = max(0, m.start() - min_len // 2)
-                            end = min(len(txt), m.end() + min_len // 2)
-                            excerpt = txt[start:end].strip()
-                            matches.append({
-                                "page": pg["page"],
-                                "excerpt": excerpt,
-                                "position": m.start()
-                            })
-                    
-                    if not matches:
-                        st.info("No results found")
-                        st.session_state.search_results = None
-                    else:
-                        matches = matches[:max_results]
-                        st.session_state.search_results = matches
-                        st.session_state.search_info = {
-                            "source": source,
-                            "query": query,
-                            "mode": search_mode,
-                            "pattern": pattern
-                        }
-        
-        # Display results
-        if st.session_state.search_results:
-            info = st.session_state.search_info
-            st.success(f"✅ Found {len(st.session_state.search_results)} results for '{info['query']}'")
-            
-            for i, match in enumerate(st.session_state.search_results, 1):
-                with st.container():
-                    st.markdown(f"**Result {i} - Page {match['page']}**")
-                    highlighted = highlight_matches(match['excerpt'], info['pattern'])
-                    st.markdown(highlighted)
-                    
-                    col_a, col_b = st.columns([3, 1])
-                    with col_a:
-                        st.caption(f"📄 {info['source']} • Page {match['page']}")
-                    with col_b:
-                        if st.button(f"→ Load to Text", key=f"load_{i}", use_container_width=True):
-                            st.session_state.loaded_afsc_text = match['excerpt']
-                            st.session_state.loaded_afsc_code = ""
-                            st.success("✅ Loaded! See Step 3 below ↓")
-                            time.sleep(1)
-                            st.rerun()
-                    
-                    if i < len(st.session_state.search_results):
-                        st.markdown("---")
+# Search options in expandable section
+with st.expander("⚙️ Advanced Search Options"):
+    col_opt1, col_opt2 = st.columns(2)
+    with col_opt1:
+        min_len = st.slider("Excerpt length", 200, 600, 360, 20, help="Length of text excerpts in search results")
+    with col_opt2:
+        max_results = st.slider("Max results", 5, 30, 10, help="Maximum number of results to display")
 
-elif mode == "📁 Markdown Files":
-    col_md_left, col_md_right = st.columns([2, 5])
-    
-    with col_md_left:
-        df_index = get_markdown_index()
-        
-        if df_index.empty:
-            st.warning("No markdown files found")
-        else:
-            st.info(f"📁 {len(df_index)} AFSCs available")
-            
-            source_filter = st.multiselect(
-                "Filter by source",
-                df_index["source"].unique().tolist(),
-                default=df_index["source"].unique().tolist()
-            )
-            
-            filtered = df_index[df_index["source"].isin(source_filter)]
-            
-            selected = st.selectbox(
-                "Select AFSC",
-                [""] + filtered["afsc"].tolist(),
-                format_func=lambda x: x if x else "Choose..."
-            )
-    
-    with col_md_right:
-        if selected:
+# Search buttons
+col_search_btn, col_clear_btn = st.columns([3, 1])
+with col_search_btn:
+    search_btn = st.button("🔍 Search Document", use_container_width=True, type="primary")
+with col_clear_btn:
+    if st.button("Clear", use_container_width=True):
+        st.session_state.search_results = None
+        st.session_state.search_info = {}
+        st.rerun()
+
+# Search logic
+if search_btn:
+    if not query.strip():
+        st.warning("⚠️ Enter a search term")
+    else:
+        with st.spinner("🔍 Searching PDF..."):
             try:
-                row = df_index[df_index["afsc"] == selected].iloc[0]
-                content = pathlib.Path(row["path"]).read_text(encoding="utf-8")
-                
-                st.markdown(f"### 📄 {selected}")
-                st.caption(f"Source: {row['source']} • {len(content)} characters")
-                
-                st.text_area(
-                    "Preview",
-                    content[:1000] + ("..." if len(content) > 1000 else ""),
-                    height=200,
-                    disabled=True,
-                    label_visibility="collapsed"
-                )
-                
-                col_a, col_b = st.columns([3, 1])
-                with col_a:
-                    st.caption(f"💾 Full document: {len(content)} chars")
-                with col_b:
-                    if st.button("→ Load to Text", use_container_width=True, type="primary"):
-                        st.session_state.loaded_afsc_text = content
-                        st.session_state.loaded_afsc_code = selected
-                        st.success("✅ Loaded! See Step 3 below ↓")
-                        time.sleep(1)
-                        st.rerun()
-            
+                pages = load_pdf_pages(SOURCES[source])
             except Exception as e:
-                st.error(f"❌ Error loading file: {e}")
-        else:
-            st.info("👈 Select an AFSC to view and load")
+                st.error(f"❌ Could not load PDF: {e}")
+                st.stop()
+            
+            # Search logic
+            if search_mode == "AFSC Code":
+                pattern = r"\b" + re.escape(query.strip().upper()) + r"\b"
+            else:
+                pattern = r"\b" + re.escape(query.strip()) + r"\b"
+            
+            matches = []
+            for pg in pages:
+                txt = pg["text"]
+                for m in re.finditer(pattern, txt, flags=re.IGNORECASE):
+                    start = max(0, m.start() - min_len // 2)
+                    end = min(len(txt), m.end() + min_len // 2)
+                    excerpt = txt[start:end].strip()
+                    matches.append({
+                        "page": pg["page"],
+                        "excerpt": excerpt,
+                        "position": m.start()
+                    })
+            
+            if not matches:
+                st.info("ℹ️ No results found. Try different keywords or check spelling.")
+                st.session_state.search_results = None
+            else:
+                matches = matches[:max_results]
+                st.session_state.search_results = matches
+                st.session_state.search_info = {
+                    "source": source,
+                    "query": query,
+                    "mode": search_mode,
+                    "pattern": pattern
+                }
+
+# Display results
+if st.session_state.search_results:
+    info = st.session_state.search_info
+    st.success(f"✅ Found {len(st.session_state.search_results)} results for **'{info['query']}'**")
+    
+    st.markdown("---")
+    
+    for i, match in enumerate(st.session_state.search_results, 1):
+        # Result card with better styling
+        st.markdown(f"#### 📄 Result {i} • Page {match['page']}")
+        
+        # Highlighted excerpt
+        highlighted = highlight_matches(match['excerpt'], info['pattern'])
+        st.markdown(highlighted)
+        
+        # Action button
+        col_info, col_load = st.columns([4, 1])
+        with col_info:
+            st.caption(f"Source: {info['source']} • Page {match['page']}")
+        with col_load:
+            # Load button
+            if st.button("✅ Load", key=f"load_{i}", use_container_width=True, type="secondary"):
+                st.session_state.loaded_afsc_text = match['excerpt']
+                st.session_state.loaded_afsc_code = ""
+                st.success("✅ Text loaded! See Step 3 below ↓")
+                time.sleep(1.5)
+                st.rerun()
+        
+        if i < len(st.session_state.search_results):
+            st.markdown("---")
 
 st.divider()
 
@@ -374,10 +334,10 @@ if st.session_state.loaded_afsc_text:
     st.info(f"📄 Text loaded from search ({len(st.session_state.loaded_afsc_text)} characters)")
 
 afsc_code = st.text_input(
-    "AFSC Code (optional)",
+    "AFSC Code *",
     value=st.session_state.loaded_afsc_code,
-    placeholder="e.g., 14N",
-    help="Used for context in LLM prompts"
+    placeholder="e.g., 14N, 1N1X1",
+    help="Required - used to tag output and provide context for LLM"
 )
 
 afsc_text = st.text_area(
@@ -385,7 +345,7 @@ afsc_text = st.text_area(
     value=st.session_state.loaded_afsc_text,
     height=300,
     placeholder="Paste AFSC text here, or use Step 2 to search and load documentation...",
-    help="You can paste text directly or load it from the search above"
+    help="Full AFSC documentation text for extraction"
 )
 
 if st.button("🗑️ Clear Text", use_container_width=True):
@@ -423,12 +383,30 @@ with st.sidebar:
     """)
 
 # Process Button
-can_run = has_key and afsc_text.strip()
+can_run = has_key and afsc_code.strip() and afsc_text.strip()
 
 if not has_key:
     st.warning("⚠️ Configure your API key in Step 1 to enable extraction")
+elif not afsc_code.strip():
+    st.warning("⚠️ Enter an AFSC Code in Step 3 (required)")
 elif not afsc_text.strip():
     st.warning("⚠️ Add AFSC text in Step 3 to enable extraction")
+
+# Green extract button with custom styling
+st.markdown("""
+<style>
+    div[data-testid="stButton"] button[kind="primary"] {
+        background-color: #28a745 !important;
+        color: white !important;
+        border: none !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stButton"] button[kind="primary"]:hover {
+        background-color: #218838 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
     try:
