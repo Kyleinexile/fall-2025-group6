@@ -230,7 +230,7 @@ Visit `http://localhost:8501` in your browser!
 
 ## 🔗 Links
 
-- **Live Demo**: [Streamlit Cloud](https://fall-2025-group6.streamlit.app) *(if deployed)*
+- **Live Demo**: [Streamlit Cloud](https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/)
 - **Pipeline Documentation**: [src/afsc_pipeline/README.md](src/afsc_pipeline/README.md)
 - **LAiSER Project**: [GitHub](https://github.com/LAiSER-Software/extract-module)
 - **OSN Taxonomy**: [Open Skills Network](https://learnworkecosystemlibrary.com/initiatives/open-skills-network-osn/)
