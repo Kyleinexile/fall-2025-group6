@@ -644,6 +644,8 @@ Requirements:
         
         st.info("💡 **Note:** These results are NOT saved to the database. This is a demo/testing tool only. Use Admin Tools for permanent storage.")
         
+        st.caption("📖 **Skill Taxonomy Reference:** Skills are aligned to the Open Skills Network (OSN) taxonomy. View the complete taxonomy codes and labels: [LAiSER Taxonomy CSV](https://github.com/LAiSER-Software/extract-module/blob/main/laiser/public/combined.csv)")
+        
     except Exception as e:
         st.error(f"❌ Extraction failed: {e}")
         import traceback
@@ -707,6 +709,14 @@ with st.expander("❓ Help & FAQ"):
     3. More context = better extraction quality
     4. Enable LAiSER for taxonomy-aligned skills
     5. Adjust temperature for creativity vs. precision
+    
+    ### Skill Taxonomy Reference
+    
+    Skills extracted by LAiSER are aligned to the **Open Skills Network (OSN)** taxonomy, which provides standardized skill definitions. Each taxonomy code (e.g., ESCO.95) corresponds to a specific skill label.
+    
+    - **View complete taxonomy:** [LAiSER Taxonomy CSV](https://github.com/LAiSER-Software/extract-module/blob/main/laiser/public/combined.csv)
+    - **Total skills:** 2,217+ standardized skills
+    - **Format:** SkillTag (ESCO.XX) → SkillLabel
     """)
 
 st.divider()
