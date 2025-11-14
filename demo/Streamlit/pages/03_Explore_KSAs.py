@@ -225,12 +225,18 @@ else:
                 st.metric("Shared Items", len(overlaps))
                 
                 # Filter by overlap count
-                min_overlap = st.slider(
-                    "Min shared by (AFSCs)",
-                    2,
-                    len(selected),
-                    2
-                )
+                if len(selected) == 2:
+                    # Only one possible overlap value (2), no slider needed
+                    min_overlap = 2
+                    st.info(f"Showing items shared by both AFSCs (minimum: 2)")
+                else:
+                    # Multiple AFSCs, allow user to filter
+                    min_overlap = st.slider(
+                        "Min shared by (AFSCs)",
+                        2,
+                        len(selected),
+                        2
+                    )
                 
                 filtered = overlaps[overlaps["overlap_count"] >= min_overlap]
                 st.caption(f"Showing {len(filtered)} items")
