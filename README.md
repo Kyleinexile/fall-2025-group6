@@ -241,28 +241,13 @@ Visit `http://localhost:8501` in your browser!
 
 **GWU Data Science Capstone – Fall 2025, Group 6**
 
-- Kyle Hall – Project Lead, Pipeline Development
-- *[Add other team members]*
-
-**Faculty Advisor**: *[Advisor name]*  
-**Sponsor Mentor**: *[LAiSER/GWU mentor name]*
+- Kyle Hall
 
 ---
 
 ## 🙏 Acknowledgments
 
 - **LAiSER Team** for the skill extraction framework and OSN taxonomy integration
-- **GWU Institute of Public Policy (GWIPP)** for project sponsorship
-- **Anthropic, OpenAI, and Google** for LLM API access
-- **Neo4j** for graph database technology
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 ## 📧 Contact
 
@@ -270,6 +255,3 @@ For questions about this project, please contact:
 - Kyle Hall: [kyle.hall@gwmail.gwu.edu](mailto:kyle.hall@gwmail.gwu.edu)
 - Repository: [github.com/Kyleinexile/fall-2025-group6](https://github.com/Kyleinexile/fall-2025-group6)
 
----
-
-*Built with ❤️ at George Washington University*
