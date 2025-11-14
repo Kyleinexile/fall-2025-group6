@@ -6,7 +6,6 @@
 ![Python](https://img.shields.io/badge/python-3.13+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.50.0-red.svg)
 ![Neo4j](https://img.shields.io/badge/neo4j-6.0.2-green.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
