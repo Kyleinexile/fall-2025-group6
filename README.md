@@ -215,7 +215,7 @@ Visit `http://localhost:8501` in your browser!
 - **12 AFSCs** ingested (Officer and Enlisted specialties)
 - **300+ KSAs** extracted across all AFSCs
 - **Average 25-30 KSAs per AFSC**
-- **70%+ Skills** aligned to OSN taxonomy
+- **Skills aligned to ESO/OSN taxonomy** via LAiSER
 
 ### Sample AFSCs
 - 14N - Intelligence Officer
