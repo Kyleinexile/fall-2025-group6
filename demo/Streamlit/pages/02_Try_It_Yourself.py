@@ -613,7 +613,7 @@ Requirements:
             hide_index=True,
             column_config={
                 "Confidence": st.column_config.NumberColumn(format="%.2f"),
-                "Taxonomy": st.column_config.TextColumn("ESCO Code")
+                "Taxonomy": st.column_config.TextColumn("Skill Taxonomy")
             }
         )
         
