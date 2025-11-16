@@ -273,6 +273,31 @@ if not st.session_state.entered:
             st.session_state.entered = True
             st.rerun()
         
+        # ============================================================================
+        # VIDEO SECTION (Added below Enter button, above icons)
+        # ============================================================================
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div style='text-align: center;'>
+            <h3 style='color: #00539B; font-size: 1.4rem; margin-bottom: 1rem; font-weight: 700;'>
+                📹 Watch Our 1-Minute Demo
+            </h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Video with centered layout
+        video_url = "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/presentation/AFSC_KSA_Capstone_Promo.mp4"
+        st.video(video_url)
+        
+        st.markdown("""
+        <div style='text-align: center; color: #6B7280; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem;'>
+            Complete pipeline overview: from AFSC documents to structured KSAs
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # ============================================================================
+        
         st.markdown("<hr style='margin: 2.5rem 0; border-color: #E5E7EB;'>", unsafe_allow_html=True)
         
         # Key Features
