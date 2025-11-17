@@ -300,19 +300,10 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
 
     - If USE_LAISER is false (or unset), the heuristic path is used.
     - If USE_LAISER is true, the function attempts to initialize LAiSER and
-      call `extract_skills` on the full AFSC text.
+      call either `extract_skills` (new API) or `extract_and_align` (batch API)
+      on the full AFSC text.
     - If LAiSER fails at any point, the function logs the error and falls
       back to the heuristic extractor.
-
-    Parameters
-    ----------
-    clean_text:
-        Preprocessed AFSC text (a single narrative block).
-
-    Returns
-    -------
-    List[ItemDraft]
-        A list of SKILL items with confidence scores and optional ESCO IDs.
     """
     use_laiser = (os.getenv("USE_LAISER") or "false").strip().lower() in {
         "1",
@@ -331,24 +322,57 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         print("[LAISER] Extractor failed to initialize, using fallback")
         return _fallback_extract(clean_text)
 
-    # ---- NEW: use extract_skills on the full text, not align_skills on phrases ----
+    # Decide which LAiSER interface is available
+    has_extract_skills = hasattr(extractor, "extract_skills")
+    has_extract_and_align = hasattr(extractor, "extract_and_align")
+
     try:
-        print("[LAISER] Calling extract_skills (method='ksa', input_type='job_desc')...")
-        # Text MUST be the first positional argument per LAiSER docs
-        laiser_result = extractor.extract_skills(
-            clean_text,
-            method="ksa",
-            input_type="job_desc",
-        )
+        if has_extract_skills:
+            # New refactored API – single text
+            print(
+                "[LAISER] Using SkillExtractorRefactored.extract_skills "
+                "(method='ksa', input_type='job_desc')"
+            )
+            laiser_result = extractor.extract_skills(
+                clean_text,
+                method="ksa",
+                input_type="job_desc",
+            )
+
+        elif has_extract_and_align:
+            # Older refactored API – batch DataFrame
+            print(
+                "[LAISER] Using SkillExtractorRefactored.extract_and_align "
+                "with a single-row DataFrame (input_type='job_desc')"
+            )
+            import pandas as pd  # type: ignore
+
+            df = pd.DataFrame(
+                [{"job_id": "AFSC-0", "description": clean_text}]
+            )
+            laiser_result = extractor.extract_and_align(
+                df,
+                id_column="job_id",
+                text_columns=["description"],
+                input_type="job_desc",
+            )
+
+        else:
+            print(
+                "[LAISER] No compatible methods on SkillExtractorRefactored "
+                "(missing extract_skills/extract_and_align); using fallback"
+            )
+            return _fallback_extract(clean_text)
+
     except Exception as e:
-        print(f"[LAISER] Error during extract_skills: {e}")
+        print(f"[LAISER] Error during LAiSER extraction: {e}")
         import traceback
 
         traceback.print_exc()
         return _fallback_extract(clean_text)
 
     if laiser_result is None:
-        print("[LAISER] extract_skills returned None, using fallback")
+        print("[LAISER] LAiSER returned None, using fallback")
         return _fallback_extract(clean_text)
 
     # We try to be robust: handle DataFrame, list[dict], or similar structures
@@ -363,12 +387,11 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             # If it's a list/dict, try to coerce into a DataFrame
             df = pd.DataFrame(laiser_result)
     except Exception:
-        # As a last resort, just bail to fallback if we can't interpret the result
-        print("[LAISER] Could not interpret extract_skills result, using fallback")
+        print("[LAISER] Could not interpret LAiSER result, using fallback")
         return _fallback_extract(clean_text)
 
     if df.empty:
-        print("[LAISER] Empty extract_skills results, using fallback")
+        print("[LAISER] Empty LAiSER result, using fallback")
         return _fallback_extract(clean_text)
 
     for _, row in df.iterrows():
@@ -418,7 +441,9 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         )
 
     if not items:
-        print("[LAISER] No usable rows in extract_skills result, using fallback")
+        print(
+            "[LAISER] No usable rows in LAiSER result, using fallback"
+        )
         return _fallback_extract(clean_text)
 
     # Sort and cap like before
@@ -427,7 +452,8 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
 
     esco_count = sum(1 for i in items if i.esco_id)
     print(
-        f"[LAISER] Returning {len(items)} skills ({esco_count} with ESCO IDs) from extract_skills"
+        f"[LAISER] Returning {len(items)} skills ({esco_count} with ESCO IDs) "
+        "from LAiSER"
     )
 
     return items if items else _fallback_extract(clean_text)
