@@ -1,6 +1,17 @@
 # src/afsc_pipeline/enhance_llm.py
 """
 LLM-based enhancement for K/A (Knowledge / Ability) items with graceful fallbacks.
+
+This module takes SKILL-heavy draft items (primarily from LAiSER) and:
+- Uses large language models (LLMs) to generate complementary Knowledge
+  and Ability statements.
+- Applies simple heuristics when LLMs are disabled or unavailable.
+- Normalizes and sanitizes LLM output into a constrained bullet format.
+- Guards against duplicates (both exact and near-duplicate paraphrases).
+
+It also exposes a small, general-purpose `run_llm` helper that supports
+the Streamlit "Try It Yourself" page, allowing users to plug in their own
+API keys and providers without modifying the pipeline code.
 """
 
 from __future__ import annotations
@@ -20,6 +31,8 @@ logger = logging.getLogger(__name__)
 # -------------------------
 # Config
 # -------------------------
+# Provider selection and default model names are driven by environment
+# variables, but sensible defaults are provided for local development.
 LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()  # Default to OpenAI
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
@@ -36,8 +49,27 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 _word = r"[A-Za-z0-9/\-\+]+"
 _cap = r"[A-Z][a-zA-Z0-9/\-\+]+"
 
+
 def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
-    """Extract noun-like phrases for Knowledge generation."""
+    """
+    Extract simple noun-like phrases from AFSC text for Knowledge generation.
+
+    This is a lightweight heuristic that looks for:
+    - Capitalized sequences (e.g., "Intelligence Preparation of the Battlespace")
+    - Common collocations around analysis/intelligence/operations
+
+    Parameters
+    ----------
+    text:
+        Cleaned AFSC narrative text.
+    max_items:
+        Maximum number of candidate phrases to return.
+
+    Returns
+    -------
+    List[str]
+        A small list of topical phrases suitable for "Knowledge of ..." items.
+    """
     if not text:
         return []
     caps = re.findall(rf"\b({_cap}(?:\s+{_cap}){{0,3}})\b", text)
@@ -62,8 +94,32 @@ def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
 # -------------------------
 # Heuristic enhancement
 # -------------------------
+
+
 def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft]:
-    """Generate K/A from heuristics when LLM unavailable."""
+    """
+    Generate Knowledge/Ability items from heuristics when LLMs are unavailable.
+
+    This function is used when:
+    - The selected LLM provider is disabled, or
+    - All provider calls fail and we need a graceful fallback.
+
+    Heuristics:
+    - Derive "Ability to ..." statements from SKILL verbs.
+    - Derive "Knowledge of ..." statements from topical noun phrases.
+
+    Parameters
+    ----------
+    afsc_text:
+        Cleaned AFSC description text.
+    items:
+        Existing draft items (typically SKILL-heavy).
+
+    Returns
+    -------
+    List[ItemDraft]
+        A small set of synthetic Knowledge/Ability items.
+    """
     have_k = any(it.item_type == ItemType.KNOWLEDGE for it in items)
     have_a = any(it.item_type == ItemType.ABILITY for it in items)
 
@@ -76,31 +132,45 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
             if it.item_type != ItemType.SKILL:
                 continue
             first = it.text.split()[0].lower() if it.text else ""
-            if first in {"analyze", "conduct", "synthesize", "assess", "brief", "collect", "evaluate", "integrate", "develop"}:
+            if first in {
+                "analyze",
+                "conduct",
+                "synthesize",
+                "assess",
+                "brief",
+                "collect",
+                "evaluate",
+                "integrate",
+                "develop",
+            }:
                 verbs.append(it.text)
         verbs = verbs[:2]
         for v in verbs:
             text = f"Ability to {v[0].lower() + v[1:]}" if v else "Ability to perform core tasks"
-            new_items.append(ItemDraft(
-                text=text,
-                item_type=ItemType.ABILITY,
-                confidence=0.55,
-                source="llm-heuristic",
-                esco_id=None,
-            ))
+            new_items.append(
+                ItemDraft(
+                    text=text,
+                    item_type=ItemType.ABILITY,
+                    confidence=0.55,
+                    source="llm-heuristic",
+                    esco_id=None,
+                )
+            )
 
     # Knowledge from topics
     if not have_k:
         topics = _topical_candidates(afsc_text, max_items=3)
         for t in topics:
             text = f"Knowledge of {t}"
-            new_items.append(ItemDraft(
-                text=text,
-                item_type=ItemType.KNOWLEDGE,
-                confidence=0.55,
-                source="llm-heuristic",
-                esco_id=None,
-            ))
+            new_items.append(
+                ItemDraft(
+                    text=text,
+                    item_type=ItemType.KNOWLEDGE,
+                    confidence=0.55,
+                    source="llm-heuristic",
+                    esco_id=None,
+                )
+            )
 
     logger.info(f"Generated {len(new_items)} items via heuristics")
     return new_items
@@ -108,14 +178,38 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
 # -------------------------
 # LLM Implementations
 # -------------------------
+
+
 def _call_llm_gemini(
     prompt: str,
     *,
     temperature: float = 0.3,
     max_tokens: int = 512,
-    model: str | None = None
+    model: str | None = None,
 ) -> str:
-    """Call Google Gemini API with permissive safety and generation config."""
+    """
+    Call Google Gemini API with permissive safety and generation settings.
+
+    This is used for:
+    - Core K/A enhancement in `enhance_items_with_llm` (via _provider_call).
+    - The generic `run_llm` function when `provider='gemini'`.
+
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to the model.
+    temperature:
+        Sampling temperature (0.0 = deterministic, higher = more diverse).
+    max_tokens:
+        Maximum number of tokens in the response.
+    model:
+        Optional override for the Gemini model ID.
+
+    Returns
+    -------
+    str
+        The response text from Gemini, or raises a RuntimeError on failure.
+    """
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not set")
     try:
@@ -155,12 +249,26 @@ def _call_llm_gemini(
     except Exception as e:
         raise RuntimeError(f"Gemini API error: {e}")
 
+
 def _call_llm_anthropic(prompt: str) -> str:
-    """Call Anthropic Claude API."""
+    """
+    Call Anthropic Claude API using the messages interface.
+
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to Claude.
+
+    Returns
+    -------
+    str
+        The response text from Claude, or raises a RuntimeError on failure.
+    """
     if not ANTHROPIC_API_KEY:
         raise ValueError("ANTHROPIC_API_KEY not set")
     try:
         import anthropic
+
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         message = client.messages.create(
             model=LLM_MODEL_ANTHROPIC,
@@ -180,12 +288,27 @@ def _call_llm_anthropic(prompt: str) -> str:
     except Exception as e:
         raise RuntimeError(f"Anthropic API error: {e}")
 
+
 def _call_llm_openai(prompt: str) -> str:
-    """Call OpenAI API."""
+    """
+    Call OpenAI Chat Completions API.
+
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to the model.
+
+    Returns
+    -------
+    str
+        The response text from the configured OpenAI model, or raises a
+        RuntimeError on failure.
+    """
     if not OPENAI_API_KEY:
         raise ValueError("OPENAI_API_KEY not set")
     try:
         from openai import OpenAI
+
         client = OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
             model=LLM_MODEL_OPENAI,
@@ -199,8 +322,23 @@ def _call_llm_openai(prompt: str) -> str:
     except Exception as e:
         raise RuntimeError(f"OpenAI API error: {e}")
 
+
 def _provider_call(prompt: str) -> str:
-    """Call LLM with automatic fallback."""
+    """
+    Call the active LLM provider with automatic fallback behavior.
+
+    Logic
+    -----
+    - If LLM_PROVIDER == "openai":
+        * Try OpenAI; if it fails, fall back to Gemini (if configured).
+    - If LLM_PROVIDER == "gemini":
+        * Try Gemini; if it fails, fall back to OpenAI (if configured).
+    - If LLM_PROVIDER == "anthropic":
+        * Try Claude; if it fails, return "" to trigger heuristics.
+
+    The function returns an empty string on failure rather than raising,
+    so that the caller can gracefully fall back to `_heuristic_enhance`.
+    """
     if LLM_PROVIDER == "openai":
         try:
             return _call_llm_openai(prompt)
@@ -234,10 +372,21 @@ def _provider_call(prompt: str) -> str:
     return ""
 
 # ---- Runtime override helpers (useful for Streamlit BYO-key page) -----------
+
+
 def set_runtime_credentials(provider: str | None = None, api_key: str | None = None):
     """
     Override the provider and corresponding API key at runtime.
-    This is optional, but convenient for a Streamlit 'Try it yourself' tab.
+
+    This is used primarily by the Streamlit "Try It Yourself" tab so that
+    users can paste their own API key without modifying environment variables.
+
+    Parameters
+    ----------
+    provider:
+        Provider name ("openai", "anthropic", "gemini").
+    api_key:
+        API key to use for the chosen provider.
     """
     global LLM_PROVIDER, OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY
     if provider:
@@ -254,6 +403,7 @@ def set_runtime_credentials(provider: str | None = None, api_key: str | None = N
             GOOGLE_API_KEY = api_key
             logger.debug("Runtime Gemini API key configured")
 
+
 def run_llm(
     *,
     prompt: str,
@@ -266,8 +416,30 @@ def run_llm(
     """
     Public, minimal LLM caller for ad-hoc prompts (e.g., 'Try it yourself' page).
 
-    - If provider/api_key are given, they take precedence over module defaults.
-    - Returns the raw text response (no parsing/sanitization).
+    This is separate from `enhance_items_with_llm`, which is specialized for
+    K/A generation. `run_llm` is general-purpose and returns raw text.
+
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to the provider.
+    provider:
+        Optional provider override ("openai", "anthropic", "gemini").
+        If omitted, falls back to LLM_PROVIDER.
+    api_key:
+        Optional API key override. If omitted, uses the module-level key.
+    temperature:
+        Sampling temperature.
+    max_tokens:
+        Maximum number of tokens to generate.
+    model:
+        Optional model name override for the provider.
+
+    Returns
+    -------
+    str
+        Raw response text from the selected provider, or an empty string if
+        the prompt is empty.
     """
     prompt = (prompt or "").strip()
     if not prompt:
@@ -282,6 +454,7 @@ def run_llm(
             raise ValueError("OPENAI_API_KEY not set")
         try:
             from openai import OpenAI
+
             client = OpenAI(api_key=key)
             mdl = model or LLM_MODEL_OPENAI
             resp = client.chat.completions.create(
@@ -300,6 +473,7 @@ def run_llm(
             raise ValueError("ANTHROPIC_API_KEY not set")
         try:
             import anthropic
+
             client = anthropic.Anthropic(api_key=key)
             mdl = model or LLM_MODEL_ANTHROPIC
             msg = client.messages.create(
@@ -324,6 +498,7 @@ def run_llm(
             raise ValueError("GOOGLE_API_KEY not set")
         try:
             import google.generativeai as genai
+
             genai.configure(api_key=key)
             return _call_llm_gemini(
                 prompt,
@@ -340,7 +515,7 @@ def run_llm(
 # -------------------------
 # Prompt + parse
 # -------------------------
-# NOTE: includes {missing_hint} which can be empty string
+# NOTE: includes {missing_hint} which can be an empty string.
 _PROMPT = """
 You are assisting with extracting new Knowledge and Ability statements from an Air Force specialty description.
 
@@ -365,6 +540,7 @@ FORMAT EXAMPLE:
 - Knowledge of geospatial analysis techniques
 """.strip()
 
+
 def _format_existing(items: List[ItemDraft]) -> str:
     """Render existing items as [- [Knowledge]/[Ability]] to guide the model."""
     if not items:
@@ -386,14 +562,19 @@ def _format_existing(items: List[ItemDraft]) -> str:
 # Accept only these stems
 _BULLET_RE = re.compile(r"^\s*-\s*(Knowledge of|Ability to)\s.+$", re.IGNORECASE)
 
+
 def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
     """
-    Filters model output to:
-      - bullets only, starting with '- '
-      - surface forms 'Knowledge of ...' or 'Ability to ...'
-      - no trailing punctuation ; : , . ! ?
-      - length <= max_len (excluding the leading '- ')
-    Canonicalizes capitalization of the stems, and dedups exact matches.
+    Filter model output to a constrained, predictable K/A bullet format.
+
+    Rules:
+    - Keep only lines that:
+        * Start with a dash ("-") and
+        * Begin with "Knowledge of" or "Ability to".
+    - Strip trailing punctuation ; : , . ! ?
+    - Enforce a maximum character length (excluding the leading "- ").
+    - Canonicalize capitalization of the stems.
+    - Deduplicate bullets case-insensitively.
     """
     if not raw:
         return []
@@ -423,7 +604,17 @@ def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
             deduped.append(l)
     return deduped
 
+
 def _normalize_item_text(s: str) -> str:
+    """
+    Normalize text for approximate duplicate detection.
+
+    - Lowercase
+    - Strip tags like "[Knowledge]" / "[Ability]"
+    - Strip leading "Knowledge of" / "Ability to"
+    - Remove non-alphanumeric characters
+    - Collapse whitespace
+    """
     s = s.lower().strip()
     s = re.sub(r"^\-\s*\[(knowledge|ability)\]\s*", "", s)   # strip tags from EXISTING
     s = re.sub(r"^\-\s*(knowledge of|ability to)\s*", "", s) # strip stems from new lines
@@ -431,8 +622,15 @@ def _normalize_item_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s)
     return s
 
+
 def _filter_against_existing(generated: List[str], existing_block: str) -> List[str]:
-    """Remove near-duplicates vs existing with simple normalization + substring checks."""
+    """
+    Remove near-duplicates vs existing items using simple normalization.
+
+    A generated line is dropped if its normalized form:
+    - exactly matches an existing normalized line, or
+    - is a substring/superstring of an existing normalized line.
+    """
     existing_norm = []
     for line in existing_block.splitlines():
         line = line.strip()
@@ -446,10 +644,18 @@ def _filter_against_existing(generated: List[str], existing_block: str) -> List[
             keep.append(g)
     return keep
 
+
 def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
     """
-    Parse LLM output into (type, text) tuples.
-    Accepts only Knowledge/Ability (never Skill).
+    Parse LLM output into (ItemType, text) tuples.
+
+    Accepts only Knowledge/Ability (never Skill). Lines are interpreted as:
+    - Optional tag form:
+        [Knowledge] text...
+        [Ability] text...
+    - Or direct surface form:
+        Knowledge of ...
+        Ability to ...
     """
     out: List[Tuple[ItemType, str]] = []
     if not raw:
@@ -487,6 +693,8 @@ def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
 # -------------------------
 # Public API
 # -------------------------
+
+
 def enhance_items_with_llm(
     afsc_code: str,
     afsc_text: str,
@@ -495,9 +703,33 @@ def enhance_items_with_llm(
     max_new: int = 6,
 ) -> List[ItemDraft]:
     """
-    Enrich items with K/A from LLM or heuristics.
+    Enrich items with Knowledge/Ability statements via LLM or heuristics.
 
-    Returns only NEW items; caller should extend and dedupe.
+    Typical flow:
+    1. Inspect existing items to determine K/A balance.
+    2. Build a targeted prompt with a `missing_hint` explaining which types
+       are currently underrepresented.
+    3. Call the configured provider via `_provider_call`.
+    4. Sanitize and filter the raw LLM output.
+    5. Parse into ItemDrafts with type = KNOWLEDGE or ABILITY.
+    6. Fall back to `_heuristic_enhance` on any error or empty response.
+
+    Parameters
+    ----------
+    afsc_code:
+        AFSC code being processed (for logging/traceability).
+    afsc_text:
+        Cleaned AFSC description text.
+    items:
+        Existing items (primarily SKILLs; may already include some K/A).
+    max_new:
+        Maximum number of new items to return.
+
+    Returns
+    -------
+    List[ItemDraft]
+        Newly generated Knowledge/Ability items only. The caller is
+        responsible for merging and final deduplication.
     """
     # If disabled, use heuristics
     if LLM_PROVIDER in {"", "disabled", "off", "false", "0"}:
@@ -544,13 +776,15 @@ def enhance_items_with_llm(
         parsed = _parse_llm_lines("\n".join(clean_lines))
         new_items: List[ItemDraft] = []
         for item_type, text in parsed[:max_new]:
-            new_items.append(ItemDraft(
-                text=text,
-                item_type=item_type,
-                confidence=0.70,
-                source=f"llm-{LLM_PROVIDER}",
-                esco_id=None,
-            ))
+            new_items.append(
+                ItemDraft(
+                    text=text,
+                    item_type=item_type,
+                    confidence=0.70,
+                    source=f"llm-{LLM_PROVIDER}",
+                    esco_id=None,
+                )
+            )
 
         logger.info(f"Generated {len(new_items)} new items for {afsc_code} via {LLM_PROVIDER}")
         return new_items
@@ -564,12 +798,12 @@ def enhance_items_with_llm(
 # Test function
 # -------------------------
 if __name__ == "__main__":
-    # Configure logging for test
+    # Configure logging for test runs
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    
+
     sample_text = """
     Performs and manages intelligence targeting operations and training.
     Performs intelligence data analysis. Determines intelligence
@@ -597,13 +831,13 @@ if __name__ == "__main__":
     logger.info("=" * 60)
     logger.info(f"Provider: {LLM_PROVIDER}")
     logger.info(f"Existing items: {len(sample_items)}")
-    
+
     new_items = enhance_items_with_llm(
         afsc_code="1N0X1",
         afsc_text=sample_text,
         items=sample_items,
     )
-    
+
     logger.info(f"Generated {len(new_items)} new items:")
     for ni in new_items:
         logger.info(f"- {ni.item_type.value}: {ni.text}")
