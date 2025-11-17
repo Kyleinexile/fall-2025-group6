@@ -1,5 +1,5 @@
 import sys, pathlib, os, io, re, time, textwrap
-from typing import Optional
+from typing import Optional, Any, Dict, List, Iterable, Union
 
 # Path setup
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
@@ -15,9 +15,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Pipeline imports
-from afsc_pipeline.preprocess import clean_afsc_text
-from afsc_pipeline.extract_laiser import extract_ksa_items
+# NEW: use orchestrated demo pipeline (no DB writes)
+from afsc_pipeline.pipeline import run_pipeline_demo
 
 # Paths
 DOCS_ROOTS = [
@@ -42,7 +41,76 @@ SOURCES = {
 
 st.set_page_config(page_title="Try It Yourself", page_icon="🔬", layout="wide")
 
+# -------------------------------------------------------------------
+# Helper types + extractors to interpret pipeline output
+# -------------------------------------------------------------------
+ItemLike = Union[Dict[str, Any], Any]
+
+def _extract_items_from_result(result: Any) -> List[ItemLike]:
+    """
+    Best-effort extraction of item list from run_pipeline_demo output.
+    Handles dicts with 'items'/'all_items' or bare lists.
+    """
+    if isinstance(result, dict):
+        if "items" in result:
+            return list(result["items"])
+        if "all_items" in result:
+            return list(result["all_items"])
+        # Fallback: if dict looks like a single item, wrap it
+        if any(k in result for k in ("item_type", "type", "text")):
+            return [result]
+        return []
+    if isinstance(result, (list, tuple)):
+        return list(result)
+    return []
+
+def _get_item_type(item: ItemLike) -> str:
+    t = None
+    if hasattr(item, "item_type"):
+        t = getattr(item, "item_type")
+        if hasattr(t, "value"):
+            t = t.value
+    elif isinstance(item, dict):
+        t = item.get("item_type") or item.get("type")
+    if isinstance(t, str):
+        return t.lower()
+    return ""
+
+def _get_item_text(item: ItemLike) -> str:
+    if hasattr(item, "text"):
+        return str(getattr(item, "text"))
+    if isinstance(item, dict) and "text" in item:
+        return str(item["text"])
+    return ""
+
+def _get_item_conf(item: ItemLike) -> float:
+    v = 0.0
+    if hasattr(item, "confidence"):
+        v = getattr(item, "confidence")
+    elif isinstance(item, dict):
+        v = item.get("confidence", 0.0)
+    try:
+        return float(v)
+    except Exception:
+        return 0.0
+
+def _get_item_source(item: ItemLike) -> str:
+    if hasattr(item, "source"):
+        return str(getattr(item, "source"))
+    if isinstance(item, dict):
+        return str(item.get("source", ""))
+    return ""
+
+def _get_item_esco(item: ItemLike) -> str:
+    if hasattr(item, "esco_id"):
+        return str(getattr(item, "esco_id") or "")
+    if isinstance(item, dict):
+        return str(item.get("esco_id", "") or "")
+    return ""
+
+# -------------------------------------------------------------------
 # Custom CSS for Air Force Blue theme and large buttons
+# -------------------------------------------------------------------
 st.markdown("""
 <style>
     /* Air Force Blue theme */
@@ -101,7 +169,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# -------------------------------------------------------------------
 # Initialize session state
+# -------------------------------------------------------------------
 if "user_api_key" not in st.session_state:
     st.session_state.user_api_key = None
 if "user_provider" not in st.session_state:
@@ -115,7 +185,9 @@ if "search_results" not in st.session_state:
 if "search_info" not in st.session_state:
     st.session_state.search_info = {}
 
-# Helper Functions
+# -------------------------------------------------------------------
+# Helper Functions for docs
+# -------------------------------------------------------------------
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_pdf_pages(url: str):
     r = requests.get(url, timeout=60)
@@ -148,7 +220,9 @@ def get_markdown_index():
                 rows.append({"afsc": p.stem, "source": source, "path": str(p)})
     return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["afsc", "source", "path"])
 
+# -------------------------------------------------------------------
 # Main UI
+# -------------------------------------------------------------------
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
 st.markdown("**Experience the pipeline hands-on with your own API key**")
 
@@ -217,21 +291,18 @@ st.divider()
 st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', unsafe_allow_html=True)
 st.markdown("Search through **AFOCD (Officer)** and **AFECD (Enlisted)** documents from the repository")
 
-# Search interface - cleaner, more prominent layout
 col_doc, col_mode = st.columns([2, 1])
 with col_doc:
     source = st.selectbox("📄 Select Document", list(SOURCES.keys()))
 with col_mode:
     search_mode = st.radio("Search by", ["AFSC Code", "Keywords"], horizontal=True, label_visibility="collapsed")
 
-# Large, prominent search box
 query = st.text_input(
     "🔍 Search Query",
     placeholder="Try: 14N, 1N1X1, pilot, intelligence, cyber...",
     help="Enter an AFSC code (e.g., 14N, 1N1X1) or keywords (e.g., intelligence, pilot)"
 )
 
-# Search options in expandable section
 with st.expander("⚙️ Advanced Search Options"):
     col_opt1, col_opt2 = st.columns(2)
     with col_opt1:
@@ -239,7 +310,6 @@ with st.expander("⚙️ Advanced Search Options"):
     with col_opt2:
         max_results = st.slider("Max results", 5, 30, 10, help="Maximum number of results to display")
 
-# Search buttons
 col_search_btn, col_clear_btn = st.columns([3, 1])
 with col_search_btn:
     search_btn = st.button("🔍 Search Document", use_container_width=True, type="primary")
@@ -249,7 +319,6 @@ with col_clear_btn:
         st.session_state.search_info = {}
         st.rerun()
 
-# Search logic
 if search_btn:
     if not query.strip():
         st.warning("⚠️ Enter a search term")
@@ -261,13 +330,12 @@ if search_btn:
                 st.error(f"❌ Could not load PDF: {e}")
                 st.stop()
         
-        # Build pattern - RESTORED FROM ADMIN TOOLS
+        # Pattern: same logic as Admin Tools
         if search_mode == "AFSC Code":
             pattern = rf"(?i)\b{re.escape(query.strip().upper())}[A-Z0-9]*\b"
         else:
             pattern = re.escape(query) if not any(c in query for c in ".*?+[]()") else query
         
-        # Search with better implementation
         hits = []
         try:
             rx = re.compile(pattern, flags=re.IGNORECASE)
@@ -282,7 +350,7 @@ if search_btn:
                     hits.append({
                         "page": rec["page"],
                         "snippet": snippet,
-                        "full": rec["text"]  # Store full page for loading
+                        "full": rec["text"]
                     })
                     if len(hits) >= max_results:
                         break
@@ -304,7 +372,6 @@ if search_btn:
                 "pattern": pattern
             }
 
-# Display results
 if st.session_state.search_results:
     info = st.session_state.search_info
     st.success(f"✅ Found {len(st.session_state.search_results)} results for **'{info['query']}'**")
@@ -312,19 +379,15 @@ if st.session_state.search_results:
     st.markdown("---")
     
     for i, match in enumerate(st.session_state.search_results, 1):
-        # Result card with better styling
         st.markdown(f"#### 📄 Result {i} • Page {match['page']}")
         
-        # Highlighted snippet
         highlighted = highlight_matches(match['snippet'], info['pattern'])
         st.markdown(highlighted)
         
-        # Expandable full page view
         with st.expander("📖 View Full Page"):
             display_text = match["full"][:10000] + "\n..." if len(match["full"]) > 10000 else match["full"]
             st.text(display_text)
         
-        # Action buttons
         col_info, col_download, col_load = st.columns([3, 1, 1])
         with col_info:
             st.caption(f"Source: {info['source']} • Page {match['page']}")
@@ -337,9 +400,8 @@ if st.session_state.search_results:
                 use_container_width=True
             )
         with col_load:
-            # Load button
             if st.button("✅ Load", key=f"load_{i}", use_container_width=True, type="secondary"):
-                st.session_state.loaded_afsc_text = match["full"]  # Load FULL text, not snippet
+                st.session_state.loaded_afsc_text = match["full"]
                 st.session_state.loaded_afsc_code = ""
                 st.success("✅ Text loaded! See Step 3 below ↓")
                 time.sleep(1.5)
@@ -353,7 +415,6 @@ st.divider()
 # ============ STEP 3: Paste/Edit AFSC Text ============
 st.markdown('<div class="step-header">📝 Step 3: Paste or Edit AFSC Text</div>', unsafe_allow_html=True)
 
-# Show loaded indicator
 if st.session_state.loaded_afsc_text:
     st.info(f"📄 Text loaded from search ({len(st.session_state.loaded_afsc_text)} characters)")
 
@@ -379,10 +440,10 @@ if st.button("🗑️ Clear Text", use_container_width=True):
 
 st.divider()
 
-# ============ STEP 4: Run Extraction ============
+# ============ STEP 4: Run Extraction (via pipeline demo) ============
 st.markdown('<div class="step-header">🚀 Step 4: Run KSA Extraction</div>', unsafe_allow_html=True)
 
-# Settings Sidebar
+# Settings Sidebar (these map directly into pipeline knobs)
 with st.sidebar:
     st.markdown("### ⚙️ Extraction Settings")
     
@@ -406,7 +467,6 @@ with st.sidebar:
     - LLM generates complementary K/A items
     """)
 
-# Process Button
 can_run = has_key and afsc_code.strip() and afsc_text.strip()
 
 if not has_key:
@@ -416,7 +476,7 @@ elif not afsc_code.strip():
 elif not afsc_text.strip():
     st.warning("⚠️ Add AFSC text in Step 3 to enable extraction")
 
-# Green extract button with custom styling
+# Green extract button styling
 st.markdown("""
 <style>
     div[data-testid="stButton"] button[kind="primary"] {
@@ -435,150 +495,60 @@ st.markdown("""
 if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
     try:
         with st.status("Processing...", expanded=True) as status:
-            # Step 1: Clean
-            st.write("🧹 Cleaning text...")
-            cleaned_text = clean_afsc_text(afsc_text)
-            st.write(f"   ✓ Cleaned to {len(cleaned_text)} characters")
+            st.write("🧠 Running full AFSC → KSA pipeline in demo mode (no database writes)...")
+            
+            # 👉 Single call into orchestrated demo pipeline
+            # Adjust kwarg names if your implementation differs.
+            result = run_pipeline_demo(
+                afsc_code=afsc_code.strip(),
+                raw_text=afsc_text,
+                provider=st.session_state.user_provider,
+                api_key=st.session_state.user_api_key,
+                use_laiser=use_laiser,
+                laiser_topk=laiser_topk,
+                max_llm_items=max_llm_items,
+                temperature=temperature,
+                write_to_db=False,
+                source="try_it_yourself",
+            )
+            
+            items = _extract_items_from_result(result)
+            st.write(f"   ✓ Received {len(items)} items from pipeline")
             time.sleep(0.2)
-            
-            # Step 2: LAiSER (if enabled)
-            laiser_items = []
-            if use_laiser:
-                st.write("🔍 LAiSER extracting skills...")
-                
-                # Temporarily set environment for this extraction
-                old_use_laiser = os.getenv("USE_LAISER")
-                old_topk = os.getenv("LAISER_ALIGN_TOPK")
-                
-                os.environ["USE_LAISER"] = "true"
-                os.environ["LAISER_ALIGN_TOPK"] = str(laiser_topk)
-                
-                try:
-                    laiser_items = extract_ksa_items(cleaned_text)
-                    st.write(f"   ✓ Extracted {len(laiser_items)} skills with taxonomy codes")
-                finally:
-                    # Restore original env
-                    if old_use_laiser:
-                        os.environ["USE_LAISER"] = old_use_laiser
-                    if old_topk:
-                        os.environ["LAISER_ALIGN_TOPK"] = old_topk
-                
-                time.sleep(0.2)
-            else:
-                st.write("⏭️ LAiSER disabled, skipping skill extraction")
-            
-            # Step 3: LLM Enhancement
-            st.write("🤖 LLM generating Knowledge/Abilities...")
-            
-            # Import and configure LLM
-            from afsc_pipeline.enhance_llm import run_llm
-            
-            # Build hints from LAiSER items
-            hints = []
-            if laiser_items:
-                skills = [item.text for item in laiser_items[:10]]  # Top 10 as hints
-                hints = skills
-            
-            # Build prompt
-            context = f"AFSC: {afsc_code or 'Unknown'}\n\n{cleaned_text[:2000]}"
-            
-            prompt = f"""Extract {max_llm_items} items from this Air Force job description.
-
-Context:
-{context}
-
-Extracted Skills (use as hints):
-{chr(10).join(f'- {h}' for h in hints[:5]) if hints else '(none)'}
-
-Generate exactly {max_llm_items} items total:
-- {max_llm_items // 2} Knowledge items (theoretical understanding needed)
-- {max_llm_items // 2} Ability items (cognitive/physical capacities)
-
-Format EACH as JSON on separate lines:
-{{"type": "knowledge", "text": "..."}}
-{{"type": "ability", "text": "..."}}
-
-Requirements:
-- Must be SPECIFIC to this role
-- NO generic statements
-- NO duplicates
-- CONCISE (under 100 chars each)"""
-
-            # Call LLM with user's key
-            try:
-                import json
-                
-                response_text = run_llm(
-                    prompt=prompt,
-                    provider=st.session_state.user_provider,
-                    api_key=st.session_state.user_api_key,
-                    temperature=temperature
-                )
-                
-                # Parse response
-                enhanced_items = []
-                for line in response_text.strip().split('\n'):
-                    line = line.strip()
-                    if line.startswith('{'):
-                        try:
-                            obj = json.loads(line)
-                            enhanced_items.append({
-                                'type': obj.get('type', 'knowledge'),
-                                'text': obj.get('text', ''),
-                                'confidence': 0.7,
-                                'source': f'llm-{st.session_state.user_provider}'
-                            })
-                        except:
-                            pass
-                
-                st.write(f"   ✓ Generated {len(enhanced_items)} Knowledge/Ability items")
-                time.sleep(0.2)
-                
-            except Exception as e:
-                st.error(f"❌ LLM call failed: {e}")
-                enhanced_items = []
             
             status.update(label="✅ Extraction Complete!", state="complete")
         
-        # Combine results
-        all_items = []
-        
-        # Add LAiSER items
-        for item in laiser_items:
-            all_items.append({
-                'Type': 'skill',
-                'Text': item.text,
-                'Confidence': float(getattr(item, 'confidence', 0.0)),
-                'Source': getattr(item, 'source', 'laiser'),
-                'Taxonomy': getattr(item, 'esco_id', '') or ''
-            })
-        
-        # Add LLM items
-        for item in enhanced_items:
-            all_items.append({
-                'Type': item['type'],
-                'Text': item['text'],
-                'Confidence': item['confidence'],
-                'Source': item['source'],
-                'Taxonomy': ''
-            })
-        
-        if not all_items:
+        if not items:
             st.warning("⚠️ No items extracted. Try enabling LAiSER or adjusting settings in the sidebar.")
             st.stop()
         
-        # Display Results
-        st.success(f"✅ Successfully extracted {len(all_items)} KSAs!")
-        st.balloons()
+        # Build rows for display (mirror previous schema)
+        all_rows = []
+        for item in items:
+            t = _get_item_type(item) or "skill"
+            txt = _get_item_text(item)
+            conf = _get_item_conf(item)
+            src = _get_item_source(item) or "pipeline"
+            esco = _get_item_esco(item)
+            all_rows.append({
+                "Type": t,
+                "Text": txt,
+                "Confidence": conf,
+                "Source": src,
+                "Taxonomy": esco,
+            })
         
         # Metrics
-        k_count = sum(1 for i in all_items if i['Type'] == 'knowledge')
-        s_count = sum(1 for i in all_items if i['Type'] == 'skill')
-        a_count = sum(1 for i in all_items if i['Type'] == 'ability')
-        tax_count = sum(1 for i in all_items if i['Taxonomy'])
+        k_count = sum(1 for i in all_rows if i["Type"] == "knowledge")
+        s_count = sum(1 for i in all_rows if i["Type"] == "skill")
+        a_count = sum(1 for i in all_rows if i["Type"] == "ability")
+        tax_count = sum(1 for i in all_rows if i["Taxonomy"])
+        
+        st.success(f"✅ Successfully extracted {len(all_rows)} KSAs!")
+        st.balloons()
         
         col1, col2, col3, col4, col5 = st.columns(5)
-        col1.metric("Total KSAs", len(all_items))
+        col1.metric("Total KSAs", len(all_rows))
         col2.metric("Knowledge", k_count)
         col3.metric("Skills", s_count)
         col4.metric("Abilities", a_count)
@@ -587,26 +557,23 @@ Requirements:
         # Results Table
         st.markdown("### 📊 Extracted KSAs")
         
-        df = pd.DataFrame(all_items)
+        df = pd.DataFrame(all_rows)
         
-        # Add filters
         col_filter1, col_filter2 = st.columns(2)
         with col_filter1:
             type_filter = st.multiselect(
                 "Filter by type",
-                ['knowledge', 'skill', 'ability'],
-                default=['knowledge', 'skill', 'ability']
+                ["knowledge", "skill", "ability"],
+                default=["knowledge", "skill", "ability"]
             )
         with col_filter2:
             min_conf = st.slider("Minimum confidence", 0.0, 1.0, 0.0, 0.05)
         
-        # Apply filters
-        filtered_df = df[df['Type'].isin(type_filter)]
-        filtered_df = filtered_df[filtered_df['Confidence'] >= min_conf]
+        filtered_df = df[df["Type"].isin(type_filter)]
+        filtered_df = filtered_df[filtered_df["Confidence"] >= min_conf]
         
         st.caption(f"Showing {len(filtered_df)} of {len(df)} items")
         
-        # Display
         st.dataframe(
             filtered_df,
             use_container_width=True,
@@ -645,7 +612,7 @@ Requirements:
         st.info("💡 **Note:** These results are NOT saved to the database. This is a demo/testing tool only. Use Admin Tools for permanent storage.")
         
         st.caption("📖 **Skill Taxonomy Reference:** Skills are aligned to the Open Skills Network (OSN) taxonomy. View the complete taxonomy codes and labels: [LAiSER Taxonomy CSV](https://github.com/LAiSER-Software/extract-module/blob/main/laiser/public/combined.csv)")
-        
+    
     except Exception as e:
         st.error(f"❌ Extraction failed: {e}")
         import traceback
@@ -675,8 +642,8 @@ with st.expander("❓ Help & FAQ"):
     - Edit and refine as needed
     
     **Step 4: Extract KSAs**
-    - LAiSER extracts skills with ESCO taxonomy codes
-    - LLM generates complementary knowledge and abilities
+    - Full pipeline (clean → LAiSER → filters → ESCO → LLM enhance)
+    - No Neo4j writes in this demo mode
     - Download results as CSV
     
     ### Privacy & Security
