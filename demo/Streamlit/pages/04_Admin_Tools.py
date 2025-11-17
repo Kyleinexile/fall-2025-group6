@@ -411,4 +411,263 @@ with tab1:
             col1, col2 = st.columns([1, 3])
             
             with col1:
-                sources = ["All"] + sorted(df["source"].u
+                sources = ["All"] + sorted(df["source"].unique().tolist())
+                src_filter = st.selectbox("Source", sources)
+                filtered = df if src_filter == "All" else df[df["source"] == src_filter]
+                
+                search_text = st.text_input("Filter", placeholder="e.g., 1N1")
+                if search_text.strip():
+                    filtered = filtered[filtered["afsc"].str.contains(search_text.strip(), case=False)]
+                
+                st.caption(f"{len(filtered)} files")
+                
+                options = [f"{r.afsc} ({r.source})" for r in filtered.itertuples()]
+                selected = st.selectbox("Select", [""] + options)
+            
+            with col2:
+                if selected:
+                    code = selected.split(" ")[0]
+                    row = filtered[filtered["afsc"] == code].iloc[0]
+                    
+                    st.markdown(f"### {code}")
+                    st.caption(f"Source: {row['source']}")
+                    
+                    try:
+                        content = pathlib.Path(row["path"]).read_text(encoding="utf-8")
+                        
+                        with st.expander("📄 Preview", expanded=True):
+                            st.markdown(content[:2000] + "\n..." if len(content) > 2000 else content)
+                        
+                        col_a, col_b = st.columns(2)
+                        with col_a:
+                            st.download_button("⬇️ Download", content, f"{code}.md", use_container_width=True)
+                        with col_b:
+                            if st.button("→ Load to Ingest", use_container_width=True):
+                                st.session_state.admin_loaded_text = content
+                                st.session_state.admin_loaded_code = code
+                                st.success("✅ Loaded! Go to Ingest & Process tab →")
+                    
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                else:
+                    st.info("👈 Select an AFSC")
+
+# ============ TAB 2: Ingest & Process ============
+with tab2:
+    st.markdown("### Process Single AFSC")
+    
+    # Get loaded data
+    loaded_code = st.session_state.get("admin_loaded_code", "")
+    loaded_text = st.session_state.get("admin_loaded_text", "")
+    
+    if loaded_text:
+        st.info(f"📄 Text loaded ({len(loaded_text)} chars)")
+    
+    code = st.text_input("AFSC Code", value=loaded_code, placeholder="e.g., 14N")
+    text = st.text_area("AFSC Text", value=loaded_text, height=300, placeholder="Paste AFSC documentation here...")
+    
+    # Future hooks: you could surface pipeline knobs here (max_items, temperature, etc.)
+    
+    if st.button("🚀 Process", type="primary", disabled=not (code.strip() and text.strip() and db_connected)):
+        afsc_code = code.strip()
+        try:
+            driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+            
+            with st.status("Processing with full AFSC → KSA pipeline...", expanded=True) as status:
+                st.write("🧠 Running pipeline (clean → LAiSER → filters → ESCO → LLM → Neo4j)...")
+                
+                with driver.session(database=NEO4J_DATABASE) as session:
+                    # IMPORTANT: all real writes go through the orchestrated pipeline
+                    result = run_pipeline(
+                        afsc_code=afsc_code,
+                        raw_text=text,
+                        session=session,
+                        write_to_db=True,
+                        source="admin_single",
+                    )
+                
+                items = _extract_items_from_result(result)
+                metrics = summarize_items(items)
+                
+                st.write(f"   ✓ Wrote {metrics['total']} KSAs to Neo4j")
+                status.update(label="✅ Complete!", state="complete")
+            
+            driver.close()
+            
+            log_admin_ingest(
+                afsc_code=afsc_code,
+                mode="single",
+                status="success",
+                metrics=metrics,
+            )
+            
+            st.success(f"✅ Processed {afsc_code}")
+            st.balloons()
+            
+            # Metrics display
+            col1, col2, col3, col4, col5 = st.columns(5)
+            col1.metric("Total", metrics["total"])
+            col2.metric("Knowledge", metrics["knowledge"])
+            col3.metric("Skills", metrics["skills"])
+            col4.metric("Abilities", metrics["abilities"])
+            col5.metric("Aligned", metrics["esco_aligned"])
+            
+            st.caption("Pipeline: LAiSER → quality filter → dedupe → ESCO map → LLM enhance (if enabled)")
+            
+            # Show items
+            if items:
+                with st.expander(f"📊 View {len(items)} Items"):
+                    df = pd.DataFrame([{
+                        "Type": _get_item_type(i).upper(),
+                        "Text": (t := _get_item_text(i))[:80] + ("..." if len(t) > 80 else ""),
+                        "Conf": f"{_get_item_conf(i):.2f}",
+                        "Source": _get_item_source(i),
+                        "ESCO": _get_item_esco(i),
+                    } for i in items])
+                    st.dataframe(df, use_container_width=True, hide_index=True)
+            
+            # Clear button
+            if st.button("✨ Process Another", use_container_width=True):
+                st.session_state.admin_loaded_code = ""
+                st.session_state.admin_loaded_text = ""
+                st.rerun()
+        
+        except Exception as e:
+            err_str = str(e)
+            log_admin_ingest(
+                afsc_code=afsc_code,
+                mode="single",
+                status="error",
+                metrics={},
+                error=err_str[:5000],
+            )
+            st.error(f"❌ Failed: {err_str}")
+            import traceback
+            with st.expander("Details"):
+                st.code(traceback.format_exc())
+
+# ============ TAB 3: Bulk Upload ============
+with tab3:
+    st.markdown("### Bulk JSONL Processing")
+    st.caption("Upload JSONL with fields: `afsc`, `md` or `sections`")
+    
+    file = st.file_uploader("Upload JSONL", type=["jsonl"])
+    
+    if file:
+        lines = file.getvalue().decode("utf-8").splitlines()
+        st.info(f"Found {len(lines)} records")
+        
+        if st.button("🚀 Process All", type="primary", disabled=not db_connected):
+            try:
+                driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+                
+                success = fail = 0
+                progress = st.progress(0)
+                status_text = st.empty()
+                
+                with driver.session(database=NEO4J_DATABASE) as session:
+                    for i, line in enumerate(lines, 1):
+                        try:
+                            obj = json.loads(line)
+                            code = (obj.get("afsc") or "").strip()
+                            if not code:
+                                raise ValueError("Missing 'afsc'")
+                            
+                            text = obj.get("md")
+                            if not text:
+                                # Fallback if you stored structured sections
+                                sections = obj.get("sections", {})
+                                text = json.dumps(sections, ensure_ascii=False)
+                            
+                            if not text:
+                                raise ValueError("Missing 'md' or 'sections'")
+                            
+                            # Call the real pipeline per AFSC – writes directly to Neo4j
+                            result = run_pipeline(
+                                afsc_code=code,
+                                raw_text=text,
+                                session=session,
+                                write_to_db=True,
+                                source="admin_bulk",
+                            )
+                            
+                            items = _extract_items_from_result(result)
+                            metrics = summarize_items(items)
+                            
+                            log_admin_ingest(
+                                afsc_code=code,
+                                mode="bulk",
+                                status="success",
+                                metrics=metrics,
+                            )
+                            success += 1
+                        except Exception as e:
+                            fail += 1
+                            log_admin_ingest(
+                                afsc_code=(obj.get("afsc") or "").strip() if "obj" in locals() else "",
+                                mode="bulk",
+                                status="error",
+                                metrics={},
+                                error=str(e)[:5000],
+                            )
+                        
+                        progress.progress(i / len(lines))
+                        status_text.text(f"{i}/{len(lines)} • ✓ {success} • ✗ {fail}")
+                
+                driver.close()
+                st.success(f"Complete! Success: {success}, Failed: {fail}")
+            
+            except Exception as e:
+                st.error(f"Bulk processing failed: {e}")
+
+# ============ TAB 4: Management ============
+with tab4:
+    st.markdown("### Database Management")
+    st.warning("⚠️ Destructive operations")
+    
+    codes = st.text_area("AFSCs to delete (comma/space/newline separated)", placeholder="1N1X1, 14N")
+    confirm = st.text_input("Type DELETE to confirm")
+    
+    if st.button("🗑️ Delete", disabled=(confirm != "DELETE" or not db_connected), type="secondary"):
+        try:
+            afsc_list = [c.strip() for c in re.split(r"[,\s]+", codes) if c.strip()]
+            
+            if not afsc_list:
+                st.error("No AFSCs specified")
+            else:
+                driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+                with driver.session(database=NEO4J_DATABASE) as s:
+                    result = s.run("""
+                        MATCH (a:AFSC)
+                        WHERE a.code IN $codes
+                        OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
+                        WITH collect(DISTINCT a) AS afscs, collect(DISTINCT k) AS ksa_nodes
+                        
+                        UNWIND afscs AS a
+                        DETACH DELETE a
+                        
+                        WITH ksa_nodes
+                        UNWIND ksa_nodes AS k
+                        WITH DISTINCT k
+                        WHERE k IS NOT NULL AND NOT (k)<-[:REQUIRES]-(:AFSC)
+                        
+                        DETACH DELETE k
+                        RETURN count(k) AS ksas_deleted
+                    """, {"codes": afsc_list})
+                    
+                    rec = result.single()
+                    ksas_deleted = rec["ksas_deleted"] if rec else 0
+                
+                driver.close()
+                st.success(f"Deleted {len(afsc_list)} AFSCs and {ksas_deleted} orphaned KSAs")
+                st.cache_data.clear()
+        
+        except Exception as e:
+            st.error(f"Delete failed: {e}")
+    
+    st.markdown("---")
+    
+    if st.button("🔄 Clear All Caches", use_container_width=True):
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.success("Caches cleared")
