@@ -300,7 +300,7 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
 
     - If USE_LAISER is false (or unset), the heuristic path is used.
     - If USE_LAISER is true, the function attempts to initialize LAiSER and
-      call `align_skills` with a set of candidate phrases.
+      call `extract_skills` on the full AFSC text.
     - If LAiSER fails at any point, the function logs the error and falls
       back to the heuristic extractor.
 
@@ -331,58 +331,78 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         print("[LAISER] Extractor failed to initialize, using fallback")
         return _fallback_extract(clean_text)
 
-    # Split text into phrases
-    raw_candidates: List[str] = []
-    for seg in re.split(r"[;\n\.\u2022,]", clean_text):
-        c = seg.strip()
-        if c.lower().startswith(
-            ("duties", "knowledge", "skills", "abilities")
-        ):
-            continue
-        if 4 <= len(c) < 100:
-            raw_candidates.append(c)
-
-    if not raw_candidates:
-        raw_candidates = [
-            "imagery exploitation",
-            "geospatial intelligence",
-            "target development",
-        ]
-
-    # Deduplicate while preserving order, and cap the candidate list
-    raw_candidates = list(dict.fromkeys(raw_candidates))[:50]
-    print(f"[LAISER] Extracted {len(raw_candidates)} candidate phrases")
-
-    # Call align_skills with Gemini
+    # ---- NEW: use extract_skills on the full text, not align_skills on phrases ----
     try:
-        print("[LAISER] Calling align_skills...")
-        result_df = extractor.align_skills(
-            raw_skills=raw_candidates,
-            document_id="AFSC-0",
+        print("[LAISER] Calling extract_skills (method='ksa', input_type='job_desc')...")
+        # Text MUST be the first positional argument per LAiSER docs
+        laiser_result = extractor.extract_skills(
+            clean_text,
+            method="ksa",
+            input_type="job_desc",
         )
-        print(f"[LAISER] Got {len(result_df)} results from align_skills")
     except Exception as e:
-        print(f"[LAISER] Error during align_skills: {e}")
+        print(f"[LAISER] Error during extract_skills: {e}")
         import traceback
 
         traceback.print_exc()
         return _fallback_extract(clean_text)
 
-    if result_df.empty:
-        print("[LAISER] Empty results, using fallback")
+    if laiser_result is None:
+        print("[LAISER] extract_skills returned None, using fallback")
         return _fallback_extract(clean_text)
 
-    # Parse results
+    # We try to be robust: handle DataFrame, list[dict], or similar structures
     items: List[ItemDraft] = []
-    for idx, row in result_df.iterrows():
+
+    try:
+        import pandas as pd  # type: ignore
+
+        if isinstance(laiser_result, pd.DataFrame):
+            df = laiser_result
+        else:
+            # If it's a list/dict, try to coerce into a DataFrame
+            df = pd.DataFrame(laiser_result)
+    except Exception:
+        # As a last resort, just bail to fallback if we can't interpret the result
+        print("[LAISER] Could not interpret extract_skills result, using fallback")
+        return _fallback_extract(clean_text)
+
+    if df.empty:
+        print("[LAISER] Empty extract_skills results, using fallback")
+        return _fallback_extract(clean_text)
+
+    for _, row in df.iterrows():
+        # Try several possible text fields LAiSER might use
         txt = str(
-            row.get("Taxonomy Skill") or row.get("Description") or ""
+            row.get("Taxonomy Skill")
+            or row.get("Description")
+            or row.get("Raw Skill")
+            or row.get("Skill")
+            or ""
         ).strip()
         if not txt:
             continue
 
-        conf = float(row.get("Correlation Coefficient") or 0.5)
-        esco_id = str(row.get("Skill Tag") or "").strip() or None
+        # Confidence / score field can have different names
+        conf_val = (
+            row.get("Correlation Coefficient")
+            or row.get("score")
+            or row.get("confidence")
+            or 0.5
+        )
+        try:
+            conf = float(conf_val)
+        except Exception:
+            conf = 0.5
+
+        # ESCO / taxonomy ID
+        esco_id_raw = (
+            row.get("Skill Tag")
+            or row.get("ESCO ID")
+            or row.get("esco_id")
+            or ""
+        )
+        esco_id = str(esco_id_raw).strip() or None
 
         if esco_id:
             print(f"[LAISER] ✓ {txt[:50]} -> {esco_id} (conf={conf:.3f})")
@@ -397,13 +417,18 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
             )
         )
 
-    if items:
-        items.sort(key=lambda x: x.confidence, reverse=True)
-        items = items[:top_k]
+    if not items:
+        print("[LAISER] No usable rows in extract_skills result, using fallback")
+        return _fallback_extract(clean_text)
+
+    # Sort and cap like before
+    items.sort(key=lambda x: x.confidence, reverse=True)
+    items = items[:top_k]
 
     esco_count = sum(1 for i in items if i.esco_id)
     print(
-        f"[LAISER] Returning {len(items)} skills ({esco_count} with ESCO IDs)"
+        f"[LAISER] Returning {len(items)} skills ({esco_count} with ESCO IDs) from extract_skills"
     )
 
     return items if items else _fallback_extract(clean_text)
+
