@@ -11,30 +11,36 @@ The pipeline converts unstructured AFOCD/AFECD text into structured **Knowledge*
 ---
 
 ## ⭐ High-Level Architecture
-```
 Raw AFSC Text
      │
      ▼
-Preprocessing (cleaning, normalization)
+1. Preprocessing
+   (cleanup, fix formatting)
      │
      ▼
-LAiSER Extraction (Skill candidates)
+2. Skill Extraction (LAiSER)
+   (gets action-oriented Skills)
      │
      ▼
-LLM Enhancement (Knowledge + Ability generation)
+3. LLM Enhancement
+   (adds Knowledge + Abilities)
      │
      ▼
-Quality Filtering (confidence + formatting checks)
+4. Quality Filtering
+   (removes noise, short items, off-topic items)
      │
      ▼
-Similarity Deduplication (embedding-based merging)
+5. Semantic Deduplication
+   (merges near-duplicates)
      │
      ▼
-ESCO/OSN Mapping (optional)
+6. ESCO/OSN Mapping
+   (optional taxonomy alignment)
      │
      ▼
-Neo4j Graph Writer (AFSC, Item, relationships)
-```
+7. Neo4j Graph Writer
+   (creates/updates AFSC + KSA nodes)
+
 
 The output is a clean, reusable, searchable KSA inventory for each AFSC.
 
