@@ -479,8 +479,8 @@ with tab2:
                 with driver.session(database=NEO4J_DATABASE) as session:
                     # IMPORTANT: all real writes go through the orchestrated pipeline
                     result = run_pipeline(
-                        afsc_code=afsc_code,
-                        raw_text=text,
+                        afsc_code,
+                        text,
                         session=session,
                         write_to_db=True,
                         source="admin_single",
@@ -584,8 +584,8 @@ with tab3:
                             
                             # Call the real pipeline per AFSC – writes directly to Neo4j
                             result = run_pipeline(
-                                afsc_code=code,
-                                raw_text=text,
+                                code,
+                                text,
                                 session=session,
                                 write_to_db=True,
                                 source="admin_bulk",
