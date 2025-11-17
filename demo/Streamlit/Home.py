@@ -588,7 +588,7 @@ with col4:
     <div class='pipeline-step'>
         <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>✨</div>
         <h4 style='color: #00539B; margin-bottom: 0.5rem; font-weight: 700;'>4. Enhance</h4>
-        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>LLM K/A generation</p>
+        <p style='color: #6B7280; font-size: 0.9rem; margin: 0;'>Optional LLM K/A generation</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -620,34 +620,111 @@ with st.expander("See detailed pipeline steps"):
     st.markdown("""
     ### Detailed Process
     
-    The AFSC → KSA Pipeline automates the extraction and organization of Knowledge, Skills, and Abilities (KSAs) from Air Force Specialty Code (AFSC) descriptions. It enables skill-mapping, workforce analytics, and cross-AFSC capability visualization within a Neo4j graph.
+    The AFSC → KSA Pipeline automates the extraction and organization of Knowledge, Skills, and Abilities (KSAs)
+    from Air Force Specialty Code (AFSC) descriptions. It turns unstructured AFOCD/AFECD text into a searchable
+    Neo4j graph that can power workforce and transition analytics.
     
     **0. Ingest (Document Loading)**  
-    AFSC source documents (AFOCD / AFECD PDFs or JSONL) are parsed and indexed. Each AFSC entry is extracted with section headers (summary, duties, qualifications) and stored as normalized JSON records for downstream use.
+    AFSC source documents (AFOCD / AFECD PDFs or JSONL exports) are parsed outside the app and split into
+    individual AFSC records. Each record contains the AFSC code, title, and relevant narrative sections
+    (summary, duties, qualifications). The Streamlit **Admin Tools** page lets an admin paste text or load
+    pre-parsed AFSCs for processing.
     
-    **1. Preprocessing**  
-    Removes headers, page numbers, and formatting artifacts. Fixes hyphenation / line-break issues and standardizes encoding for consistent text analysis.
+    **1. Preprocessing (`preprocess.py`)**  
+    Raw text is cleaned to make it easier for both LAiSER and downstream logic to work with:
     
-    **2. Extraction (Skills – LAiSER Engine)**  
-    The LAiSER extractor identifies core Skill items via taxonomy-based matching against professional datasets. Each item is tagged with confidence (0–1). Fallback regex logic provides coverage in offline or low-confidence cases.
+    - Removes page headers/footers and page numbers  
+    - Fixes hyphenated line breaks (e.g., "intelli-\ngence" → "intelligence")  
+    - Normalizes whitespace and stray formatting artifacts  
+    - Produces a single, readable block of text per AFSC  
     
-    **3. Enhancement (Knowledge & Ability – LLM Stage)**  
-    Large Language Models (Gemini 1.5 Flash primary, Claude Sonnet 4 fallback) generate complementary Knowledge and Ability statements to fill coverage gaps. If no API key is provided, heuristics generate minimal items. Outputs are filtered for duplicates and format compliance.
+    This is handled by `clean_afsc_text`, which lives entirely in the pipeline (no UI dependency).
     
-    **4. Quality Filtering**  
-    Applies domain-specific rules and confidence thresholds (items below 0.50 removed). Performs exact-match deduplication (type + text) and drops generic or low-signal entries.
+    **2. Extraction (Skills – `extract_laiser.py`)**  
+    The cleaned AFSC text is passed to LAiSER’s skill extractor:
     
-    **5. Deduplication & Canonicalization**  
-    Performs fuzzy merge of near-duplicates using cosine-similarity (TF-IDF vectors) and Levenshtein distance checks. Keeps the highest-confidence or ESCO-linked instance to maintain clarity and consistency.
+    - LAiSER proposes short, action-oriented **Skill** phrases  
+    - Each item is tagged with a confidence score (0–1)  
+    - Where available, LAiSER also returns aligned taxonomy identifiers (ESCO/OSN-style skill IDs)  
+    - If LAiSER cannot be initialized or returns nothing, a lightweight regex-based fallback creates a few
+      reasonable skill items so the run still produces output  
     
-    **6. ESCO Mapping**  
-    Aligns remaining items to the European Skills, Competences, Qualifications and Occupations (ESCO) taxonomy. Enables standardized cross-AFSC / civilian comparisons and labor-market interoperability.
+    At this point, most items are of type **Skill** and may already include taxonomy links.
     
-    **7. Graph Persistence**  
-    Writes results to a Neo4j Aura graph using `MERGE` operations for idempotency (no duplicate nodes or edges). Establishes relationships between (AFSC) and (Item) nodes for querying and overlap analysis.
+    **3. Quality Filtering (`quality_filter.py`)**  
+    Before anything is written to the graph, items pass through a structural and domain-aware filter:
     
-    **8. Audit & Telemetry**  
-    Logs counts, timings, and errors for each stage. All outputs are timestamped and versioned, providing full traceability from source text to graph node.
+    - Drops items that are too short, too long, or empty  
+    - Removes obviously bad or out-of-domain phrases via a small banned list  
+    - Normalizes text (lowercasing, punctuation trimming, light canonical mapping like
+      `"imagery analysis" → "imagery exploitation"`)  
+    - Optionally prefers GEOINT-related skills when `GEOINT_BIAS` is enabled  
+    - Optionally requires an ESCO ID for low-confidence skills when `STRICT_SKILL_FILTER` is enabled  
+    - Performs **exact** deduplication on `(type, normalized text)`  
+    
+    Key knobs (all environment-backed) include:
+    
+    - `QUALITY_MIN_LEN` / `QUALITY_MAX_LEN` – minimum/maximum length of an item  
+    - `LOW_CONF_SKILL_THRESHOLD` – confidence cutoff for stricter rules on skills  
+    - `STRICT_SKILL_FILTER`, `GEOINT_BIAS` – toggle tighter screening behavior  
+    
+    The result is a cleaner, smaller set of high-signal KSA candidates.
+    
+    **4. Deduplication & Canonicalization (`dedupe.py`)**  
+    After structural filtering, the pipeline removes **near-duplicate** items using a hybrid string-similarity approach:
+    
+    - Normalizes text (case, punctuation, whitespace)  
+    - Computes both token-level overlap and character-level similarity  
+    - Clusters items that are very similar (above a tunable threshold, default ~0.86) **within the same type**  
+    - For each cluster, chooses a single **canonical** representative, preferring:
+      - Items with an ESCO ID  
+      - Higher confidence  
+      - LAiSER-sourced items  
+      - Slightly longer, more descriptive text  
+    
+    If any member of a cluster has an ESCO ID, that ID is lifted onto the chosen representative. This step
+    keeps the graph compact and readable (e.g., avoiding three slightly different “process intelligence data” variants).
+    
+    **5. ESCO Mapping (`esco_mapper.py`, optional)**  
+    For items that do **not** already have an ESCO ID, the pipeline can attempt to map them to a local ESCO catalog:
+    
+    - Loads a CSV of ESCO skills (ID, label, and optional alternative labels)  
+    - Normalizes both KSA text and ESCO labels  
+    - Computes similarity and chooses the best match per item  
+    - Applies type-specific thresholds so only strong matches are kept  
+    
+    If a match clears the threshold, an ESCO ID is attached to the item; otherwise, the item is left unmapped.
+    This mapping is **additive** and never overwrites IDs already supplied by LAiSER.
+    
+    **6. Graph Persistence (`graph_writer_v2.py`)**  
+    The cleaned and canonicalized items are written to a Neo4j graph using idempotent `MERGE` operations:
+    
+    - `(:AFSC {code, title, ...})` nodes represent Air Force specialties  
+    - `(:KSA {text, type, esco_id, ...})` nodes represent individual Knowledge/Skill/Ability items  
+    - Relationships connect them:
+      - `(:AFSC)-[:REQUIRES]->(:KSA)`  — AFSC requires this KSA  
+      - `(:KSA)-[:ALIGNS_TO]->(:ESCO)` — optional link to a taxonomy skill node  
+    
+    Because writes use `MERGE`, re-running the pipeline for the same AFSC updates relationships and properties
+    without creating duplicate nodes.
+    
+    **7. Audit & Telemetry (`audit.py` + `pipeline.py`)**  
+    Each run records:
+    
+    - How many items were extracted, filtered, and finally written  
+    - Whether LAiSER or fallback logic was used  
+    - How many items ended up with ESCO IDs  
+    - Any errors encountered during extraction, filtering, or writing  
+    - Wall-clock runtime in milliseconds  
+    
+    These details are returned to the Streamlit app and can be surfaced in the **Admin Tools** view for
+    debugging and quality review.
+    
+    **How this Home Page fits in:**  
+    - The **Admin Tools** page calls this pipeline to ingest or re-ingest AFSCs into Neo4j.  
+    - The **Try It Yourself** page lets users experiment with LLM providers using their own API keys
+      (for *ad hoc* K/A generation) without writing to the main database.  
+    - The **Explore KSAs** page reads from the Neo4j graph to visualize overlaps and distributions.
     """)
 
 st.markdown("<hr style='border: none; border-top: 3px solid #E5E7EB; margin: 3rem 0;'>", unsafe_allow_html=True)
@@ -692,18 +769,17 @@ with st.expander("📖 Learn More (About • KSA Definitions • Tech Stack • 
         st.markdown("**🤖 AI/ML**")
         st.markdown("""
         - LAiSER (GWU) - Skill extraction
-        - Gemini 1.5 Flash - Primary LLM
-        - Claude Sonnet 4 - Fallback LLM
-        - OpenAI GPT-4 - Optional
+        - Gemini (Google) - Optional LLM provider
+        - Claude (Anthropic) - Optional LLM provider
+        - OpenAI GPT-4o family - Optional LLM provider
         """)
     
     with col_t2:
         st.markdown("**💾 Data**")
         st.markdown("""
         - Neo4j Aura - Graph database
-        - ESCO Taxonomy - EU skills framework
-        - LAiSER Taxonomy - Extended codes
-        - Python 3.11 - Core language
+        - ESCO / OSN - Skill taxonomies
+        - Python 3.x - Core language
         """)
     
     with col_t3:
