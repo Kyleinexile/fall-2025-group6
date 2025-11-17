@@ -481,9 +481,8 @@ with tab2:
                     result = run_pipeline(
                         afsc_code,
                         text,
-                        session=session,
+                        session,
                         write_to_db=True,
-                        source="admin_single",
                     )
                 
                 items = _extract_items_from_result(result)
@@ -586,9 +585,8 @@ with tab3:
                             result = run_pipeline(
                                 code,
                                 text,
-                                session=session,
+                                session,
                                 write_to_db=True,
-                                source="admin_bulk",
                             )
                             
                             items = _extract_items_from_result(result)
