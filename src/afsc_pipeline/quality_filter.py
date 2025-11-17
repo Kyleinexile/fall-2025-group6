@@ -1,4 +1,21 @@
 # src/afsc_pipeline/quality_filter.py
+"""
+Quality filtering and light normalization for extracted KSA items.
+
+This module sits between the raw extraction/enhancement steps and the
+downstream deduplication / graph-writing stages. Its job is to:
+
+- Remove obviously noisy or out-of-domain items.
+- Enforce minimum/maximum length constraints.
+- Apply optional GEOINT-focused biasing rules.
+- Optionally require ESCO alignment for low-confidence skills.
+- Canonicalize certain phrases to a preferred surface form.
+- Perform *exact* deduplication on (item_type, text) pairs.
+
+The goal is to ensure that only reasonably clean, on-topic items move
+forward into semantic deduplication (FAISS) and graph persistence.
+"""
+
 from __future__ import annotations
 
 import os
@@ -7,11 +24,18 @@ from typing import List, Tuple
 
 from afsc_pipeline.extract_laiser import ItemDraft, ItemType
 
-# ----------------------------
+# ---------------------------------------------------------------------------
 # Environment-backed knobs
-# ----------------------------
+# ---------------------------------------------------------------------------
+# These helpers read boolean/float flags from the environment, allowing
+# behavior to be tuned without code changes (e.g., in Streamlit, Codespaces,
+# or a containerized deployment).
+# ---------------------------------------------------------------------------
+
+
 def _get_bool(name: str, default: bool) -> bool:
-    return (os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes"})
+    return os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes"}
+
 
 def _get_float(name: str, default: float) -> float:
     try:
@@ -19,15 +43,29 @@ def _get_float(name: str, default: float) -> float:
     except Exception:
         return default
 
+
+# Length constraints for item text
 MIN_LEN = int(os.getenv("QUALITY_MIN_LEN", "3"))
 MAX_LEN = int(os.getenv("QUALITY_MAX_LEN", "80"))
 
-# If a SKILL's confidence is below this, we may require ESCO (strict mode) or GEOINT hint.
+# If a SKILL's confidence is below this, we may require ESCO (strict mode)
+# and/or a GEOINT hint (geoint_bias mode).
 LOW_CONF_SKILL = _get_float("LOW_CONF_SKILL_THRESHOLD", 0.60)
 
-# ----------------------------
+
+# ---------------------------------------------------------------------------
 # Domain hints / canonicalization
-# ----------------------------
+# ---------------------------------------------------------------------------
+# GEOINT_HINT:
+#     Regex capturing GEOINT / targeting / imagery / geospatial cues.
+#
+# BANNED:
+#     Known-bad phrases that should never appear in the final KSA set.
+#
+# CANON_MAP:
+#     Canonical text replacements for certain common variants.
+# ---------------------------------------------------------------------------
+
 GEOINT_HINT = re.compile(
     r"\b(imagery|geospatial|geoint|gis|remote sensing|target(ing)?|mensurat|terrain|"
     r"annotation|coordinates?|azimuth|order of battle|brief(ing)?|ipoe|aoc)\b",
@@ -50,22 +88,37 @@ CANON_MAP = {
 
 PUNCT_STRIP = " .,:;()[]{}\"'`""''|/\\"
 
+
 def _itype_str(t) -> str:
+    """Normalize an ItemType or string-like value to a lowercase type name."""
     if hasattr(t, "value"):
         return str(t.value).lower()
     return str(t).lower()
 
+
 def _canon_text(txt: str) -> str:
+    """
+    Normalize text for comparison and deduplication.
+
+    - Lowercases and collapses internal whitespace.
+    - Strips common leading/trailing punctuation.
+    - Applies CANON_MAP overrides when a canonical form is defined.
+    """
     t = " ".join((txt or "").strip().lower().split())
     t = t.strip(PUNCT_STRIP)
     return CANON_MAP.get(t, t)
 
+
 def _has_esco(it: ItemDraft) -> bool:
+    """Return True if the item has a non-empty ESCO identifier."""
     return bool((getattr(it, "esco_id", "") or "").strip())
 
-# ----------------------------
+
+# ---------------------------------------------------------------------------
 # Public API
-# ----------------------------
+# ---------------------------------------------------------------------------
+
+
 def apply_quality_filter(
     items: List[ItemDraft],
     *,
@@ -75,14 +128,40 @@ def apply_quality_filter(
     """
     Prune noisy/out-of-domain items, normalize text, and exact-dedupe.
 
-    Rules (summarized):
-      - Drop empty/very short/very long items (QUALITY_MIN_LEN/QUALITY_MAX_LEN).
-      - Drop known-bad phrases (BANNED).
-      - If KEEP_TYPES coerced everything to SKILL upstream, we still apply SKILL rules below.
-      - If geoint_bias: SKILLs with conf < LOW_CONF_SKILL must show a GEOINT_HINT.
-      - If strict_skill_filter: SKILLs with conf < LOW_CONF_SKILL must have ESCO.
-      - Canonicalize text via CANON_MAP (lowercased, trimmed, punctuation-stripped).
-      - Exact dedupe on (item_type, text).
+    Rules (summarized)
+    ------------------
+    - Drop items with:
+        * Empty text
+        * Length < QUALITY_MIN_LEN
+        * Length > QUALITY_MAX_LEN
+        * Text in the BANNED list
+    - Normalize item text via `_canon_text` (lowercase, trimmed, punctuation-stripped,
+      plus any CANON_MAP replacements).
+    - GEOINT bias:
+        * If `geoint_bias` is True, SKILLs with confidence < LOW_CONF_SKILL must
+          match GEOINT_HINT somewhere in the text or they are dropped.
+    - Strict skill filter:
+        * If `strict_skill_filter` is True, SKILLs with confidence < LOW_CONF_SKILL
+          must have an ESCO ID or they are dropped.
+    - Exact deduplication:
+        * Final items are deduped on (item_type, normalized_text).
+
+    Parameters
+    ----------
+    items:
+        List of draft items (typically from LAiSER + LLM enhancement).
+    strict_skill_filter:
+        When True, enforces that low-confidence SKILL items must have ESCO
+        alignment to survive the filter.
+    geoint_bias:
+        When True, enforces that low-confidence SKILL items must show GEOINT
+        domain hints (imagery, targeting, geospatial, etc.).
+
+    Returns
+    -------
+    List[ItemDraft]
+        Filtered and normalized items, safe for downstream deduplication
+        and graph persistence.
     """
     out: List[ItemDraft] = []
     seen: set[Tuple[str, str]] = set()
