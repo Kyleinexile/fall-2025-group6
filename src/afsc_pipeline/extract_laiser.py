@@ -322,9 +322,21 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         print("[LAISER] Extractor failed to initialize, using fallback")
         return _fallback_extract(clean_text)
 
+    # ---- DEBUG: what does this object actually look like? ----
+    try:
+        methods = [m for m in dir(extractor) if not m.startswith("_")]
+        print(f"[LAISER] SkillExtractorRefactored type: {type(extractor)}")
+        print(f"[LAISER] Available public methods: {methods}")
+    except Exception as e:
+        print(f"[LAISER] Error introspecting extractor: {e}")
+
     # Decide which LAiSER interface is available
     has_extract_skills = hasattr(extractor, "extract_skills")
     has_extract_and_align = hasattr(extractor, "extract_and_align")
+    print(
+        f"[LAISER] has_extract_skills={has_extract_skills}, "
+        f"has_extract_and_align={has_extract_and_align}"
+    )
 
     try:
         if has_extract_skills:
@@ -383,15 +395,17 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
 
         if isinstance(laiser_result, pd.DataFrame):
             df = laiser_result
+            print(f"[LAISER] Result is DataFrame with columns: {list(df.columns)}")
         else:
-            # If it's a list/dict, try to coerce into a DataFrame
+            print(f"[LAISER] Result type is {type(laiser_result)}, coercing to DataFrame")
             df = pd.DataFrame(laiser_result)
-    except Exception:
-        print("[LAISER] Could not interpret LAiSER result, using fallback")
+            print(f"[LAISER] Coerced DataFrame columns: {list(df.columns)}")
+    except Exception as e:
+        print(f"[LAISER] Could not interpret LAiSER result: {e}")
         return _fallback_extract(clean_text)
 
     if df.empty:
-        print("[LAISER] Empty LAiSER result, using fallback")
+        print("[LAISER] Empty LAiSER result DataFrame, using fallback")
         return _fallback_extract(clean_text)
 
     for _, row in df.iterrows():
@@ -441,9 +455,7 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
         )
 
     if not items:
-        print(
-            "[LAISER] No usable rows in LAiSER result, using fallback"
-        )
+        print("[LAISER] No usable rows in LAiSER result, using fallback")
         return _fallback_extract(clean_text)
 
     # Sort and cap like before
@@ -457,4 +469,3 @@ def extract_ksa_items(clean_text: str) -> List[ItemDraft]:
     )
 
     return items if items else _fallback_extract(clean_text)
-
