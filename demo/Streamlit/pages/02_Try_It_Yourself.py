@@ -1,4 +1,4 @@
-import sys, pathlib, os, io, re, time, textwrap
+import sys, pathlib, os, io, re, time
 from typing import Optional
 
 # Path setup
@@ -17,7 +17,7 @@ load_dotenv()
 
 from afsc_pipeline.pipeline import run_pipeline_demo
 
-# Paths for local text docs (if needed later)
+# -------- Paths for local docs (if needed later) --------
 DOCS_ROOTS = [
     pathlib.Path("/workspaces/docs_text"),
     SRC / "docs_text",
@@ -32,6 +32,7 @@ def _first_existing(*paths):
 DOCS_ROOT = _first_existing(*DOCS_ROOTS)
 DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
 
+# PDF sources in the repo
 SOURCES = {
     "AFECD (Enlisted)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFECD%202025%20Split.pdf",
     "AFOCD (Officer)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFOCD%202025%20Split.pdf",
@@ -39,7 +40,7 @@ SOURCES = {
 
 st.set_page_config(page_title="Try It Yourself", page_icon="🔬", layout="wide")
 
-# Custom CSS
+# -------- CSS --------
 st.markdown(
     """
 <style>
@@ -56,8 +57,7 @@ st.markdown(
 
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
 
-# ===== SESSION STATE =====
-
+# -------- SESSION STATE (no keys here) --------
 if "selected_source" not in st.session_state:
     st.session_state.selected_source = "AFECD (Enlisted)"
 if "search_results" not in st.session_state:
@@ -71,7 +71,7 @@ if "afsc_code" not in st.session_state:
 if "afsc_text" not in st.session_state:
     st.session_state.afsc_text = ""
 
-# ===== UTILITIES =====
+# -------- UTILITIES --------
 
 @st.cache_data(show_spinner=False)
 def fetch_pdf(url: str) -> bytes:
@@ -91,7 +91,7 @@ def load_pdf_pages(source_key: str):
             text = re.sub(r"[ \t]+\n", "\n", text)
             text = re.sub(r"\u00ad", "", text)
             pages.append({"page": i + 1, "text": text})
-        except:
+        except Exception:
             pages.append({"page": i + 1, "text": ""})
     return pages
 
@@ -103,6 +103,9 @@ def highlight_matches(text: str, pattern: str) -> str:
         return text
 
 def search_pages(pages, query: str, max_hits: int = 50):
+    """
+    Return full-page text for pages that match, no truncation.
+    """
     if not query.strip():
         return []
 
@@ -112,22 +115,19 @@ def search_pages(pages, query: str, max_hits: int = 50):
         text = page["text"]
         if rx.search(text):
             matches = rx.findall(text)
-            snippet = textwrap.shorten(text, width=700, placeholder=" ...")
-            snippet = highlight_matches(snippet, query)
             results.append(
                 {
                     "page": page["page"],
                     "matches": len(matches),
-                    "snippet": snippet,
                 }
             )
             if len(results) >= max_hits:
                 break
     return results
 
-# ===== STEP 1: LLM PROVIDER (NO USER KEY STORAGE) =====
+# ================== STEP 1: LLM PROVIDER + API KEY ==================
 
-st.markdown('<div class="step-header">🔑 Step 1: Configure LLM Provider</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-header">🔑 Step 1: Configure LLM API Key (optional)</div>', unsafe_allow_html=True)
 
 col_p1, col_p2 = st.columns([1, 3])
 
@@ -135,23 +135,30 @@ with col_p1:
     provider_choice = st.selectbox(
         "LLM Provider",
         ["openai", "anthropic", "gemini"],
-        help="Choose which LLM provider the pipeline will use for Knowledge/Ability generation.",
+        help="Provider for the pipeline's Knowledge/Ability generation.",
     )
 
 with col_p2:
-    st.info(
+    st.markdown(
         f"""
-**How this works**
-
-- This public demo uses **server-side API keys** configured in Streamlit secrets.
-- You do **not** need to enter your own key here.
-- If you don't change anything, the pipeline defaults to **OpenAI**.
-- Selecting **Anthropic** or **Gemini** will instruct the pipeline to use those providers, 
-  assuming their keys are configured on the backend.
+- If you **leave the API key blank**, the pipeline uses **server-side keys** configured in Streamlit secrets.
+- If you **enter a key**, it is only used for this run and **not stored**.
+- Default behavior (no changes): **OpenAI with server-side key**.
 """
     )
 
-# ===== STEP 2: SOURCE DOCUMENT & SEARCH (FULL WIDTH) =====
+api_key_input = st.text_input(
+    f"{provider_choice} API key (optional)",
+    type="password",
+    placeholder={
+        "openai": "sk-...",
+        "anthropic": "sk-ant-...",
+        "gemini": "AIza...",
+    }.get(provider_choice, "API key..."),
+    help="Optional override for this run only; not saved anywhere.",
+)
+
+# ================== STEP 2: SOURCE DOCUMENT & SEARCH ==================
 
 st.markdown('<div class="step-header">📄 Step 2: Select Source Document & Search</div>', unsafe_allow_html=True)
 
@@ -196,44 +203,39 @@ if results is not None:
         st.info("No matches found. Try another search term.")
     else:
         for r in results:
+            # Get full text for this page
+            page_full = next((p for p in pages if p["page"] == r["page"]), None)
+            full_text = page_full["text"] if page_full else ""
+            highlighted = highlight_matches(full_text, query)
+
             with st.expander(f"Page {r['page']} • {r['matches']} match(es)"):
-                st.markdown(r["snippet"])
+                # Show the full page text, highlighted, no truncation
+                st.markdown(highlighted)
+
                 if st.button(
                     f"📥 Use Page {r['page']} as AFSC text",
                     key=f"use_page_{r['page']}",
                     use_container_width=True,
                 ):
-                    page_full = next((p for p in pages if p["page"] == r["page"]), None)
-                    if page_full:
-                        st.session_state.selected_page_text = page_full["text"]
-                        st.session_state.afsc_text = page_full["text"]
-                        st.info(f"Loaded full text from page {r['page']} into Step 3.")
-                        st.rerun()
+                    st.session_state.selected_page_text = full_text
+                    st.session_state.afsc_text = full_text
+                    st.info(f"Loaded full text from page {r['page']} into Step 3.")
+                    st.rerun()
 else:
     st.info("Use the search bar above to find relevant AFSC sections, then load them into Step 3.")
 
-# ===== STEP 3: AFSC CODE & TEXT =====
+# ================== STEP 3: AFSC CODE & TEXT ==================
 
 st.markdown('<div class="step-header">🧩 Step 3: Provide AFSC Code and Text</div>', unsafe_allow_html=True)
 
 st.markdown("Enter the AFSC code and paste the relevant text (duties, responsibilities, qualifications, etc.).")
 
-col_code, col_example = st.columns([2, 1])
-with col_code:
-    afsc_code = st.text_input(
-        "AFSC Code",
-        value=st.session_state.afsc_code,
-        placeholder="e.g., 1N4, 14N, 21A",
-    )
-    st.session_state.afsc_code = afsc_code
-
-with col_example:
-    if st.button("Use Example (1N4)", use_container_width=True):
-        example_text = "1N4X1 - Fusion Analyst / Cyber Intelligence ..."
-        st.session_state.afsc_code = "1N4"
-        st.session_state.afsc_text = example_text
-        st.session_state.selected_page_text = example_text
-        st.experimental_rerun()
+afsc_code = st.text_input(
+    "AFSC Code",
+    value=st.session_state.afsc_code,
+    placeholder="e.g., 1N4, 14N, 21A",
+)
+st.session_state.afsc_code = afsc_code
 
 afsc_text = st.text_area(
     "AFSC Text (duties, responsibilities, qualifications)",
@@ -250,7 +252,7 @@ st.markdown(
 """
 )
 
-# ===== SIDEBAR: EXTRACTION SETTINGS =====
+# ================== SIDEBAR: PIPELINE SETTINGS ==================
 
 with st.sidebar:
     st.markdown("### ⚙️ Extraction Settings")
@@ -299,7 +301,7 @@ with st.sidebar:
 """
     )
 
-# ===== STEP 4: RUN EXTRACTION =====
+# ================== STEP 4: RUN EXTRACTION ==================
 
 st.markdown('<div class="step-header">🚀 Step 4: Run KSA Extraction</div>', unsafe_allow_html=True)
 
@@ -310,7 +312,7 @@ if not afsc_code.strip():
 elif not afsc_text.strip():
     st.warning("⚠️ Add AFSC text in Step 3 to enable extraction.")
 
-# Button styling
+# Green primary button styling
 st.markdown(
     """
 <style>
@@ -331,13 +333,29 @@ st.markdown(
 
 if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
     try:
+        # Preserve old env settings
         old_use_laiser = os.getenv("USE_LAISER")
         old_topk = os.getenv("LAISER_ALIGN_TOPK")
         old_llm_provider = os.getenv("LLM_PROVIDER")
+        old_openai_key = os.getenv("OPENAI_API_KEY")
+        old_anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        old_gemini_key = os.getenv("GEMINI_API_KEY")
 
+        # Apply sidebar / Step 1 overrides for this run only
         os.environ["USE_LAISER"] = "true" if use_laiser else "false"
         os.environ["LAISER_ALIGN_TOPK"] = str(laiser_topk)
-        os.environ["LLM_PROVIDER"] = provider_choice  # openai / anthropic / gemini
+        os.environ["LLM_PROVIDER"] = provider_choice  # expected by enhance_llm
+
+        # Optional: override provider-specific key for this run
+        key = api_key_input.strip()
+        if key:
+            if provider_choice == "openai":
+                os.environ["OPENAI_API_KEY"] = key
+            elif provider_choice == "anthropic":
+                os.environ["ANTHROPIC_API_KEY"] = key
+            elif provider_choice == "gemini":
+                # Adjust if your code expects a different env var name
+                os.environ["GEMINI_API_KEY"] = key
 
         with st.status("Running full pipeline...", expanded=True) as status:
             status.write("🧹 Cleaning text and running LAiSER / filters / dedupe / LLM enhancer...")
@@ -364,6 +382,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
 
             status.update(label="✅ Extraction Complete!", state="complete")
 
+        # Build rows for display
         all_items = []
         for it in items:
             raw_type = getattr(it, "item_type", "")
@@ -395,6 +414,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
                 "⚠️ No items extracted. Try enabling LAiSER or adjusting settings in the sidebar."
             )
         else:
+            # Metrics
             k_count = sum(1 for i in all_items if i["Type"] == "knowledge")
             s_count = sum(1 for i in all_items if i["Type"] == "skill")
             a_count = sum(1 for i in all_items if i["Type"] == "ability")
@@ -411,6 +431,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
 
             df = pd.DataFrame(all_items)
 
+            # Filters
             col_f1, col_f2 = st.columns(2)
             with col_f1:
                 type_filter = st.multiselect(
@@ -443,6 +464,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
                 },
             )
 
+            # Export
             st.markdown("### 💾 Export Results")
 
             col_e1, col_e2 = st.columns(2)
@@ -452,6 +474,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
                     "⬇️ Download Filtered Results",
                     csv,
                     f"{afsc_code or 'extracted'}_ksas.csv",
+                    "text/csv",
                     "text/csv",
                     use_container_width=True,
                 )
@@ -472,6 +495,7 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
             st.code(traceback.format_exc())
 
     finally:
+        # Restore env vars
         if old_use_laiser is not None:
             os.environ["USE_LAISER"] = old_use_laiser
         else:
@@ -487,7 +511,22 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
         else:
             os.environ.pop("LLM_PROVIDER", None)
 
-# ===== HELP & FOOTER =====
+        if old_openai_key is not None:
+            os.environ["OPENAI_API_KEY"] = old_openai_key
+        else:
+            os.environ.pop("OPENAI_API_KEY", None)
+
+        if old_anthropic_key is not None:
+            os.environ["ANTHROPIC_API_KEY"] = old_anthropic_key
+        else:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+
+        if old_gemini_key is not None:
+            os.environ["GEMINI_API_KEY"] = old_gemini_key
+        else:
+            os.environ.pop("GEMINI_API_KEY", None)
+
+# ================== HELP & FOOTER ==================
 
 with st.expander("❓ Help & FAQ"):
     st.markdown(
@@ -505,7 +544,7 @@ with st.expander("❓ Help & FAQ"):
 | Feature | Try It Yourself | Admin Tools |
 |--------|-----------------|-------------|
 | Writes to Neo4j | ❌ No | ✅ Yes |
-| API keys | Server-side only | Server-side only |
+| API keys | Optional per-run input | Server-side secrets |
 | Scope | Single AFSC at a time | Bulk AFSC ingestion |
 | Use Case | Testing, demos | Production ingestion |
 
@@ -514,4 +553,4 @@ This page is a **read-only** playground: it never writes to the database and onl
     )
 
 st.divider()
-st.caption("🔬 Try It Yourself | No user API keys stored | No database writes | Download results only")
+st.caption("🔬 Try It Yourself | API keys optional and not stored | No database writes | Download results only")
