@@ -38,7 +38,6 @@ _ws_re = re.compile(r"\s+")
 # Remove punctuation while keeping word characters and spaces
 _punct_re = re.compile(r"[^\w\s]")  # remove punctuation except spaces/word chars
 # (Not currently used, but kept as a helper if we later strip articles like "the")
-_articles_re = re.compile(r"\b(a|an|the)\b", re.IGNORECASE)
 
 
 def _normalize_for_match(text: str) -> str:
@@ -225,12 +224,11 @@ def canonicalize_items(
                 for j in cluster[1:]:
                     maybe = ordered[j]
                     if maybe.esco_id and str(maybe.esco_id).strip():
-                        # Create a shallow copy with esco_id lifted; preserve content_sig
+                        # Create a shallow copy with esco_id lifted
                         winner = ItemDraft(
                             text=winner.text,
                             item_type=winner.item_type,
                             confidence=winner.confidence,
-                            esco_id=maybe.esco_id,
                             source=winner.source,
                             esco_id=maybe.esco_id,
                         )
