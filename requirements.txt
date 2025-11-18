@@ -1,10 +1,16 @@
 streamlit==1.50.0
+neo4j==6.0.2
 pandas==2.3.3
 pypdf>=4.2.0
-python-dotenv
-openai>=1.55.0
-anthropic>=0.33.0
+python-dotenv>=1.0.1
+
+# LLM SDKs
+openai>=1.55.0,<3
+anthropic>=0.33.0,<1
 google-generativeai>=0.8.5
 huggingface-hub>=0.24.0
+
+# LAiSER + NLP
 laiser==0.3.12
+spacy==3.8.11
 https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl
