@@ -40,6 +40,7 @@ LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
 LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
+LLM_MODEL_HF = os.getenv("LLM_MODEL_HF", "HuggingFaceH4/zephyr-7b-beta")  # default HF model
 
 # Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
@@ -77,7 +78,7 @@ def get_api_key(provider: str) -> str:
             or GOOGLE_API_KEY
         )
     elif provider == "huggingface":
-        # For future HF integration; Try It Yourself sets HF_TOKEN via env
+        # Try HF_TOKEN first (as set by Try It Yourself), then fallback env
         return os.getenv("HF_TOKEN", "")
     return ""
 
@@ -95,26 +96,15 @@ def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
     This is a lightweight heuristic that looks for:
     - Capitalized sequences (e.g., "Intelligence Preparation of the Battlespace")
     - Common collocations around analysis/intelligence/operations
-
-    Parameters
-    ----------
-    text:
-        Cleaned AFSC narrative text.
-    max_items:
-        Maximum number of candidate phrases to return.
-
-    Returns
-    -------
-    List[str]
-        A small list of topical phrases suitable for "Knowledge of ..." items.
     """
     if not text:
         return []
-    caps = re.findall(rf"\b({_cap}(?:\s+{_cap}){{0,3}})\b", text)
-    collos = re.findall(
+    import re as _re
+    caps = _re.findall(rf"\b({_cap}(?:\s+{_cap}){{0,3}})\b", text)
+    collos = _re.findall(
         rf"\b({_word}\s+(analysis|intelligence|security|threats|operations|collection|targeting|briefing|reporting))\b",
         text,
-        flags=re.IGNORECASE,
+        flags=_re.IGNORECASE,
     )
     collos = [c[0] for c in collos]
     cand = [c.strip() for c in caps + collos]
@@ -137,26 +127,6 @@ def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
 def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft]:
     """
     Generate Knowledge/Ability items from heuristics when LLMs are unavailable.
-
-    This function is used when:
-    - The selected LLM provider is disabled, or
-    - All provider calls fail and we need a graceful fallback.
-
-    Heuristics:
-    - Derive "Ability to ..." statements from SKILL verbs.
-    - Derive "Knowledge of ..." statements from topical noun phrases.
-
-    Parameters
-    ----------
-    afsc_text:
-        Cleaned AFSC description text.
-    items:
-        Existing draft items (typically SKILL-heavy).
-
-    Returns
-    -------
-    List[ItemDraft]
-        A small set of synthetic Knowledge/Ability items.
     """
     have_k = any(it.item_type == ItemType.KNOWLEDGE for it in items)
     have_a = any(it.item_type == ItemType.ABILITY for it in items)
@@ -227,26 +197,6 @@ def _call_llm_gemini(
 ) -> str:
     """
     Call Google Gemini API with permissive safety and generation settings.
-
-    This is used for:
-    - Core K/A enhancement in `enhance_items_with_llm` (via _provider_call).
-    - The generic `run_llm` function when `provider='gemini'`.
-
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to the model.
-    temperature:
-        Sampling temperature (0.0 = deterministic, higher = more diverse).
-    max_tokens:
-        Maximum number of tokens in the response.
-    model:
-        Optional override for the Gemini model ID.
-
-    Returns
-    -------
-    str
-        The response text from Gemini, or raises a RuntimeError on failure.
     """
     key = get_api_key("gemini")
     if not key:
@@ -277,7 +227,6 @@ def _call_llm_gemini(
         )
         text = (getattr(resp, "text", "") or "").strip()
         if not text:
-            # Some SDK versions return candidates/parts instead of .text
             cands = getattr(resp, "candidates", None)
             if cands and getattr(cands[0], "content", None):
                 parts = getattr(cands[0].content, "parts", None) or []
@@ -292,16 +241,6 @@ def _call_llm_gemini(
 def _call_llm_anthropic(prompt: str) -> str:
     """
     Call Anthropic Claude API using the messages interface.
-
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to Claude.
-
-    Returns
-    -------
-    str
-        The response text from Claude, or raises a RuntimeError on failure.
     """
     key = get_api_key("anthropic")
     if not key:
@@ -315,7 +254,6 @@ def _call_llm_anthropic(prompt: str) -> str:
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}],
         )
-        # message.content is a list of content blocks
         text_parts = []
         for block in getattr(message, "content", []) or []:
             if hasattr(block, "text"):
@@ -332,17 +270,6 @@ def _call_llm_anthropic(prompt: str) -> str:
 def _call_llm_openai(prompt: str) -> str:
     """
     Call OpenAI Chat Completions API.
-
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to the model.
-
-    Returns
-    -------
-    str
-        The response text from the configured OpenAI model, or raises a
-        RuntimeError on failure.
     """
     key = get_api_key("openai")
     if not key:
@@ -372,98 +299,47 @@ def _call_llm_huggingface(
     model: str | None = None,
 ) -> str:
     """
-    Call Hugging Face Inference API.
-    
-    Uses the free Inference API for models hosted on HuggingFace.
-    Default model: meta-llama/Llama-3.2-3B-Instruct (fast, free tier compatible)
-    
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to the model.
-    temperature:
-        Sampling temperature (0.0 = deterministic, higher = more diverse).
-    max_tokens:
-        Maximum number of tokens in the response.
-    model:
-        Optional override for the HuggingFace model ID.
-    
-    Returns
-    -------
-    str
-        The response text from HuggingFace, or raises RuntimeError on failure.
+    Call a Hugging Face text-generation model via huggingface-hub.
+
+    Uses HF_TOKEN from the environment (set by Try It Yourself).
     """
-    hf_token = os.getenv("HF_TOKEN", "")
-    if not hf_token:
-        raise ValueError("HF_TOKEN not set")
-    
+    key = get_api_key("huggingface")
+    if not key:
+        raise ValueError("HF_TOKEN not set for Hugging Face provider")
     try:
-        import requests
-        
-        # Default to a free, fast model that works with Inference API
-        model_id = model or "meta-llama/Llama-3.2-3B-Instruct"
-        api_url = f"https://api-inference.huggingface.co/models/{model_id}"
-        
-        headers = {
-            "Authorization": f"Bearer {hf_token}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "temperature": float(temperature),
-                "max_new_tokens": int(max_tokens),
-                "return_full_text": False
-            }
-        }
-        
-        response = requests.post(api_url, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
-        
-        result = response.json()
-        
-        # HF API returns different formats depending on the model
-        if isinstance(result, list) and len(result) > 0:
-            if "generated_text" in result[0]:
-                return result[0]["generated_text"].strip()
-            elif "text" in result[0]:
-                return result[0]["text"].strip()
-        elif isinstance(result, dict):
-            if "generated_text" in result:
-                return result["generated_text"].strip()
-            elif "text" in result:
-                return result["text"].strip()
-        
-        # Fallback - convert to string
-        text = str(result).strip()
-        if not text:
-            raise RuntimeError("Empty response from HuggingFace API")
-        
-        return text
-        
+        from huggingface_hub import InferenceClient
+
+        mdl = model or LLM_MODEL_HF
+        client = InferenceClient(mdl, token=key)
+
+        # text_generation returns a plain string
+        text = client.text_generation(
+            prompt,
+            max_new_tokens=int(max_tokens),
+            temperature=float(temperature),
+            do_sample=temperature > 0.0,
+        )
+        return (text or "").strip()
+    except ImportError:
+        raise ImportError("huggingface-hub not installed")
     except Exception as e:
-        logger.error(f"HuggingFace API error: {e}")
-        raise RuntimeError(f"HuggingFace call failed: {e}")
+        raise RuntimeError(f"HuggingFace API error: {e}")
+
+# -------------------------
+# Provider switch
+# -------------------------
 
 
 def _provider_call(prompt: str) -> str:
     """
     Call the active LLM provider with automatic fallback behavior.
 
-    Logic
-    -----
-    - If provider == "openai":
-        * Try OpenAI; if it fails, fall back to Gemini (if configured).
-    - If provider == "gemini":
-        * Try Gemini; if it fails, fall back to OpenAI (if configured).
-    - If provider == "anthropic":
-        * Try Claude; if it fails, return "" to trigger heuristics.
-
-    The function returns an empty string on failure rather than raising,
-    so that the caller can gracefully fall back to `_heuristic_enhance`.
+    - openai ↔ gemini mutual fallback
+    - anthropic: no fallback (heuristics on failure)
+    - huggingface: no fallback (heuristics on failure)
     """
     provider = get_llm_provider()
+    logger.info(f"_provider_call using provider={provider}")
 
     if provider == "openai":
         try:
@@ -493,7 +369,7 @@ def _provider_call(prompt: str) -> str:
         except Exception as e:
             logger.warning(f"Anthropic failed: {e}, using heuristics")
             return ""
-    
+
     elif provider == "huggingface":
         try:
             return _call_llm_huggingface(prompt)
@@ -503,22 +379,20 @@ def _provider_call(prompt: str) -> str:
 
     return ""
 
-# ---- Runtime override helpers (useful for Streamlit BYO-key page) -----------
+# ---- Runtime override helpers (legacy/programmatic) -----------
 
 
 def set_runtime_credentials(provider: str | None = None, api_key: str | None = None):
     """
     Override the provider and corresponding API key at runtime.
 
-    This is primarily for legacy / programmatic use. In the Streamlit app,
-    the Try It Yourself page now prefers to set environment variables
-    directly for per-run overrides.
+    In the Streamlit app, the Try It Yourself page now prefers to set
+    environment variables directly for per-run overrides.
     """
     global LLM_PROVIDER, OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY
 
     if provider:
         provider_norm = provider.strip().lower()
-        # Update env and module-level default
         os.environ["LLM_PROVIDER"] = provider_norm
         LLM_PROVIDER = provider_norm
         logger.info(f"Runtime provider set to: {provider_norm}")
@@ -541,6 +415,10 @@ def set_runtime_credentials(provider: str | None = None, api_key: str | None = N
             os.environ["HF_TOKEN"] = api_key
             logger.debug("Runtime HuggingFace token configured")
 
+# -------------------------
+# Generic run_llm API
+# -------------------------
+
 
 def run_llm(
     *,
@@ -553,31 +431,6 @@ def run_llm(
 ) -> str:
     """
     Public, minimal LLM caller for ad-hoc prompts (e.g., 'Try it yourself' page).
-
-    This is separate from `enhance_items_with_llm`, which is specialized for
-    K/A generation. `run_llm` is general-purpose and returns raw text.
-
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to the provider.
-    provider:
-        Optional provider override ("openai", "anthropic", "gemini").
-        If omitted, falls back to current LLM provider.
-    api_key:
-        Optional API key override. If omitted, uses env/module-level key.
-    temperature:
-        Sampling temperature.
-    max_tokens:
-        Maximum number of tokens to generate.
-    model:
-        Optional model name override for the provider.
-
-    Returns
-    -------
-    str
-        Raw response text from the selected provider, or an empty string if
-        the prompt is empty.
     """
     prompt = (prompt or "").strip()
     if not prompt:
@@ -646,27 +499,17 @@ def run_llm(
             )
         except ImportError:
             raise ImportError("google-generativeai not installed")
-    
+
     elif prov == "huggingface":
-        hf_token = api_key or get_api_key("huggingface")
-        if not hf_token:
-            raise ValueError("HF_TOKEN not set - HuggingFace requires a free API token")
-        # Temporarily set token for _call_llm_huggingface
-        old_token = os.getenv("HF_TOKEN")
-        os.environ["HF_TOKEN"] = hf_token
-        try:
-            return _call_llm_huggingface(
-                prompt,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                model=model,
-            )
-        finally:
-            # Restore old token
-            if old_token is not None:
-                os.environ["HF_TOKEN"] = old_token
-            else:
-                os.environ.pop("HF_TOKEN", None)
+        key = api_key or get_api_key("huggingface")
+        if not key:
+            raise ValueError("HF_TOKEN not set for HuggingFace provider")
+        return _call_llm_huggingface(
+            prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            model=model,
+        )
 
     else:
         raise ValueError(f"Unsupported provider: {prov}")
@@ -674,7 +517,6 @@ def run_llm(
 # -------------------------
 # Prompt + parse
 # -------------------------
-# NOTE: includes {missing_hint} which can be an empty string.
 _PROMPT = """
 You are assisting with extracting new Knowledge and Ability statements from an Air Force specialty description.
 
@@ -706,7 +548,6 @@ def _format_existing(items: List[ItemDraft]) -> str:
         return "- (none)"
     lines = []
     for it in items:
-        # normalize to exactly two tags
         t = str(getattr(it, "item_type", "") or "").strip().lower()
         if hasattr(it, "item_type") and hasattr(it.item_type, "value"):
             t = str(it.item_type.value).strip().lower()
@@ -718,22 +559,12 @@ def _format_existing(items: List[ItemDraft]) -> str:
 
 # ---- Output sanitization & duplicate guard ---------------------------------
 
-# Accept only these stems
 _BULLET_RE = re.compile(r"^\s*-\s*(Knowledge of|Ability to)\s.+$", re.IGNORECASE)
 
 
 def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
     """
     Filter model output to a constrained, predictable K/A bullet format.
-
-    Rules:
-    - Keep only lines that:
-        * Start with a dash ("-") and
-        * Begin with "Knowledge of" or "Ability to".
-    - Strip trailing punctuation ; : , . ! ?
-    - Enforce a maximum character length (excluding the leading "- ").
-    - Canonicalize capitalization of the stems.
-    - Deduplicate bullets case-insensitively.
     """
     if not raw:
         return []
@@ -744,16 +575,12 @@ def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
             continue
         if not _BULLET_RE.match(line):
             continue
-        # Trim trailing punctuation
         line = re.sub(r"\s*[\.;:,!?]\s*$", "", line)
-        # Canonicalize stems
         line = re.sub(r"^\s*-\s*knowledge of", "- Knowledge of", line, flags=re.IGNORECASE)
         line = re.sub(r"^\s*-\s*ability to", "- Ability to", line, flags=re.IGNORECASE)
-        # Enforce logical length (without "- ")
         logical_len = len(line.lstrip()[2:].lstrip()) if line.lstrip().startswith("- ") else len(line)
         if logical_len <= max_len:
             out.append(line)
-    # Deduplicate (case-insensitive)
     seen = set()
     deduped = []
     for l in out:
@@ -765,18 +592,10 @@ def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
 
 
 def _normalize_item_text(s: str) -> str:
-    """
-    Normalize text for approximate duplicate detection.
-
-    - Lowercase
-    - Strip tags like "[Knowledge]" / "[Ability]"
-    - Strip leading "Knowledge of" / "Ability to"
-    - Remove non-alphanumeric characters
-    - Collapse whitespace
-    """
+    """Normalize text for approximate duplicate detection."""
     s = s.lower().strip()
-    s = re.sub(r"^\-\s*\[(knowledge|ability)\]\s*", "", s)   # strip tags from EXISTING
-    s = re.sub(r"^\-\s*(knowledge of|ability to)\s*", "", s) # strip stems from new lines
+    s = re.sub(r"^\-\s*\[(knowledge|ability)\]\s*", "", s)
+    s = re.sub(r"^\-\s*(knowledge of|ability to)\s*", "", s)
     s = re.sub(r"[^a-z0-9\s]", "", s)
     s = re.sub(r"\s+", " ", s)
     return s
@@ -785,10 +604,6 @@ def _normalize_item_text(s: str) -> str:
 def _filter_against_existing(generated: List[str], existing_block: str) -> List[str]:
     """
     Remove near-duplicates vs existing items using simple normalization.
-
-    A generated line is dropped if its normalized form:
-    - exactly matches an existing normalized line, or
-    - is a substring/superstring of an existing normalized line.
     """
     existing_norm = []
     for line in existing_block.splitlines():
@@ -807,14 +622,6 @@ def _filter_against_existing(generated: List[str], existing_block: str) -> List[
 def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
     """
     Parse LLM output into (ItemType, text) tuples.
-
-    Accepts only Knowledge/Ability (never Skill). Lines are interpreted as:
-    - Optional tag form:
-        [Knowledge] text...
-        [Ability] text...
-    - Or direct surface form:
-        Knowledge of ...
-        Ability to ...
     """
     out: List[Tuple[ItemType, str]] = []
     if not raw:
@@ -826,7 +633,6 @@ def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
         if line.startswith("-"):
             line = line[1:].strip()
 
-        # Tag form: [Knowledge] / [Ability]
         m = re.match(r"\[(knowledge|ability)\]\s+(.*)$", line, re.IGNORECASE)
         if m:
             tag = m.group(1).lower()
@@ -838,7 +644,6 @@ def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
                 out.append((ItemType.ABILITY, txt))
             continue
 
-        # Surface form
         txt = re.sub(r"\s*[\.;:,!?]\s*$", "", line)
         low = txt.lower()
         if low.startswith("knowledge of "):
@@ -863,32 +668,6 @@ def enhance_items_with_llm(
 ) -> List[ItemDraft]:
     """
     Enrich items with Knowledge/Ability statements via LLM or heuristics.
-
-    Typical flow:
-    1. Inspect existing items to determine K/A balance.
-    2. Build a targeted prompt with a `missing_hint` explaining which types
-       are currently underrepresented.
-    3. Call the configured provider via `_provider_call`.
-    4. Sanitize and filter the raw LLM output.
-    5. Parse into ItemDrafts with type = KNOWLEDGE or ABILITY.
-    6. Fall back to `_heuristic_enhance` on any error or empty response.
-
-    Parameters
-    ----------
-    afsc_code:
-        AFSC code being processed (for logging/traceability).
-    afsc_text:
-        Cleaned AFSC description text.
-    items:
-        Existing items (primarily SKILLs; may already include some K/A).
-    max_new:
-        Maximum number of new items to return.
-
-    Returns
-    -------
-    List[ItemDraft]
-        Newly generated Knowledge/Ability items only. The caller is
-        responsible for merging and final deduplication.
     """
     provider = get_llm_provider()
 
@@ -916,7 +695,7 @@ def enhance_items_with_llm(
 
     existing_formatted = _format_existing(items)
     prompt = _PROMPT.format(
-        afsc_text=afsc_text.strip()[:2000],  # token safety
+        afsc_text=afsc_text.strip()[:2000],
         existing=existing_formatted,
         missing_hint=missing_hint,
     )
@@ -929,11 +708,9 @@ def enhance_items_with_llm(
             logger.warning(f"No LLM response for {afsc_code}, using heuristics")
             return _heuristic_enhance(afsc_text, items)
 
-        # Sanitize and filter against existing
         clean_lines = _sanitize_lines(raw)
         clean_lines = _filter_against_existing(clean_lines, existing_formatted)
 
-        # Convert to ItemDrafts
         parsed = _parse_llm_lines("\n".join(clean_lines))
         new_items: List[ItemDraft] = []
         for item_type, text in parsed[:max_new]:
@@ -961,7 +738,6 @@ def enhance_items_with_llm(
 # Test function
 # -------------------------
 if __name__ == "__main__":
-    # Configure logging for test runs
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
