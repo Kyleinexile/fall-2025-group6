@@ -232,7 +232,7 @@ def canonicalize_items(
                             confidence=winner.confidence,
                             esco_id=maybe.esco_id,
                             source=winner.source,
-                            content_sig=winner.content_sig,
+                            esco_id=maybe.esco_id,
                         )
                         break
             canonical.append(winner)
