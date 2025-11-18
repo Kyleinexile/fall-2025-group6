@@ -388,16 +388,20 @@ with tab1:
                             st.markdown(highlight_matches(h["snippet"], info.get("pattern", "")))
                             
                             with st.expander("Full page"):
-                                display_text = h["full"][:10000] + "\n..." if len(h["full"]) > 10000 else h["full"]
-                                st.text(display_text)
-                                
-                                col_a, col_b = st.columns(2)
-                                with col_a:
-                                    st.download_button("⬇️ Download", h["full"], f"page_{h['page']}.txt", key=f"dl_{i}", use_container_width=True)
-                                with col_b:
-                                    if st.button("→ Load to Ingest", key=f"send_{i}", use_container_width=True):
-                                        st.session_state.admin_loaded_text = h["full"]
-                                        st.session_state.admin_loaded_code = ""
+                                # Safety check for old search results without 'full' key
+                                if "full" not in h:
+                                    st.warning("⚠️ Old search result format - please search again")
+                                else:
+                                    display_text = h["full"][:10000] + "\n..." if len(h["full"]) > 10000 else h["full"]
+                                    st.text(display_text)
+                                    
+                                    col_a, col_b = st.columns(2)
+                                    with col_a:
+                                        st.download_button("⬇️ Download", h["full"], f"page_{h['page']}.txt", key=f"dl_{i}", use_container_width=True)
+                                    with col_b:
+                                        if st.button("→ Load to Ingest", key=f"send_{i}", use_container_width=True):
+                                            st.session_state.admin_loaded_text = h["full"]
+                                            st.session_state.admin_loaded_code = ""
                                         st.success("✅ Loaded! Go to Ingest & Process tab →")
                             
                             st.markdown("---")
