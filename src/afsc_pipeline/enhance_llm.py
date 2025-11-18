@@ -38,7 +38,7 @@ LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-sonnet-4-5-20250929")
 LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini-2024-07-18")
 # HuggingFace default (matches secrets.toml)
-LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "HuggingFaceH4/zephyr-7b-beta")
+LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "meta-llama/Llama-3.2-3B-Instruct")
 
 # Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
