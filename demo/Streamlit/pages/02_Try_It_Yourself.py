@@ -207,6 +207,7 @@ st.markdown("#### 🔍 Search within the document")
 query = st.text_input(
     "Search term (e.g., '14N', '1N4X1', 'Intelligence')",
     value=st.session_state.search_info.get("query", ""),
+    key="search_query_input"
 )
 
 col_search_btn, col_clear_btn = st.columns([3, 1])
@@ -216,6 +217,7 @@ with col_clear_btn:
     if st.button("Clear Results", use_container_width=True):
         st.session_state.search_results = None
         st.session_state.search_info = {}
+        st.session_state.search_query_input = ""  # Clear the text input too
         st.rerun()
 
 if search_btn:
@@ -225,11 +227,21 @@ if search_btn:
         with st.spinner("Searching pages..."):
             results = search_pages(pages, query)
             st.session_state.search_results = results
-            st.session_state.search_info = {"query": query}
+            st.session_state.search_info = {
+                "query": query,
+                "timestamp": time.time()
+            }
 
 results = st.session_state.search_results
 
 if results is not None:
+    # Show when these results were generated
+    search_info = st.session_state.search_info
+    if "timestamp" in search_info:
+        time_ago = int(time.time() - search_info["timestamp"])
+        time_str = f"{time_ago}s ago" if time_ago < 60 else f"{time_ago//60}m ago"
+        st.caption(f"📍 Results for **'{search_info.get('query', '')}'** (searched {time_str})")
+    
     st.markdown("#### 📑 Matching Pages")
     if not results:
         st.info("No matches found. Try another search term.")
@@ -247,8 +259,7 @@ if results is not None:
                             value=page_full["text"],
                             height=400,
                             key=f"fulltext_{r['page']}",
-                            label_visibility="collapsed",
-                            disabled=True
+                            label_visibility="collapsed"
                         )
                 
                 # Load button
@@ -439,6 +450,8 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
             st.session_state.afsc_code = ""
             st.session_state.afsc_text = ""
             st.session_state.selected_page_text = ""
+            st.session_state.search_results = None
+            st.session_state.search_info = {}
             st.rerun()
         
     except Exception as e:
