@@ -183,6 +183,39 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
     return new_items
 
 # -------------------------
+# Hugging Face chat-template wrapper
+# -------------------------
+
+def _hf_wrap_prompt_for_model(model_id: str, user_prompt: str) -> str:
+    m = (model_id or "").lower().strip()
+    p = user_prompt.strip()
+
+    # Mistral Instruct family
+    if "mistral" in m:
+        return f"[INST] {p} [/INST]"
+
+    # Zephyr chat format
+    if "zephyr" in m:
+        return (
+            "<|system|>\nYou are a concise assistant.\n"
+            "<|user|>\n" + p + "\n"
+            "<|assistant|>\n"
+        )
+
+    # Llama instruct-style (covers many Llama 3/3.1/3.2 instruct variants)
+    if "llama" in m:
+        return (
+            "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n"
+            "You are a concise assistant.\n"
+            "<|eot_id|><|start_header_id|>user<|end_header_id|>\n"
+            + p +
+            "\n<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n"
+        )
+
+    # Gemma often works with the raw prompt; add a wrapper later if needed
+    return p
+
+# -------------------------
 # LLM Implementations
 # -------------------------
 
@@ -240,16 +273,6 @@ def _call_llm_gemini(
 def _call_llm_anthropic(prompt: str) -> str:
     """
     Call Anthropic Claude API using the messages interface.
-
-    Parameters
-    ----------
-    prompt:
-        Prompt text to send to Claude.
-
-    Returns
-    -------
-    str
-        The response text from Claude, or raises a RuntimeError on failure.
     """
     key = get_api_key("anthropic")
     if not key:
@@ -331,11 +354,12 @@ def _call_llm_huggingface(
         from huggingface_hub import InferenceClient
 
         mdl = model or LLM_MODEL_HF
-        client = InferenceClient(mdl, token=key)
+        wrapped = _hf_wrap_prompt_for_model(mdl, prompt)
 
-        # text_generation returns a plain string
+        # bump timeout; enable sampling only if temperature > 0
+        client = InferenceClient(mdl, token=key, timeout=60)
         text = client.text_generation(
-            prompt,
+            wrapped,
             max_new_tokens=int(max_tokens),
             temperature=float(temperature),
             do_sample=temperature > 0.0,
@@ -492,7 +516,10 @@ def run_llm(
                 model=mdl,
                 max_tokens=max_tokens or 1024,
                 temperature=temperature,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[{
+                    "role": "user",
+                    "content": [{"type": "text", "text": prompt}],
+                }],
             )
             parts = []
             for block in getattr(msg, "content", []) or []:
@@ -524,12 +551,12 @@ def run_llm(
     elif prov == "huggingface":
         key = api_key or get_api_key("huggingface")
         if not key:
-            raise ValueError("HF_TOKEN not set for HuggingFace provider")
+            raise ValueError("HF_TOKEN not set for Hugging Face provider")
         return _call_llm_huggingface(
             prompt,
             temperature=temperature,
             max_tokens=max_tokens,
-            model=model,
+            model=model or LLM_MODEL_HF,
         )
 
     else:
