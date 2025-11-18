@@ -1,24 +1,10 @@
-# -------- Core app --------
 streamlit==1.50.0
 pandas==2.3.3
-neo4j==6.0.2
-python-dotenv
 pypdf>=4.2.0
-
-# -------- LLM clients --------
-openai>=1.51.0
-anthropic>=0.36.0
+python-dotenv
+openai>=1.55.0
+anthropic>=0.33.0
 google-generativeai>=0.8.5
-google-ai-generativelanguage>=0.6.15
-
-# -------- LAiSER with Gemini support --------
-# If your pip supports extras, prefer the first line. If not, keep the second.
-laiser[gemini]>=0.3.12
-# laiser>=0.3.12
-
-# -------- HF (optional, for enhancer) --------
 huggingface-hub>=0.24.0
-transformers>=4.43.0
-
-# -------- spaCy model --------
+laiser==0.3.12
 https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl
