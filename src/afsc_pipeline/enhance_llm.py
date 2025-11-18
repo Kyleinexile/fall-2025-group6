@@ -46,7 +46,7 @@ LLM_MODEL_HF = os.getenv("LLM_MODEL_HF", "HuggingFaceH4/zephyr-7b-beta")  # defa
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-
+LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "meta-llama/Llama-3.2-3B-Instruct")
 
 def get_llm_provider() -> str:
     """
