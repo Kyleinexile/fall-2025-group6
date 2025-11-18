@@ -195,9 +195,9 @@ def _strip_prefixes(text: str, t: ItemType) -> str:
     Remove leading "Knowledge of" / "Ability to" where appropriate, so the
     matcher can focus on the core concept or verb phrase.
     """
-    if t == ItemType.knowledge:
+    if t == ItemType.KNOWLEDGE:
         return _prefix_knowledge.sub("", text).strip()
-    if t == ItemType.ability:
+    if t == ItemType.ABILITY:
         # Keep verb phrase; often free-form, but stripping the prefix helps.
         return _prefix_ability.sub("", text).strip()
     return text.strip()
@@ -207,9 +207,9 @@ def _threshold_for_type(t: ItemType) -> float:
     """
     Return the ESCO similarity threshold for the given item type.
     """
-    if t == ItemType.knowledge:
+    if t == ItemType.KNOWLEDGE:
         return SIMILARITY_THRESHOLD_KNOW
-    if t == ItemType.ability:
+    if t == ItemType.ABILITY:
         return SIMILARITY_THRESHOLD_ABILITY
     return SIMILARITY_THRESHOLD_SKILL
 
@@ -266,8 +266,7 @@ def map_esco_ids(items: List[ItemDraft]) -> List[ItemDraft]:
     - Otherwise, we:
         * compute the best ESCO match for the item text,
         * check if the score exceeds the type-specific threshold, and
-        * if so, return a shallow copy of the item with `esco_id` set
-          (preserving other fields like `content_sig`).
+        * if so, return a shallow copy of the item with `esco_id` set.
 
     Strategy notes
     --------------
@@ -304,14 +303,13 @@ def map_esco_ids(items: List[ItemDraft]) -> List[ItemDraft]:
 
         esco_id, score, match_label = _best_match(it.text, it.item_type)
         if esco_id:
-            # Create a shallow copy with esco_id set; preserve content_sig
+            # Create shallow copy with esco_id set
             updated.append(ItemDraft(
                 text=it.text,
                 item_type=it.item_type,
                 confidence=it.confidence,
-                esco_id=esco_id,
                 source=it.source,
-                content_sig=it.content_sig,
+                esco_id=esco_id,
             ))
         else:
             updated.append(it)
