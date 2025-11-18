@@ -36,9 +36,9 @@ LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-sonnet-4-5-20250929")
-LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-5.1-instant")
-# Choose an HF default that many providers host and that supports chat or text-gen
-LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "mistralai/Mistral-7B-Instruct-v0.3")
+LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini-2024-07-18")
+# HuggingFace default (matches secrets.toml)
+LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "HuggingFaceH4/zephyr-7b-beta")
 
 # Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
