@@ -312,6 +312,11 @@ elif not afsc_text.strip():
     st.warning("⚠️ Add AFSC text")
 
 if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
+    # 🧹 Auto-clear: Remove old results to prevent memory buildup
+    for key in list(st.session_state.keys()):
+        if key.startswith("extraction_") or key == "last_results_df":
+            del st.session_state[key]
+    
     try:
         # Backup system keys
         old_openai = os.getenv("OPENAI_API_KEY")
@@ -427,6 +432,14 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
         )
         
         st.info("💡 Results are NOT saved to database (demo mode)")
+        
+        # Quick reset button
+        st.divider()
+        if st.button("🔄 Start New Extraction", type="primary", use_container_width=True):
+            st.session_state.afsc_code = ""
+            st.session_state.afsc_text = ""
+            st.session_state.selected_page_text = ""
+            st.rerun()
         
     except Exception as e:
         st.error(f"❌ Extraction failed: {e}")
