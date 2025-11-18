@@ -429,14 +429,31 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
         old_topk = os.getenv("LAISER_ALIGN_TOPK")
         old_llm_provider = os.getenv("LLM_PROVIDER")
         
+        # Backup ALL provider keys (to restore later)
+        old_openai_key = os.getenv("OPENAI_API_KEY")
+        old_anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        old_gemini_key = os.getenv("GEMINI_API_KEY")
+        old_google_key = os.getenv("GOOGLE_API_KEY")
+        old_hf_token = os.getenv("HF_TOKEN")
+        
+        # CRITICAL: Clear ALL provider keys first to prevent fallback to secrets
+        for key in ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "HF_TOKEN"]:
+            os.environ.pop(key, None)
+        
+        # Now set ONLY the selected provider's key
         key_env_name = get_key_env_name(provider)
-        old_api_key = os.getenv(key_env_name)
         
         # Apply settings for this run
         os.environ["USE_LAISER"] = "true" if use_laiser else "false"
         os.environ["LAISER_ALIGN_TOPK"] = str(laiser_topk)
         os.environ["LLM_PROVIDER"] = provider
         os.environ[key_env_name] = api_key.strip()
+        
+        # Force reload of enhance_llm module to pick up new env vars
+        import sys
+        if 'afsc_pipeline.enhance_llm' in sys.modules:
+            import importlib
+            importlib.reload(sys.modules['afsc_pipeline.enhance_llm'])
         
         with st.status("Running full pipeline...", expanded=True) as status:
             status.write("🧹 Preprocessing text...")
@@ -610,10 +627,31 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
         else:
             os.environ.pop("LLM_PROVIDER", None)
         
-        if old_api_key is not None:
-            os.environ[key_env_name] = old_api_key
+        # Restore ALL provider keys
+        if old_openai_key is not None:
+            os.environ["OPENAI_API_KEY"] = old_openai_key
         else:
-            os.environ.pop(key_env_name, None)
+            os.environ.pop("OPENAI_API_KEY", None)
+            
+        if old_anthropic_key is not None:
+            os.environ["ANTHROPIC_API_KEY"] = old_anthropic_key
+        else:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+            
+        if old_gemini_key is not None:
+            os.environ["GEMINI_API_KEY"] = old_gemini_key
+        else:
+            os.environ.pop("GEMINI_API_KEY", None)
+            
+        if old_google_key is not None:
+            os.environ["GOOGLE_API_KEY"] = old_google_key
+        else:
+            os.environ.pop("GOOGLE_API_KEY", None)
+            
+        if old_hf_token is not None:
+            os.environ["HF_TOKEN"] = old_hf_token
+        else:
+            os.environ.pop("HF_TOKEN", None)
 
 # ============ Help Section ============
 with st.expander("❓ Help & FAQ"):
