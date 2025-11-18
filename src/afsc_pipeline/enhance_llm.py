@@ -34,19 +34,22 @@ logger = logging.getLogger(__name__)
 # Provider selection and default model names are driven by environment
 # variables, but sensible defaults are provided for local development.
 
+# Provider selection and default model names are driven by environment
+# variables, but sensible defaults are provided for local development.
+
 # Module-level default provider captured at import time (used as fallback).
 LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
-LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
-LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
+LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-sonnet-4-5-20250929")  # ✅ Updated
+LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-5.1-instant")  # ✅ Updated
 LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "meta-llama/Llama-3.2-3B-Instruct")
 
 # Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "meta-llama/Llama-3.2-3B-Instruct")
+# ✅ Removed duplicate LLM_MODEL_HF definition
 
 def get_llm_provider() -> str:
     """
