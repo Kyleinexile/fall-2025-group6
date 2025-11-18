@@ -241,6 +241,16 @@ def _call_llm_gemini(
 def _call_llm_anthropic(prompt: str) -> str:
     """
     Call Anthropic Claude API using the messages interface.
+
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to Claude.
+
+    Returns
+    -------
+    str
+        The response text from Claude, or raises a RuntimeError on failure.
     """
     key = get_api_key("anthropic")
     if not key:
@@ -252,15 +262,27 @@ def _call_llm_anthropic(prompt: str) -> str:
         message = client.messages.create(
             model=LLM_MODEL_ANTHROPIC,
             max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
         )
+
+        # message.content is a list of content blocks (v1 API style)
         text_parts = []
         for block in getattr(message, "content", []) or []:
+            # Newer client returns objects with .type / .text
             if hasattr(block, "text"):
                 text_parts.append(block.text)
             elif isinstance(block, dict) and "text" in block:
                 text_parts.append(block["text"])
         return "\n".join(text_parts).strip()
+
     except ImportError:
         raise ImportError("anthropic not installed")
     except Exception as e:
