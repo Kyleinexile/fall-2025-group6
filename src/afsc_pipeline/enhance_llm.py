@@ -72,12 +72,11 @@ def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
     """Extract simple noun-like phrases from AFSC text for Knowledge generation."""
     if not text:
         return []
-    import re as _re
-    caps = _re.findall(rf"\b({_cap}(?:\s+{_cap}){{0,3}})\b", text)
-    collos = _re.findall(
+    caps = re.findall(rf"\b({_cap}(?:\s+{_cap}){{0,3}})\b", text)            
+    collos = re.findall(                                                      
         rf"\b({_word}\s+(analysis|intelligence|security|threats|operations|collection|targeting|briefing|reporting))\b",
         text,
-        flags=_re.IGNORECASE,
+        flags=re.IGNORECASE,                                                  
     )
     collos = [c[0] for c in collos]
     cand = [c.strip() for c in caps + collos]
