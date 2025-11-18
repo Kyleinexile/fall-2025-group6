@@ -116,6 +116,7 @@ with st.expander("ℹ️ How This Works", expanded=False):
     
     **1. LAiSER (Skill Extraction)**
     - ✅ Uses the **system OpenAI API key** (from app secrets)
+    - ⚠️ **Note:** LAiSER's Gemini integration is currently broken - OpenAI only
     - ✅ You don't need to provide a key for this
     - ✅ Extracts skills with ESCO taxonomy codes
     - ✅ Always enabled and working
@@ -124,6 +125,7 @@ with st.expander("ℹ️ How This Works", expanded=False):
     - 🔑 Uses **YOUR API key** (whichever provider you choose)
     - 🔑 You provide the key below
     - 🔑 Generates complementary Knowledge and Ability items
+    - 🔑 Supports: OpenAI, Anthropic, Gemini, HuggingFace
     
     **Privacy:**
     - Your API key is session-only (cleared when you close browser)
@@ -132,7 +134,7 @@ with st.expander("ℹ️ How This Works", expanded=False):
     
     **Comparison to Admin Tools:**
     - Admin Tools: Uses system keys for both LAiSER and enhancement, saves to Neo4j
-    - Try It Yourself: Uses system key for LAiSER, YOUR key for enhancement, no database writes
+    - Try It Yourself: Uses system OpenAI for LAiSER, YOUR key for enhancement, no database writes
     """)
 
 st.divider()
@@ -182,7 +184,7 @@ with col_clear:
 
 st.markdown("""
 > 💡 **What runs with what:**
-> - **LAiSER** → System OpenAI key → Extracts skills with taxonomy
+> - **LAiSER** → System OpenAI key → Extracts skills with taxonomy (Gemini support broken)
 > - **LLM Enhancement** → Your key (above) → Generates Knowledge & Abilities
 """)
 
@@ -214,12 +216,27 @@ if st.button("🔍 Search", type="primary", use_container_width=True):
                 st.success(f"✅ Found {len(results)} result(s)")
                 
                 for idx, r in enumerate(results):
+                    full = r["full_text"]
+                    
                     with st.expander(f"📄 Page {r['page']} • {r['matches']} match(es)"):
+                        # Show snippet
                         st.markdown(r["snippet"])
                         
+                        # Show full text in nested expander
+                        with st.expander("📖 Show full page text"):
+                            st.text_area(
+                                "Full Page Content",
+                                value=full,
+                                height=400,
+                                key=f"fulltext_{idx}",
+                                label_visibility="collapsed"
+                            )
+                        
+                        # Load button
                         if st.button(f"✅ Load Page {r['page']}", key=f"load_{idx}"):
-                            st.session_state.afsc_text = r["full_text"]
+                            st.session_state.afsc_text = full
                             st.success(f"✅ Loaded page {r['page']}")
+                            time.sleep(0.3)
                             st.rerun()
             else:
                 st.info("ℹ️ No matches found")
