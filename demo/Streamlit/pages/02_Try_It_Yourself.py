@@ -1,4 +1,6 @@
-import sys, pathlib, os, io, re, time, textwrap, importlib
+import sys, pathlib, os, io, re, time, textwrap
+from typing import Optional
+
 # Path setup
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
@@ -11,9 +13,11 @@ import streamlit as st
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
-load_dotenv()  # load TOML/.env for defaults
+load_dotenv()
 
-# ---- PDF Sources (unchanged) ----
+from afsc_pipeline.pipeline import run_pipeline_demo
+
+# PDF Sources
 SOURCES = {
     "AFECD (Enlisted)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFECD%202025%20Split.pdf",
     "AFOCD (Officer)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFOCD%202025%20Split.pdf",
@@ -21,48 +25,46 @@ SOURCES = {
 
 st.set_page_config(page_title="Try It Yourself", page_icon="🔬", layout="wide")
 
-# ============ POLISHED CSS - AIR FORCE BLUE THEME ============
+# ============ CSS - AIR FORCE BLUE THEME ============
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-
-    .stButton > button { font-size: 16px !important; padding: 12px 24px !important; font-weight: 600 !important; }
-    .stButton > button[kind="primary"] { background-color: #004785 !important; border: none !important; color: white !important; }
-    .stButton > button[kind="primary"]:hover { background-color: #003366 !important; }
-
-    /* Green primary button for Extract action */
-    div[data-testid="stButton"] button[kind="primary"] {
-        background-color: #28a745 !important; color: white !important; border: none !important;
-        font-size: 18px !important; font-weight: 700 !important;
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
     }
-    div[data-testid="stButton"] button[kind="primary"]:hover { background-color: #218838 !important; }
-
+    
     .step-header {
         background: linear-gradient(90deg, #004785 0%, #0066cc 100%);
-        color: white; padding: 16px 24px; border-radius: 8px; font-size: 20px; font-weight: 700;
-        margin: 24px 0 16px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 24px 0 16px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    hr { margin: 32px 0; border: none; height: 3px; background: linear-gradient(90deg, #004785 0%, transparent 100%); }
-    [data-testid="stMetricValue"] { font-size: 28px; font-weight: 700; color: #004785; }
+    
+    .stButton > button[kind="primary"] {
+        background-color: #28a745 !important;
+        color: white !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        background-color: #218838 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Session State ----------
-if "selected_source" not in st.session_state:
-    st.session_state.selected_source = "AFECD (Enlisted)"
-if "search_results" not in st.session_state:
-    st.session_state.search_results = None
-if "search_info" not in st.session_state:
-    st.session_state.search_info = {}
-if "selected_page_text" not in st.session_state:
-    st.session_state.selected_page_text = ""
+# Initialize session state
 if "afsc_code" not in st.session_state:
     st.session_state.afsc_code = ""
 if "afsc_text" not in st.session_state:
     st.session_state.afsc_text = ""
 
-# ---------- Helpers ----------
+# Helper Functions
 @st.cache_data(show_spinner=False, ttl=3600)
 def load_pdf_pages(url: str):
     r = requests.get(url, timeout=60)
@@ -75,16 +77,9 @@ def load_pdf_pages(url: str):
             text = re.sub(r"[ \t]+\n", "\n", text)
             text = re.sub(r"\u00ad", "", text)
             pages.append({"page": i + 1, "text": text})
-        except Exception:
+        except:
             pages.append({"page": i + 1, "text": ""})
     return pages
-
-def highlight_matches(text: str, pattern: str) -> str:
-    try:
-        rx = re.compile(pattern, flags=re.IGNORECASE)
-        return rx.sub(lambda m: f"**`{m.group(0)}`**", text)
-    except Exception:
-        return text
 
 def search_pages(pages, query: str, max_hits: int = 50):
     if not query.strip():
@@ -96,7 +91,6 @@ def search_pages(pages, query: str, max_hits: int = 50):
         if rx.search(text):
             matches = rx.findall(text)
             snippet = textwrap.shorten(text, width=700, placeholder=" ...")
-            snippet = highlight_matches(snippet, query)
             results.append({
                 "page": page["page"],
                 "matches": len(matches),
@@ -107,433 +101,326 @@ def search_pages(pages, query: str, max_hits: int = 50):
                 break
     return results
 
-def get_key_env_name(provider: str) -> str:
-    provider = provider.lower()
-    if provider == "openai":
-        return "OPENAI_API_KEY"
-    if provider == "anthropic":
-        return "ANTHROPIC_API_KEY"
-    if provider == "gemini":
-        return "GEMINI_API_KEY"
-    if provider == "huggingface":
-        return "HF_TOKEN"
-    return f"{provider.upper()}_API_KEY"
-
-def _apply_laiser_env(provider: str, api_key: str):
-    """Mirror the BYO provider/key into LAISER's expected env namespace."""
-    os.environ["USE_LAISER"] = "true"
-    os.environ.pop("LAISER_NO_LLM", None)
-    os.environ["LAISER_LLM_ENABLED"] = "true"
-    os.environ["LAISER_LLM_PROVIDER"] = provider
-    if provider == "openai":
-        os.environ["LAISER_OPENAI_API_KEY"] = api_key
-    elif provider in {"gemini", "google", "googleai"}:
-        os.environ["LAISER_GEMINI_API_KEY"] = api_key
-        os.environ["LAISER_GOOGLE_API_KEY"] = api_key
-    elif provider == "anthropic":
-        os.environ["LAISER_ANTHROPIC_API_KEY"] = api_key
-    elif provider == "huggingface":
-        os.environ["LAISER_HF_TOKEN"] = api_key
-
-def _preflight_laiser_gemini_or_fallback():
-    """
-    If LAISER is set to gemini but the Gemini client isn't importable,
-    flip LAISER to openai to avoid the pattern fallback.
-    """
-    laiser_provider = os.getenv("LAISER_LLM_PROVIDER", "").lower()
-    if laiser_provider != "gemini":
-        return
-    ok = False
-    try:
-        gm = importlib.import_module("laiser.llm_models.gemini")
-        ok = hasattr(gm, "GeminiAPI")
-    except Exception:
-        ok = False
-    if not ok:
-        st.warning("LAiSER Gemini client not available in this environment; "
-                   "temporarily switching LAiSER skill extractor to OpenAI.")
-        os.environ["LAISER_LLM_PROVIDER"] = "openai"
-        # If we have a generic OPENAI key, reuse it for LAISER as well.
-        if os.getenv("OPENAI_API_KEY") and not os.getenv("LAISER_OPENAI_API_KEY"):
-            os.environ["LAISER_OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"]
-
-# ---------- UI ----------
+# Main UI
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
-st.markdown("**Experience the pipeline hands-on with your own API key**")
+st.markdown("**Test the pipeline with your own LLM API key** (LAiSER uses system OpenAI)")
+
 st.divider()
 
-# STEP 1
-st.markdown('<div class="step-header">🔑 Step 1: Configure Your API Key</div>', unsafe_allow_html=True)
-st.info("🔒 **Privacy Notice:** Your API key is stored in browser session only. Never saved to our servers or database. Cleared when you close the browser.")
+# ============ ARCHITECTURE INFO ============
+with st.expander("ℹ️ How This Works", expanded=False):
+    st.markdown("""
+    ### Pipeline Architecture
+    
+    This tool runs the **same pipeline as Admin Tools**, but with two key differences:
+    
+    **1. LAiSER (Skill Extraction)**
+    - ✅ Uses the **system OpenAI API key** (from app secrets)
+    - ✅ You don't need to provide a key for this
+    - ✅ Extracts skills with ESCO taxonomy codes
+    - ✅ Always enabled and working
+    
+    **2. LLM Enhancement (Knowledge & Abilities)**
+    - 🔑 Uses **YOUR API key** (whichever provider you choose)
+    - 🔑 You provide the key below
+    - 🔑 Generates complementary Knowledge and Ability items
+    
+    **Privacy:**
+    - Your API key is session-only (cleared when you close browser)
+    - Results are NOT saved to database (demo mode only)
+    - Download results as CSV
+    
+    **Comparison to Admin Tools:**
+    - Admin Tools: Uses system keys for both LAiSER and enhancement, saves to Neo4j
+    - Try It Yourself: Uses system key for LAiSER, YOUR key for enhancement, no database writes
+    """)
+
+st.divider()
+
+# ============ STEP 1: Configure LLM Enhancement Key ============
+st.markdown('<div class="step-header">🔑 Step 1: Your LLM API Key (for K/A Generation)</div>', unsafe_allow_html=True)
+
+st.info("🔒 **Privacy:** Your API key is stored in browser session only. Never saved to servers.")
 
 col_provider, col_key = st.columns([1, 3])
+
 with col_provider:
     provider = st.selectbox(
         "LLM Provider",
         ["openai", "anthropic", "gemini", "huggingface"],
-        help="Choose which LLM provider to use for Knowledge/Ability generation."
+        help="This controls ONLY the K/A generation. LAiSER always uses system OpenAI."
     )
+
 with col_key:
     placeholder = {
         "openai": "sk-proj-...",
         "anthropic": "sk-ant-...",
         "gemini": "AIza...",
-        "huggingface": "hf_xxx_your_token..."
+        "huggingface": "hf_..."
     }[provider]
+    
     api_key = st.text_input(
-        "API Key / Token",
+        "Your API Key",
         type="password",
         placeholder=placeholder,
-        help="Required for this demo. Not written to Neo4j or any external store."
+        help="Required for generating Knowledge/Ability items"
     )
 
 has_key = bool(api_key.strip())
+
 col_status, col_clear = st.columns([3, 1])
 with col_status:
     if has_key:
-        st.success(f"✅ API key loaded for **{provider}**")
+        st.success(f"✅ API key loaded for **{provider}** (K/A generation)")
     else:
-        st.warning("⚠️ No API key provided - required for Step 4")
+        st.warning("⚠️ No API key - LAiSER will still work, but no K/A items will be generated")
+
 with col_clear:
-    if st.button("🗑️ Clear Key"):
+    if st.button("🗑️ Clear Key", use_container_width=True):
         api_key = ""
         st.rerun()
 
-with st.expander("🔐 How to get an API key / token"):
-    st.markdown("""
-- **OpenAI**: https://platform.openai.com/api-keys  
-- **Anthropic**: https://console.anthropic.com/settings/keys  
-- **Google Gemini**: https://aistudio.google.com/app/apikey  
-- **Hugging Face (FREE tokens)**: https://huggingface.co/settings/tokens
+st.markdown("""
+> 💡 **What runs with what:**
+> - **LAiSER** → System OpenAI key → Extracts skills with taxonomy
+> - **LLM Enhancement** → Your key (above) → Generates Knowledge & Abilities
 """)
 
 st.divider()
 
-# STEP 2: Search
-st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', unsafe_allow_html=True)
-st.markdown("Search through **AFOCD (Officer)** and **AFECD (Enlisted)** documents from the repository")
+# ============ STEP 2: Search Documentation ============
+st.markdown('<div class="step-header">🔍 Step 2: Search AFSC Documentation</div>', unsafe_allow_html=True)
 
-col_doc, _ = st.columns([2, 1])
+col_doc, col_search = st.columns([2, 1])
 with col_doc:
-    source = st.selectbox("📄 Select Document", list(SOURCES.keys()))
+    source = st.selectbox("📄 Document", list(SOURCES.keys()))
+with col_search:
+    search_mode = st.radio("Search by", ["AFSC Code", "Keywords"], horizontal=True, label_visibility="collapsed")
 
 query = st.text_input(
     "🔍 Search Query",
-    placeholder="Try: 14N, 1N4X1, pilot, intelligence, cyber...",
-    help="Enter an AFSC code (e.g., 14N, 1N4X1) or keywords (e.g., intelligence, pilot)"
+    placeholder="e.g., 14N, 1N4X1, intelligence, pilot...",
 )
 
-col_search, col_clear_search = st.columns([3, 1])
-with col_search:
-    if st.button("🔍 Search Document", type="primary"):
-        if not query.strip():
-            st.warning("⚠️ Enter a search term")
-        else:
-            with st.spinner("Searching..."):
-                pages = load_pdf_pages(SOURCES[source])
-                results = search_pages(pages, query)
-                st.session_state.search_results = results
-                st.session_state.search_info = {"query": query, "source": source, "count": len(results)}
-with col_clear_search:
-    if st.button("🗑️ Clear"):
-        st.session_state.search_results = None
-        st.session_state.search_info = {}
-        st.rerun()
-
-if st.session_state.search_results is not None:
-    results = st.session_state.search_results
-    info = st.session_state.search_info
-    if results:
-        st.success(f"✅ Found {len(results)} result(s) for **'{info['query']}'** in {info['source']}")
-        for idx, r in enumerate(results):
-            full = r["full_text"]
-            full_highlighted = highlight_matches(full, info["query"]) if info["query"] else full
-            with st.expander(f"📄 Page {r['page']} • {r['matches']} match(es)", expanded=False):
-                st.markdown(r["snippet"])
-                with st.expander("📖 Show full page text"):
-                    st.markdown(full_highlighted)
-                col_btn = st.columns([1, 2])[0]
-                with col_btn:
-                    if st.button(f"✅ Load Page {r['page']}", key=f"load_{idx}"):
-                        st.session_state.selected_page_text = full
-                        st.session_state.afsc_text = full
-                        st.success(f"✅ Loaded page {r['page']} text into Step 3")
-                        time.sleep(0.3)
-                        st.rerun()
-            if idx < len(results) - 1:
-                st.markdown("---")
+if st.button("🔍 Search", type="primary", use_container_width=True):
+    if not query.strip():
+        st.warning("⚠️ Enter a search term")
     else:
-        st.info("ℹ️ No matches found. Try different search terms.")
-else:
-    st.info("💡 Use the search above to find AFSC sections, then load them into Step 3")
+        with st.spinner("Searching..."):
+            pages = load_pdf_pages(SOURCES[source])
+            results = search_pages(pages, query)
+            
+            if results:
+                st.success(f"✅ Found {len(results)} result(s)")
+                
+                for idx, r in enumerate(results):
+                    with st.expander(f"📄 Page {r['page']} • {r['matches']} match(es)"):
+                        st.markdown(r["snippet"])
+                        
+                        if st.button(f"✅ Load Page {r['page']}", key=f"load_{idx}"):
+                            st.session_state.afsc_text = r["full_text"]
+                            st.success(f"✅ Loaded page {r['page']}")
+                            st.rerun()
+            else:
+                st.info("ℹ️ No matches found")
 
 st.divider()
 
-# STEP 3: AFSC inputs
-st.markdown('<div class="step-header">📝 Step 3: Provide AFSC Code and Text</div>', unsafe_allow_html=True)
+# ============ STEP 3: AFSC Input ============
+st.markdown('<div class="step-header">📝 Step 3: AFSC Code & Text</div>', unsafe_allow_html=True)
+
 col_code, col_info = st.columns([2, 1])
+
 with col_code:
     afsc_code = st.text_input(
         "AFSC Code *",
         value=st.session_state.afsc_code,
-        placeholder="e.g., 14N, 1N4X1",
-        help="Required - used to tag output and provide context for LLM"
+        placeholder="e.g., 14N, 1N4X1"
     )
     st.session_state.afsc_code = afsc_code
+
 with col_info:
-    char_count = len(st.session_state.afsc_text or st.session_state.selected_page_text or "")
+    char_count = len(st.session_state.afsc_text)
     st.metric("Text Length", f"{char_count:,} chars")
 
 afsc_text = st.text_area(
     "AFSC Documentation",
-    value=st.session_state.afsc_text or st.session_state.selected_page_text,
+    value=st.session_state.afsc_text,
     height=300,
-    placeholder="Paste AFSC text here, or use Step 2 to search and load documentation...",
-    help="You can paste text directly or load it from the search above"
+    placeholder="Paste AFSC text, or load from search above..."
 )
 st.session_state.afsc_text = afsc_text
 
-if st.button("🗑️ Clear Text"):
+if st.button("🗑️ Clear", use_container_width=True):
     st.session_state.afsc_code = ""
     st.session_state.afsc_text = ""
-    st.session_state.selected_page_text = ""
     st.rerun()
-
-st.markdown("""
-> 💡 **Tip:** Paste the full AFSC section from AFECD/AFOCD, including summary, duties, and qualifications.
-> The more complete the context, the better the KSA extraction.
-""")
 
 st.divider()
 
-# SIDEBAR
-with st.sidebar:
-    st.markdown("### ⚙️ Extraction Settings")
-    st.markdown("**LAiSER Configuration**")
-    use_laiser = st.checkbox("Enable LAiSER", value=True, help="Use LAiSER for skill extraction with ESCO taxonomy alignment")
-    laiser_topk = st.slider("LAiSER max items", 10, 30, 25, help="Maximum number of skills LAiSER will extract")
-    st.divider()
-    st.markdown("""
-**LLM Enhancement (Fixed Settings)**
+# ============ STEP 4: Run Extraction ============
+st.markdown('<div class="step-header">🚀 Step 4: Extract KSAs</div>', unsafe_allow_html=True)
 
-- **Max K/A items:** 6 per AFSC
-- **Temperature:** ~0.3 (conservative)
-""")
-    st.divider()
-    st.markdown("""
-**Pipeline Steps:**
-1. Clean & normalize text
-2. LAiSER skill extraction
-3. Quality filtering
-4. Deduplication
-5. LLM K/A generation
-6. Combine & export
-""")
+can_run = bool(afsc_code.strip()) and bool(afsc_text.strip())
 
-# STEP 4: Run
-st.markdown('<div class="step-header">🚀 Step 4: Run KSA Extraction</div>', unsafe_allow_html=True)
-can_run = has_key and bool((st.session_state.afsc_code or "").strip()) and bool((st.session_state.afsc_text or "").strip())
-if not has_key:
-    st.warning("⚠️ Configure your API key in Step 1 to enable extraction")
-elif not (st.session_state.afsc_code or "").strip():
-    st.warning("⚠️ Enter an AFSC Code in Step 3 (required)")
-elif not (st.session_state.afsc_text or "").strip():
-    st.warning("⚠️ Add AFSC text in Step 3 to enable extraction")
+if not afsc_code.strip():
+    st.warning("⚠️ Enter an AFSC Code")
+elif not afsc_text.strip():
+    st.warning("⚠️ Add AFSC text")
 
-if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run):
+if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_container_width=True):
     try:
-        afsc_code = st.session_state.afsc_code
-        afsc_text = st.session_state.afsc_text
-
-        # Preserve existing env to restore later
-        env_keys_to_backup = [
-            "USE_LAISER","LAISER_ALIGN_TOPK","LLM_PROVIDER",
-            "OPENAI_API_KEY","ANTHROPIC_API_KEY","GEMINI_API_KEY","GOOGLE_API_KEY","HF_TOKEN",
-            "LAISER_NO_LLM","LAISER_LLM_ENABLED","LAISER_LLM_PROVIDER",
-            "LAISER_OPENAI_API_KEY","LAISER_ANTHROPIC_API_KEY",
-            "LAISER_GEMINI_API_KEY","LAISER_GOOGLE_API_KEY","LAISER_HF_TOKEN"
-        ]
-        old_env = {k: os.getenv(k) for k in env_keys_to_backup}
-
-        # Clear generic provider keys to avoid unintended fallbacks
-        for k in ["OPENAI_API_KEY","ANTHROPIC_API_KEY","GEMINI_API_KEY","GOOGLE_API_KEY","HF_TOKEN"]:
-            os.environ.pop(k, None)
-
-        # Apply user-selected provider & key for the enhancer
+        # Backup system keys
+        old_openai = os.getenv("OPENAI_API_KEY")
+        old_anthropic = os.getenv("ANTHROPIC_API_KEY")
+        old_gemini = os.getenv("GEMINI_API_KEY") 
+        old_google = os.getenv("GOOGLE_API_KEY")
+        old_hf = os.getenv("HF_TOKEN")
+        old_provider = os.getenv("LLM_PROVIDER")
+        old_enhancer = os.getenv("USE_LLM_ENHANCER")
+        
+        # Set user's provider for enhancement (LAiSER still uses system OpenAI)
         os.environ["LLM_PROVIDER"] = provider
-        os.environ[get_key_env_name(provider)] = api_key.strip()
-
-        # Apply LAISER settings (try to keep it on gemini by default unless user chose differently)
-        os.environ["USE_LAISER"] = "true" if use_laiser else "false"
-        os.environ["LAISER_ALIGN_TOPK"] = str(laiser_topk)
-        os.environ.pop("LAISER_NO_LLM", None)
-        # Prefer Gemini for LAiSER unless user specifically chose something else
-        laiser_provider = provider if provider != "huggingface" else "gemini"
-        os.environ["LAISER_LLM_ENABLED"] = "true"
-        os.environ["LAISER_LLM_PROVIDER"] = laiser_provider
-        _apply_laiser_env(laiser_provider, api_key.strip() if laiser_provider == provider else os.getenv("GEMINI_API_KEY",""))
-
-        # Preflight: if LAISER is configured to gemini but client missing, fall back LAISER→openai
-        _preflight_laiser_gemini_or_fallback()
-
-        # Lazy import AFTER env is set; reload if already imported
-        if "afsc_pipeline.extract_laiser" in sys.modules:
-            importlib.reload(sys.modules["afsc_pipeline.extract_laiser"])
-        if "afsc_pipeline.pipeline" in sys.modules:
-            importlib.reload(sys.modules["afsc_pipeline.pipeline"])
-        from afsc_pipeline.pipeline import run_pipeline_demo
-
-        with st.status("Running full pipeline...", expanded=True) as status:
-            status.write("🧹 Preprocessing text...")
-            time.sleep(0.2)
-            if use_laiser:
-                status.write("🔍 LAiSER extracting skills with taxonomy alignment...")
-                time.sleep(0.2)
-            status.write("🤖 LLM generating Knowledge/Ability items...")
-            time.sleep(0.2)
-            status.write("🔄 Deduplicating and filtering...")
-
+        
+        # Only set enhancement key if user provided one
+        if has_key:
+            os.environ["USE_LLM_ENHANCER"] = "true"
+            key_map = {
+                "openai": "OPENAI_API_KEY",
+                "anthropic": "ANTHROPIC_API_KEY", 
+                "gemini": "GEMINI_API_KEY",
+                "huggingface": "HF_TOKEN"
+            }
+            os.environ[key_map[provider]] = api_key.strip()
+        else:
+            os.environ["USE_LLM_ENHANCER"] = "false"
+        
+        with st.status("Running pipeline...", expanded=True) as status:
+            status.write("🔍 LAiSER extracting skills (using system OpenAI)...")
+            time.sleep(0.3)
+            
+            if has_key:
+                status.write(f"🤖 LLM generating K/A items (using your {provider} key)...")
+            else:
+                status.write("⚠️ Skipping LLM enhancement (no API key provided)")
+            
+            time.sleep(0.3)
+            
             t0 = time.time()
             summary = run_pipeline_demo(
                 afsc_code=afsc_code or "UNKNOWN",
                 afsc_raw_text=afsc_text,
             )
             elapsed = time.time() - t0
-
+            
             items = summary.get("items", []) or []
             n_total = len(items)
-            n_esco = summary.get(
-                "esco_tagged_count",
-                sum(1 for it in items if getattr(it, "esco_id", None)),
-            )
-            used_fallback = summary.get("used_fallback", False)
-
-            laiser_diag = {
-                "provider": os.getenv("LAISER_LLM_PROVIDER"),
-                "use_llm": os.getenv("LAISER_LLM_ENABLED"),
-                "openai": bool(os.getenv("LAISER_OPENAI_API_KEY")),
-                "anthropic": bool(os.getenv("LAISER_ANTHROPIC_API_KEY")),
-                "gemini/google": bool(os.getenv("LAISER_GEMINI_API_KEY") or os.getenv("LAISER_GOOGLE_API_KEY")),
-                "hf": bool(os.getenv("LAISER_HF_TOKEN")),
-            }
-
-            status.write(f"✅ Pipeline complete in {elapsed:.2f}s – {n_total} items ({n_esco} with taxonomy)")
-            if used_fallback:
-                status.write("⚠️ LAiSER unavailable; fallback extractor was used")
-            status.write(f"🔎 LAISER diag → {laiser_diag}")
+            n_esco = summary.get("esco_tagged_count", 0)
+            
+            status.write(f"✅ Complete in {elapsed:.2f}s – {n_total} items ({n_esco} with ESCO)")
             status.update(label="✅ Extraction Complete!", state="complete")
-
-        # Format results for display
+        
+        # Restore system keys
+        if old_openai:
+            os.environ["OPENAI_API_KEY"] = old_openai
+        if old_anthropic:
+            os.environ["ANTHROPIC_API_KEY"] = old_anthropic
+        if old_gemini:
+            os.environ["GEMINI_API_KEY"] = old_gemini
+        if old_google:
+            os.environ["GOOGLE_API_KEY"] = old_google
+        if old_hf:
+            os.environ["HF_TOKEN"] = old_hf
+        if old_provider:
+            os.environ["LLM_PROVIDER"] = old_provider
+        if old_enhancer:
+            os.environ["USE_LLM_ENHANCER"] = old_enhancer
+        
+        # Convert to display format
         all_items = []
         for it in items:
             raw_type = getattr(it, "item_type", "")
-            raw_type_val = raw_type.value if hasattr(raw_type, "value") else str(raw_type)
-            lt = str(raw_type_val).lower()
-            if "know" in lt:
-                type_label = "knowledge"
-            elif "abil" in lt:
-                type_label = "ability"
-            else:
-                type_label = "skill"
+            type_val = str(raw_type.value if hasattr(raw_type, "value") else raw_type).lower()
+            
             all_items.append({
-                "Type": type_label,
+                "Type": type_val,
                 "Text": getattr(it, "text", ""),
                 "Confidence": float(getattr(it, "confidence", 0.0) or 0.0),
-                "Source": getattr(it, "source", "pipeline"),
+                "Source": getattr(it, "source", ""),
                 "Taxonomy": getattr(it, "esco_id", "") or "",
             })
-
+        
         if not all_items:
-            st.warning("⚠️ No items extracted. Try enabling LAiSER or adjusting settings in the sidebar.")
+            st.warning("⚠️ No items extracted")
             st.stop()
-
-        st.success(f"✅ Successfully extracted {len(all_items)} KSAs!")
+        
+        st.success(f"✅ Extracted {len(all_items)} KSAs!")
         st.balloons()
-
+        
         # Metrics
         k_count = sum(1 for i in all_items if i['Type'] == 'knowledge')
         s_count = sum(1 for i in all_items if i['Type'] == 'skill')
         a_count = sum(1 for i in all_items if i['Type'] == 'ability')
         tax_count = sum(1 for i in all_items if i['Taxonomy'])
-
-        col1, col2, col3, col4, col5 = st.columns(5)
-        col1.metric("Total KSAs", len(all_items))
+        laiser_count = sum(1 for i in all_items if 'laiser' in i['Source'].lower() or i['Taxonomy'])
+        llm_count = sum(1 for i in all_items if 'llm-' in i['Source'].lower())
+        
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
+        col1.metric("Total", len(all_items))
         col2.metric("Knowledge", k_count)
         col3.metric("Skills", s_count)
         col4.metric("Abilities", a_count)
-        col5.metric("Taxonomy Aligned", tax_count)
-
-        # Results
-        st.markdown("### 📊 Extracted KSAs")
+        col5.metric("From LAiSER", laiser_count)
+        col6.metric("From LLM", llm_count)
+        
+        # Results Table
+        st.markdown("### 📊 Results")
         df = pd.DataFrame(all_items)
-
-        col_filter1, col_filter2 = st.columns(2)
-        with col_filter1:
+        
+        col_f1, col_f2 = st.columns(2)
+        with col_f1:
             type_filter = st.multiselect(
                 "Filter by type",
                 ['knowledge', 'skill', 'ability'],
                 default=['knowledge', 'skill', 'ability']
             )
-        with col_filter2:
-            taxonomy_filter = st.selectbox(
-                "Filter by taxonomy",
-                ["All", "Only taxonomy-aligned", "Only non-taxonomy"],
+        with col_f2:
+            source_filter = st.selectbox(
+                "Filter by source",
+                ["All", "LAiSER only", "LLM only", "With taxonomy"],
                 index=0
             )
-
+        
         filtered_df = df[df['Type'].isin(type_filter)]
-        if taxonomy_filter == "Only taxonomy-aligned":
+        
+        if source_filter == "LAiSER only":
+            filtered_df = filtered_df[filtered_df['Source'].str.contains('laiser|pattern', case=False, na=False)]
+        elif source_filter == "LLM only":
+            filtered_df = filtered_df[filtered_df['Source'].str.contains('llm-', case=False, na=False)]
+        elif source_filter == "With taxonomy":
             filtered_df = filtered_df[filtered_df['Taxonomy'] != ""]
-        elif taxonomy_filter == "Only non-taxonomy":
-            filtered_df = filtered_df[filtered_df['Taxonomy'] == ""]
-
+        
         st.caption(f"Showing {len(filtered_df)} of {len(df)} items")
-        st.dataframe(filtered_df, hide_index=True, width='stretch',
-                     column_config={
-                         "Confidence": st.column_config.NumberColumn(format="%.2f"),
-                         "Taxonomy": st.column_config.TextColumn("Skill Taxonomy")
-                     })
-
-        # Exports
-        st.markdown("### 💾 Export Results")
-        col_exp1, col_exp2 = st.columns(2)
-        with col_exp1:
-            csv = filtered_df.to_csv(index=False)
-            st.download_button("⬇️ Download Filtered Results", csv, f"{afsc_code or 'extracted'}_ksas.csv", "text/csv")
-        with col_exp2:
-            full_csv = df.to_csv(index=False)
-            st.download_button("⬇️ Download All Results", full_csv, f"{afsc_code or 'extracted'}_ksas_full.csv", "text/csv")
-
-        st.info("💡 **Note:** These results are NOT saved to the database. This is a demo/testing tool only. Use Admin Tools for permanent storage.")
-        st.caption("📖 **Skill Taxonomy Reference:** Skills are aligned to the Open Skills Network (OSN) taxonomy. View the complete taxonomy codes and labels: [LAiSER Taxonomy CSV](https://github.com/LAiSER-Software/extract-module/blob/main/laiser/public/combined.csv)")
-
+        st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+        
+        # Export
+        st.markdown("### 💾 Export")
+        csv = filtered_df.to_csv(index=False)
+        st.download_button(
+            "⬇️ Download Results",
+            csv,
+            f"{afsc_code or 'extracted'}_ksas.csv",
+            "text/csv",
+            use_container_width=True
+        )
+        
+        st.info("💡 Results are NOT saved to database (demo mode)")
+        
     except Exception as e:
         st.error(f"❌ Extraction failed: {e}")
         import traceback
         with st.expander("📋 Error Details"):
             st.code(traceback.format_exc())
 
-    finally:
-        # Restore env
-        for k, v in (old_env or {}).items():
-            if v is None:
-                os.environ.pop(k, None)
-            else:
-                os.environ[k] = v
-
-# Help
-with st.expander("❓ Help & FAQ"):
-    st.markdown("""
-### How This Tool Works
-1) Enter your own API key, 2) find/load AFSC text, 3) run the extractor.
-
-- LAiSER runs with your chosen provider (prefers Gemini; auto-falls back to OpenAI if Gemini client missing)
-- LLM adds Knowledge/Ability bullets with your selected provider
-- No database writes; download CSVs
-
-### Providers
-- **OpenAI** · **Anthropic** · **Google Gemini** · **Hugging Face (FREE)**
-""")
-
 st.divider()
-st.caption("🔬 Try It Yourself | Session-only API keys | No database writes | Download results only")
+st.caption("🔬 Try It Yourself | LAiSER: System OpenAI | Enhancement: Your API key | No database writes")
