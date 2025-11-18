@@ -364,6 +364,89 @@ def _call_llm_openai(prompt: str) -> str:
         raise RuntimeError(f"OpenAI API error: {e}")
 
 
+def _call_llm_huggingface(
+    prompt: str,
+    *,
+    temperature: float = 0.3,
+    max_tokens: int = 512,
+    model: str | None = None,
+) -> str:
+    """
+    Call Hugging Face Inference API.
+    
+    Uses the free Inference API for models hosted on HuggingFace.
+    Default model: meta-llama/Llama-3.2-3B-Instruct (fast, free tier compatible)
+    
+    Parameters
+    ----------
+    prompt:
+        Prompt text to send to the model.
+    temperature:
+        Sampling temperature (0.0 = deterministic, higher = more diverse).
+    max_tokens:
+        Maximum number of tokens in the response.
+    model:
+        Optional override for the HuggingFace model ID.
+    
+    Returns
+    -------
+    str
+        The response text from HuggingFace, or raises RuntimeError on failure.
+    """
+    hf_token = os.getenv("HF_TOKEN", "")
+    if not hf_token:
+        raise ValueError("HF_TOKEN not set")
+    
+    try:
+        import requests
+        
+        # Default to a free, fast model that works with Inference API
+        model_id = model or "meta-llama/Llama-3.2-3B-Instruct"
+        api_url = f"https://api-inference.huggingface.co/models/{model_id}"
+        
+        headers = {
+            "Authorization": f"Bearer {hf_token}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "temperature": float(temperature),
+                "max_new_tokens": int(max_tokens),
+                "return_full_text": False
+            }
+        }
+        
+        response = requests.post(api_url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
+        
+        result = response.json()
+        
+        # HF API returns different formats depending on the model
+        if isinstance(result, list) and len(result) > 0:
+            if "generated_text" in result[0]:
+                return result[0]["generated_text"].strip()
+            elif "text" in result[0]:
+                return result[0]["text"].strip()
+        elif isinstance(result, dict):
+            if "generated_text" in result:
+                return result["generated_text"].strip()
+            elif "text" in result:
+                return result["text"].strip()
+        
+        # Fallback - convert to string
+        text = str(result).strip()
+        if not text:
+            raise RuntimeError("Empty response from HuggingFace API")
+        
+        return text
+        
+    except Exception as e:
+        logger.error(f"HuggingFace API error: {e}")
+        raise RuntimeError(f"HuggingFace call failed: {e}")
+
+
 def _provider_call(prompt: str) -> str:
     """
     Call the active LLM provider with automatic fallback behavior.
@@ -410,6 +493,13 @@ def _provider_call(prompt: str) -> str:
         except Exception as e:
             logger.warning(f"Anthropic failed: {e}, using heuristics")
             return ""
+    
+    elif provider == "huggingface":
+        try:
+            return _call_llm_huggingface(prompt)
+        except Exception as e:
+            logger.warning(f"HuggingFace failed: {e}, using heuristics")
+            return ""
 
     return ""
 
@@ -447,6 +537,9 @@ def set_runtime_credentials(provider: str | None = None, api_key: str | None = N
             os.environ["GOOGLE_API_KEY"] = api_key
             GOOGLE_API_KEY = api_key
             logger.debug("Runtime Gemini API key configured")
+        elif current == "huggingface":
+            os.environ["HF_TOKEN"] = api_key
+            logger.debug("Runtime HuggingFace token configured")
 
 
 def run_llm(
@@ -553,6 +646,27 @@ def run_llm(
             )
         except ImportError:
             raise ImportError("google-generativeai not installed")
+    
+    elif prov == "huggingface":
+        hf_token = api_key or get_api_key("huggingface")
+        if not hf_token:
+            raise ValueError("HF_TOKEN not set - HuggingFace requires a free API token")
+        # Temporarily set token for _call_llm_huggingface
+        old_token = os.getenv("HF_TOKEN")
+        os.environ["HF_TOKEN"] = hf_token
+        try:
+            return _call_llm_huggingface(
+                prompt,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                model=model,
+            )
+        finally:
+            # Restore old token
+            if old_token is not None:
+                os.environ["HF_TOKEN"] = old_token
+            else:
+                os.environ.pop("HF_TOKEN", None)
 
     else:
         raise ValueError(f"Unsupported provider: {prov}")
