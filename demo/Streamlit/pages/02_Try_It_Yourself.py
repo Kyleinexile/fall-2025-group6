@@ -63,6 +63,8 @@ if "afsc_code" not in st.session_state:
     st.session_state.afsc_code = ""
 if "afsc_text" not in st.session_state:
     st.session_state.afsc_text = ""
+if "loaded_text" not in st.session_state:
+    st.session_state.loaded_text = None
 
 # Helper Functions
 @st.cache_data(show_spinner=False, ttl=3600)
@@ -220,24 +222,27 @@ if st.button("🔍 Search", type="primary", use_container_width=True):
                     
                     with st.expander(f"📄 Page {r['page']} • {r['matches']} match(es)"):
                         # Show snippet
+                        st.markdown("**Preview:**")
                         st.markdown(r["snippet"])
                         
-                        # Show full text in nested expander
-                        with st.expander("📖 Show full page text"):
-                            st.text_area(
-                                "Full Page Content",
-                                value=full,
-                                height=400,
-                                key=f"fulltext_{idx}",
-                                label_visibility="collapsed"
-                            )
+                        st.markdown("---")
                         
-                        # Load button
-                        if st.button(f"✅ Load Page {r['page']}", key=f"load_{idx}"):
-                            st.session_state.afsc_text = full
-                            st.success(f"✅ Loaded page {r['page']}")
-                            time.sleep(0.3)
+                        # Load button at top
+                        if st.button(f"✅ Load Page {r['page']} into Step 3", key=f"load_{idx}", type="primary"):
+                            st.session_state.loaded_text = full
+                            st.success(f"✅ Loaded! Scroll down to Step 3")
                             st.rerun()
+                        
+                        # Show full text below (not nested)
+                        st.markdown("**Full Page Text:**")
+                        st.text_area(
+                            "Full content",
+                            value=full,
+                            height=300,
+                            key=f"fulltext_{idx}",
+                            label_visibility="collapsed",
+                            disabled=True
+                        )
             else:
                 st.info("ℹ️ No matches found")
 
@@ -245,6 +250,12 @@ st.divider()
 
 # ============ STEP 3: AFSC Input ============
 st.markdown('<div class="step-header">📝 Step 3: AFSC Code & Text</div>', unsafe_allow_html=True)
+
+# Check if text was loaded from search
+if "loaded_text" in st.session_state and st.session_state.loaded_text:
+    if "afsc_text" not in st.session_state or st.session_state.afsc_text != st.session_state.loaded_text:
+        st.session_state.afsc_text = st.session_state.loaded_text
+        st.session_state.loaded_text = None  # Clear the flag
 
 col_code, col_info = st.columns([2, 1])
 
@@ -264,9 +275,13 @@ afsc_text = st.text_area(
     "AFSC Documentation",
     value=st.session_state.afsc_text,
     height=300,
-    placeholder="Paste AFSC text, or load from search above..."
+    placeholder="Paste AFSC text, or load from search above...",
+    key="afsc_text_input"
 )
-st.session_state.afsc_text = afsc_text
+
+# Only update state if user actually edited the text
+if afsc_text != st.session_state.afsc_text:
+    st.session_state.afsc_text = afsc_text
 
 if st.button("🗑️ Clear", use_container_width=True):
     st.session_state.afsc_code = ""
