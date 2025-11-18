@@ -1,6 +1,4 @@
 import sys, pathlib, os, io, re, time, textwrap, importlib
-from typing import Optional
-
 # Path setup
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
@@ -13,25 +11,9 @@ import streamlit as st
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # load TOML/.env for defaults
 
-# DO NOT import pipeline here; we lazy-import it after env is set
-
-# Paths
-DOCS_ROOTS = [
-    pathlib.Path("/workspaces/docs_text"),
-    SRC / "docs_text",
-]
-def _first_existing(*paths):
-    for p in paths:
-        if p.exists():
-            return p
-    return paths[-1]
-
-DOCS_ROOT = _first_existing(*DOCS_ROOTS)
-DOC_FOLDERS = [("AFECD", DOCS_ROOT / "AFECD"), ("AFOCD", DOCS_ROOT / "AFOCD")]
-
-# PDF Sources
+# ---- PDF Sources (unchanged) ----
 SOURCES = {
     "AFECD (Enlisted)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFECD%202025%20Split.pdf",
     "AFOCD (Officer)": "https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/src/docs/AFOCD%202025%20Split.pdf",
@@ -138,7 +120,7 @@ def get_key_env_name(provider: str) -> str:
     return f"{provider.upper()}_API_KEY"
 
 def _apply_laiser_env(provider: str, api_key: str):
-    """Mirror current BYO provider/key into LAISER's env namespace."""
+    """Mirror the BYO provider/key into LAISER's expected env namespace."""
     os.environ["USE_LAISER"] = "true"
     os.environ.pop("LAISER_NO_LLM", None)
     os.environ["LAISER_LLM_ENABLED"] = "true"
@@ -152,6 +134,28 @@ def _apply_laiser_env(provider: str, api_key: str):
         os.environ["LAISER_ANTHROPIC_API_KEY"] = api_key
     elif provider == "huggingface":
         os.environ["LAISER_HF_TOKEN"] = api_key
+
+def _preflight_laiser_gemini_or_fallback():
+    """
+    If LAISER is set to gemini but the Gemini client isn't importable,
+    flip LAISER to openai to avoid the pattern fallback.
+    """
+    laiser_provider = os.getenv("LAISER_LLM_PROVIDER", "").lower()
+    if laiser_provider != "gemini":
+        return
+    ok = False
+    try:
+        gm = importlib.import_module("laiser.llm_models.gemini")
+        ok = hasattr(gm, "GeminiAPI")
+    except Exception:
+        ok = False
+    if not ok:
+        st.warning("LAiSER Gemini client not available in this environment; "
+                   "temporarily switching LAiSER skill extractor to OpenAI.")
+        os.environ["LAISER_LLM_PROVIDER"] = "openai"
+        # If we have a generic OPENAI key, reuse it for LAISER as well.
+        if os.getenv("OPENAI_API_KEY") and not os.getenv("LAISER_OPENAI_API_KEY"):
+            os.environ["LAISER_OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"]
 
 # ---------- UI ----------
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
@@ -167,7 +171,7 @@ with col_provider:
     provider = st.selectbox(
         "LLM Provider",
         ["openai", "anthropic", "gemini", "huggingface"],
-        help="Choose which LLM provider to use for Knowledge/Ability generation. HuggingFace tokens are free!"
+        help="Choose which LLM provider to use for Knowledge/Ability generation."
     )
 with col_key:
     placeholder = {
@@ -209,11 +213,9 @@ st.divider()
 st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', unsafe_allow_html=True)
 st.markdown("Search through **AFOCD (Officer)** and **AFECD (Enlisted)** documents from the repository")
 
-col_doc, col_mode = st.columns([2, 1])
+col_doc, _ = st.columns([2, 1])
 with col_doc:
     source = st.selectbox("📄 Select Document", list(SOURCES.keys()))
-with col_mode:
-    search_mode = st.radio("Search by", ["AFSC Code", "Keywords"], horizontal=True, label_visibility="collapsed")
 
 query = st.text_input(
     "🔍 Search Query",
@@ -353,21 +355,26 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run):
         ]
         old_env = {k: os.getenv(k) for k in env_keys_to_backup}
 
-        # Clear all generic provider keys to avoid unintended fallbacks
+        # Clear generic provider keys to avoid unintended fallbacks
         for k in ["OPENAI_API_KEY","ANTHROPIC_API_KEY","GEMINI_API_KEY","GOOGLE_API_KEY","HF_TOKEN"]:
             os.environ.pop(k, None)
 
-        # Apply user-selected provider & key
+        # Apply user-selected provider & key for the enhancer
         os.environ["LLM_PROVIDER"] = provider
         os.environ[get_key_env_name(provider)] = api_key.strip()
 
-        # Apply LAISER settings
+        # Apply LAISER settings (try to keep it on gemini by default unless user chose differently)
         os.environ["USE_LAISER"] = "true" if use_laiser else "false"
         os.environ["LAISER_ALIGN_TOPK"] = str(laiser_topk)
         os.environ.pop("LAISER_NO_LLM", None)
+        # Prefer Gemini for LAiSER unless user specifically chose something else
+        laiser_provider = provider if provider != "huggingface" else "gemini"
         os.environ["LAISER_LLM_ENABLED"] = "true"
-        os.environ["LAISER_LLM_PROVIDER"] = provider
-        _apply_laiser_env(provider, api_key.strip())
+        os.environ["LAISER_LLM_PROVIDER"] = laiser_provider
+        _apply_laiser_env(laiser_provider, api_key.strip() if laiser_provider == provider else os.getenv("GEMINI_API_KEY",""))
+
+        # Preflight: if LAISER is configured to gemini but client missing, fall back LAISER→openai
+        _preflight_laiser_gemini_or_fallback()
 
         # Lazy import AFTER env is set; reload if already imported
         if "afsc_pipeline.extract_laiser" in sys.modules:
@@ -520,8 +527,8 @@ with st.expander("❓ Help & FAQ"):
 ### How This Tool Works
 1) Enter your own API key, 2) find/load AFSC text, 3) run the extractor.
 
-- LAiSER runs with your chosen provider (if enabled)
-- LLM adds Knowledge/Ability bullets
+- LAiSER runs with your chosen provider (prefers Gemini; auto-falls back to OpenAI if Gemini client missing)
+- LLM adds Knowledge/Ability bullets with your selected provider
 - No database writes; download CSVs
 
 ### Providers
