@@ -33,15 +33,53 @@ logger = logging.getLogger(__name__)
 # -------------------------
 # Provider selection and default model names are driven by environment
 # variables, but sensible defaults are provided for local development.
-LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()  # Default to OpenAI
+
+# Module-level default provider captured at import time (used as fallback).
+LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
+
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-3-5-sonnet-20241022")
 LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-4o-mini")
 
-# API Keys
+# Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
+
+def get_llm_provider() -> str:
+    """
+    Get the current LLM provider.
+
+    - Checks LLM_PROVIDER in the *current* environment first (so Streamlit
+      can override per-run).
+    - Falls back to the module-level default from import time.
+    """
+    return (os.getenv("LLM_PROVIDER") or LLM_PROVIDER or "openai").strip().lower()
+
+
+def get_api_key(provider: str) -> str:
+    """
+    Get the appropriate API key / token for a given provider.
+
+    Prefers the *current* environment value, falls back to the
+    module-level values captured at import time.
+    """
+    provider = provider.lower()
+    if provider == "openai":
+        return os.getenv("OPENAI_API_KEY") or OPENAI_API_KEY
+    elif provider == "anthropic":
+        return os.getenv("ANTHROPIC_API_KEY") or ANTHROPIC_API_KEY
+    elif provider in {"gemini", "google", "googleai"}:
+        return (
+            os.getenv("GOOGLE_API_KEY")
+            or os.getenv("GEMINI_API_KEY")
+            or GOOGLE_API_KEY
+        )
+    elif provider == "huggingface":
+        # For future HF integration; Try It Yourself sets HF_TOKEN via env
+        return os.getenv("HF_TOKEN", "")
+    return ""
 
 # -------------------------
 # Utility: simple noun phrase mining
@@ -210,13 +248,14 @@ def _call_llm_gemini(
     str
         The response text from Gemini, or raises a RuntimeError on failure.
     """
-    if not GOOGLE_API_KEY:
-        raise ValueError("GOOGLE_API_KEY not set")
+    key = get_api_key("gemini")
+    if not key:
+        raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not set")
     try:
         import google.generativeai as genai
         from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
-        genai.configure(api_key=GOOGLE_API_KEY)
+        genai.configure(api_key=key)
         mdl = model or LLM_MODEL_GEMINI
         model_obj = genai.GenerativeModel(mdl)
 
@@ -264,12 +303,13 @@ def _call_llm_anthropic(prompt: str) -> str:
     str
         The response text from Claude, or raises a RuntimeError on failure.
     """
-    if not ANTHROPIC_API_KEY:
+    key = get_api_key("anthropic")
+    if not key:
         raise ValueError("ANTHROPIC_API_KEY not set")
     try:
         import anthropic
 
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        client = anthropic.Anthropic(api_key=key)
         message = client.messages.create(
             model=LLM_MODEL_ANTHROPIC,
             max_tokens=1024,
@@ -304,12 +344,13 @@ def _call_llm_openai(prompt: str) -> str:
         The response text from the configured OpenAI model, or raises a
         RuntimeError on failure.
     """
-    if not OPENAI_API_KEY:
+    key = get_api_key("openai")
+    if not key:
         raise ValueError("OPENAI_API_KEY not set")
     try:
         from openai import OpenAI
 
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=key)
         response = client.chat.completions.create(
             model=LLM_MODEL_OPENAI,
             messages=[{"role": "user", "content": prompt}],
@@ -329,46 +370,47 @@ def _provider_call(prompt: str) -> str:
 
     Logic
     -----
-    - If LLM_PROVIDER == "openai":
+    - If provider == "openai":
         * Try OpenAI; if it fails, fall back to Gemini (if configured).
-    - If LLM_PROVIDER == "gemini":
+    - If provider == "gemini":
         * Try Gemini; if it fails, fall back to OpenAI (if configured).
-    - If LLM_PROVIDER == "anthropic":
+    - If provider == "anthropic":
         * Try Claude; if it fails, return "" to trigger heuristics.
 
     The function returns an empty string on failure rather than raising,
     so that the caller can gracefully fall back to `_heuristic_enhance`.
     """
-    if LLM_PROVIDER == "openai":
+    provider = get_llm_provider()
+
+    if provider == "openai":
         try:
             return _call_llm_openai(prompt)
         except Exception as e:
             logger.warning(f"OpenAI failed: {e}, trying Gemini...")
-            if GOOGLE_API_KEY:
-                try:
-                    return _call_llm_gemini(prompt)
-                except Exception as e2:
-                    logger.warning(f"Gemini also failed: {e2}, using heuristics")
-                    return ""
-            return ""
-    elif LLM_PROVIDER == "gemini":
+            try:
+                return _call_llm_gemini(prompt)
+            except Exception as e2:
+                logger.warning(f"Gemini also failed: {e2}, using heuristics")
+                return ""
+
+    elif provider in {"gemini", "google", "googleai"}:
         try:
             return _call_llm_gemini(prompt)
         except Exception as e:
             logger.warning(f"Gemini failed: {e}, trying OpenAI...")
-            if OPENAI_API_KEY:
-                try:
-                    return _call_llm_openai(prompt)
-                except Exception as e2:
-                    logger.warning(f"OpenAI also failed: {e2}, using heuristics")
-                    return ""
-            return ""
-    elif LLM_PROVIDER == "anthropic":
+            try:
+                return _call_llm_openai(prompt)
+            except Exception as e2:
+                logger.warning(f"OpenAI also failed: {e2}, using heuristics")
+                return ""
+
+    elif provider == "anthropic":
         try:
             return _call_llm_anthropic(prompt)
         except Exception as e:
             logger.warning(f"Anthropic failed: {e}, using heuristics")
             return ""
+
     return ""
 
 # ---- Runtime override helpers (useful for Streamlit BYO-key page) -----------
@@ -378,28 +420,31 @@ def set_runtime_credentials(provider: str | None = None, api_key: str | None = N
     """
     Override the provider and corresponding API key at runtime.
 
-    This is used primarily by the Streamlit "Try It Yourself" tab so that
-    users can paste their own API key without modifying environment variables.
-
-    Parameters
-    ----------
-    provider:
-        Provider name ("openai", "anthropic", "gemini").
-    api_key:
-        API key to use for the chosen provider.
+    This is primarily for legacy / programmatic use. In the Streamlit app,
+    the Try It Yourself page now prefers to set environment variables
+    directly for per-run overrides.
     """
     global LLM_PROVIDER, OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY
+
     if provider:
-        LLM_PROVIDER = provider.strip().lower()
-        logger.info(f"Runtime provider set to: {LLM_PROVIDER}")
+        provider_norm = provider.strip().lower()
+        # Update env and module-level default
+        os.environ["LLM_PROVIDER"] = provider_norm
+        LLM_PROVIDER = provider_norm
+        logger.info(f"Runtime provider set to: {provider_norm}")
+
     if api_key:
-        if LLM_PROVIDER == "openai":
+        current = get_llm_provider()
+        if current == "openai":
+            os.environ["OPENAI_API_KEY"] = api_key
             OPENAI_API_KEY = api_key
             logger.debug("Runtime OpenAI API key configured")
-        elif LLM_PROVIDER == "anthropic":
+        elif current == "anthropic":
+            os.environ["ANTHROPIC_API_KEY"] = api_key
             ANTHROPIC_API_KEY = api_key
             logger.debug("Runtime Anthropic API key configured")
-        elif LLM_PROVIDER in {"gemini", "google", "googleai"}:
+        elif current in {"gemini", "google", "googleai"}:
+            os.environ["GOOGLE_API_KEY"] = api_key
             GOOGLE_API_KEY = api_key
             logger.debug("Runtime Gemini API key configured")
 
@@ -425,9 +470,9 @@ def run_llm(
         Prompt text to send to the provider.
     provider:
         Optional provider override ("openai", "anthropic", "gemini").
-        If omitted, falls back to LLM_PROVIDER.
+        If omitted, falls back to current LLM provider.
     api_key:
-        Optional API key override. If omitted, uses the module-level key.
+        Optional API key override. If omitted, uses env/module-level key.
     temperature:
         Sampling temperature.
     max_tokens:
@@ -445,11 +490,11 @@ def run_llm(
     if not prompt:
         return ""
 
-    prov = (provider or LLM_PROVIDER or "openai").strip().lower()
+    prov = (provider or get_llm_provider()).strip().lower()
     logger.info(f"Running LLM with provider: {prov}")
 
     if prov == "openai":
-        key = api_key or OPENAI_API_KEY
+        key = api_key or get_api_key("openai")
         if not key:
             raise ValueError("OPENAI_API_KEY not set")
         try:
@@ -468,7 +513,7 @@ def run_llm(
             raise ImportError("openai not installed")
 
     elif prov == "anthropic":
-        key = api_key or ANTHROPIC_API_KEY
+        key = api_key or get_api_key("anthropic")
         if not key:
             raise ValueError("ANTHROPIC_API_KEY not set")
         try:
@@ -493,9 +538,9 @@ def run_llm(
             raise ImportError("anthropic not installed")
 
     elif prov in {"gemini", "google", "googleai"}:
-        key = api_key or GOOGLE_API_KEY
+        key = api_key or get_api_key("gemini")
         if not key:
-            raise ValueError("GOOGLE_API_KEY not set")
+            raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not set")
         try:
             import google.generativeai as genai
 
@@ -731,8 +776,10 @@ def enhance_items_with_llm(
         Newly generated Knowledge/Ability items only. The caller is
         responsible for merging and final deduplication.
     """
+    provider = get_llm_provider()
+
     # If disabled, use heuristics
-    if LLM_PROVIDER in {"", "disabled", "off", "false", "0"}:
+    if provider in {"", "disabled", "off", "false", "0"}:
         logger.info(f"LLM provider disabled, using heuristics for {afsc_code}")
         return _heuristic_enhance(afsc_text, items)
 
@@ -761,7 +808,7 @@ def enhance_items_with_llm(
     )
 
     try:
-        logger.info(f"Calling {LLM_PROVIDER} for {afsc_code}...")
+        logger.info(f"Calling {provider} for {afsc_code}...")
         raw = _provider_call(prompt)
 
         if not raw:
@@ -781,12 +828,14 @@ def enhance_items_with_llm(
                     text=text,
                     item_type=item_type,
                     confidence=0.70,
-                    source=f"llm-{LLM_PROVIDER}",
+                    source=f"llm-{provider}",
                     esco_id=None,
                 )
             )
 
-        logger.info(f"Generated {len(new_items)} new items for {afsc_code} via {LLM_PROVIDER}")
+        logger.info(
+            f"Generated {len(new_items)} new items for {afsc_code} via {provider}"
+        )
         return new_items
 
     except Exception as e:
@@ -829,7 +878,7 @@ if __name__ == "__main__":
     logger.info("=" * 60)
     logger.info("Testing LLM Enhancement")
     logger.info("=" * 60)
-    logger.info(f"Provider: {LLM_PROVIDER}")
+    logger.info(f"Provider: {get_llm_provider()}")
     logger.info(f"Existing items: {len(sample_items)}")
 
     new_items = enhance_items_with_llm(
