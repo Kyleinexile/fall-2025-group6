@@ -31,16 +31,14 @@ logger = logging.getLogger(__name__)
 # -------------------------
 # Config
 # -------------------------
-# Provider selection and default model names are driven by environment
-# variables, but sensible defaults are provided for local development.
-
 # Module-level default provider captured at import time (used as fallback).
 LLM_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 
 LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini-2.0-flash")
 LLM_MODEL_ANTHROPIC = os.getenv("LLM_MODEL_ANTHROPIC", "claude-sonnet-4-5-20250929")
 LLM_MODEL_OPENAI = os.getenv("LLM_MODEL_OPENAI", "gpt-5.1-instant")
-LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "meta-llama/Llama-3.2-3B-Instruct")
+# Choose an HF default that many providers host and that supports chat or text-gen
+LLM_MODEL_HF = os.getenv("LLM_MODEL_HUGGINGFACE", "mistralai/Mistral-7B-Instruct-v0.3")
 
 # Base API keys from import-time environment (used as fallback)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
@@ -48,36 +46,19 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 def get_llm_provider() -> str:
-    """
-    Get the current LLM provider.
-
-    - Checks LLM_PROVIDER in the *current* environment first (so Streamlit
-      can override per-run).
-    - Falls back to the module-level default from import time.
-    """
+    """Get current provider, preferring live env over import-time default."""
     return (os.getenv("LLM_PROVIDER") or LLM_PROVIDER or "openai").strip().lower()
 
-
 def get_api_key(provider: str) -> str:
-    """
-    Get the appropriate API key / token for a given provider.
-
-    Prefers the *current* environment value, falls back to the
-    module-level values captured at import time.
-    """
+    """Return API key/token for provider, preferring live env."""
     provider = provider.lower()
     if provider == "openai":
         return os.getenv("OPENAI_API_KEY") or OPENAI_API_KEY
     elif provider == "anthropic":
         return os.getenv("ANTHROPIC_API_KEY") or ANTHROPIC_API_KEY
     elif provider in {"gemini", "google", "googleai"}:
-        return (
-            os.getenv("GOOGLE_API_KEY")
-            or os.getenv("GEMINI_API_KEY")
-            or GOOGLE_API_KEY
-        )
+        return os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY") or GOOGLE_API_KEY
     elif provider == "huggingface":
-        # Try HF_TOKEN first (as set by Try It Yourself), then fallback env
         return os.getenv("HF_TOKEN", "")
     return ""
 
@@ -87,15 +68,8 @@ def get_api_key(provider: str) -> str:
 _word = r"[A-Za-z0-9/\-\+]+"
 _cap = r"[A-Z][a-zA-Z0-9/\-\+]+"
 
-
 def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
-    """
-    Extract simple noun-like phrases from AFSC text for Knowledge generation.
-
-    This is a lightweight heuristic that looks for:
-    - Capitalized sequences (e.g., "Intelligence Preparation of the Battlespace")
-    - Common collocations around analysis/intelligence/operations
-    """
+    """Extract simple noun-like phrases from AFSC text for Knowledge generation."""
     if not text:
         return []
     import re as _re
@@ -122,11 +96,8 @@ def _topical_candidates(text: str, max_items: int = 8) -> List[str]:
 # Heuristic enhancement
 # -------------------------
 
-
 def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft]:
-    """
-    Generate Knowledge/Ability items from heuristics when LLMs are unavailable.
-    """
+    """Generate Knowledge/Ability items from heuristics when LLMs are unavailable."""
     have_k = any(it.item_type == ItemType.KNOWLEDGE for it in items)
     have_a = any(it.item_type == ItemType.ABILITY for it in items)
 
@@ -140,15 +111,8 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
                 continue
             first = it.text.split()[0].lower() if it.text else ""
             if first in {
-                "analyze",
-                "conduct",
-                "synthesize",
-                "assess",
-                "brief",
-                "collect",
-                "evaluate",
-                "integrate",
-                "develop",
+                "analyze", "conduct", "synthesize", "assess", "brief",
+                "collect", "evaluate", "integrate", "develop",
             }:
                 verbs.append(it.text)
         verbs = verbs[:2]
@@ -183,26 +147,18 @@ def _heuristic_enhance(afsc_text: str, items: List[ItemDraft]) -> List[ItemDraft
     return new_items
 
 # -------------------------
-# Hugging Face chat-template wrapper
+# Hugging Face chat-template helper
 # -------------------------
 
 def _hf_wrap_prompt_for_model(model_id: str, user_prompt: str) -> str:
+    """Add a minimal chat template for text-generation fallback when provider lacks chat."""
     m = (model_id or "").lower().strip()
     p = user_prompt.strip()
 
-    # Mistral Instruct family
     if "mistral" in m:
         return f"[INST] {p} [/INST]"
-
-    # Zephyr chat format
     if "zephyr" in m:
-        return (
-            "<|system|>\nYou are a concise assistant.\n"
-            "<|user|>\n" + p + "\n"
-            "<|assistant|>\n"
-        )
-
-    # Llama instruct-style (covers many Llama 3/3.1/3.2 instruct variants)
+        return "<|system|>\nYou are a concise assistant.\n<|user|>\n" + p + "\n<|assistant|>\n"
     if "llama" in m:
         return (
             "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n"
@@ -211,14 +167,12 @@ def _hf_wrap_prompt_for_model(model_id: str, user_prompt: str) -> str:
             + p +
             "\n<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n"
         )
-
-    # Gemma often works with the raw prompt; add a wrapper later if needed
+    # Many other models accept raw prompt fine
     return p
 
 # -------------------------
 # LLM Implementations
 # -------------------------
-
 
 def _call_llm_gemini(
     prompt: str,
@@ -227,9 +181,7 @@ def _call_llm_gemini(
     max_tokens: int = 512,
     model: str | None = None,
 ) -> str:
-    """
-    Call Google Gemini API with permissive safety and generation settings.
-    """
+    """Call Google Gemini API with permissive safety and generation settings."""
     key = get_api_key("gemini")
     if not key:
         raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not set")
@@ -269,58 +221,39 @@ def _call_llm_gemini(
     except Exception as e:
         raise RuntimeError(f"Gemini API error: {e}")
 
-
 def _call_llm_anthropic(prompt: str) -> str:
-    """
-    Call Anthropic Claude API using the messages interface.
-    """
+    """Call Anthropic Claude API using the messages interface."""
     key = get_api_key("anthropic")
     if not key:
         raise ValueError("ANTHROPIC_API_KEY not set")
     try:
         import anthropic
-
         client = anthropic.Anthropic(api_key=key)
         message = client.messages.create(
             model=LLM_MODEL_ANTHROPIC,
             max_tokens=1024,
             temperature=0.3,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                    ],
-                }
-            ],
+            messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
         )
-
-        # message.content is a list of content blocks (v1 API style)
         text_parts = []
         for block in getattr(message, "content", []) or []:
-            # Newer client returns objects with .type / .text
             if hasattr(block, "text"):
                 text_parts.append(block.text)
             elif isinstance(block, dict) and "text" in block:
                 text_parts.append(block["text"])
         return "\n".join(text_parts).strip()
-
     except ImportError:
         raise ImportError("anthropic not installed")
     except Exception as e:
         raise RuntimeError(f"Anthropic API error: {e}")
 
-
 def _call_llm_openai(prompt: str) -> str:
-    """
-    Call OpenAI Chat Completions API.
-    """
+    """Call OpenAI Chat Completions API."""
     key = get_api_key("openai")
     if not key:
         raise ValueError("OPENAI_API_KEY not set")
     try:
         from openai import OpenAI
-
         client = OpenAI(api_key=key)
         response = client.chat.completions.create(
             model=LLM_MODEL_OPENAI,
@@ -334,7 +267,6 @@ def _call_llm_openai(prompt: str) -> str:
     except Exception as e:
         raise RuntimeError(f"OpenAI API error: {e}")
 
-
 def _call_llm_huggingface(
     prompt: str,
     *,
@@ -343,9 +275,12 @@ def _call_llm_huggingface(
     model: str | None = None,
 ) -> str:
     """
-    Call a Hugging Face text-generation model via huggingface-hub.
+    Call a Hugging Face model via Inference API.
 
-    Uses HF_TOKEN from the environment (set by Try It Yourself).
+    Many hosted providers expose models as the "conversational" task.
+    We therefore:
+      1) Try chat_completion() first
+      2) Fall back to text_generation() with a light chat template
     """
     key = get_api_key("huggingface")
     if not key:
@@ -354,17 +289,38 @@ def _call_llm_huggingface(
         from huggingface_hub import InferenceClient
 
         mdl = model or LLM_MODEL_HF
-        wrapped = _hf_wrap_prompt_for_model(mdl, prompt)
+        # Construct client without binding to a single model (some providers care)
+        client = InferenceClient(token=key, timeout=60)
 
-        # bump timeout; enable sampling only if temperature > 0
-        client = InferenceClient(mdl, token=key, timeout=60)
+        # 1) Prefer chat endpoint (works with “conversational” providers incl. novita)
+        try:
+            resp = client.chat_completion(
+                model=mdl,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            # HF returns OpenAI-like structure
+            choice = (getattr(resp, "choices", None) or [None])[0]
+            if choice and getattr(choice, "message", None):
+                content = choice.message.get("content", "")
+                if isinstance(content, list):
+                    return "".join(str(p) for p in content).strip()
+                return (content or "").strip()
+        except Exception as chat_err:
+            logger.info(f"HF chat endpoint unavailable for {mdl}: {chat_err}; falling back to text_generation")
+
+        # 2) Fallback to text_generation for classic text-generation task
+        wrapped = _hf_wrap_prompt_for_model(mdl, prompt)
         text = client.text_generation(
-            wrapped,
+            model=mdl,
+            prompt=wrapped,
             max_new_tokens=int(max_tokens),
             temperature=float(temperature),
             do_sample=temperature > 0.0,
         )
         return (text or "").strip()
+
     except ImportError:
         raise ImportError("huggingface-hub not installed")
     except Exception as e:
@@ -373,7 +329,6 @@ def _call_llm_huggingface(
 # -------------------------
 # Provider switch
 # -------------------------
-
 
 def _provider_call(prompt: str) -> str:
     """
@@ -426,7 +381,6 @@ def _provider_call(prompt: str) -> str:
 
 # ---- Runtime override helpers (legacy/programmatic) -----------
 
-
 def set_runtime_credentials(provider: str | None = None, api_key: str | None = None):
     """
     Override the provider and corresponding API key at runtime.
@@ -464,7 +418,6 @@ def set_runtime_credentials(provider: str | None = None, api_key: str | None = N
 # Generic run_llm API
 # -------------------------
 
-
 def run_llm(
     *,
     prompt: str,
@@ -474,9 +427,7 @@ def run_llm(
     max_tokens: int = 512,
     model: str | None = None,
 ) -> str:
-    """
-    Public, minimal LLM caller for ad-hoc prompts (e.g., 'Try it yourself' page).
-    """
+    """Public, minimal LLM caller for ad-hoc prompts (e.g., 'Try it yourself' page)."""
     prompt = (prompt or "").strip()
     if not prompt:
         return ""
@@ -490,7 +441,6 @@ def run_llm(
             raise ValueError("OPENAI_API_KEY not set")
         try:
             from openai import OpenAI
-
             client = OpenAI(api_key=key)
             mdl = model or LLM_MODEL_OPENAI
             resp = client.chat.completions.create(
@@ -509,17 +459,13 @@ def run_llm(
             raise ValueError("ANTHROPIC_API_KEY not set")
         try:
             import anthropic
-
             client = anthropic.Anthropic(api_key=key)
             mdl = model or LLM_MODEL_ANTHROPIC
             msg = client.messages.create(
                 model=mdl,
                 max_tokens=max_tokens or 1024,
                 temperature=temperature,
-                messages=[{
-                    "role": "user",
-                    "content": [{"type": "text", "text": prompt}],
-                }],
+                messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
             )
             parts = []
             for block in getattr(msg, "content", []) or []:
@@ -537,7 +483,6 @@ def run_llm(
             raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not set")
         try:
             import google.generativeai as genai
-
             genai.configure(api_key=key)
             return _call_llm_gemini(
                 prompt,
@@ -556,7 +501,7 @@ def run_llm(
             prompt,
             temperature=temperature,
             max_tokens=max_tokens,
-            model=model or LLM_MODEL_HF,
+            model=model or os.getenv("LLM_MODEL_HUGGINGFACE") or LLM_MODEL_HF,
         )
 
     else:
@@ -589,7 +534,6 @@ FORMAT EXAMPLE:
 - Knowledge of geospatial analysis techniques
 """.strip()
 
-
 def _format_existing(items: List[ItemDraft]) -> str:
     """Render existing items as [- [Knowledge]/[Ability]] to guide the model."""
     if not items:
@@ -609,11 +553,8 @@ def _format_existing(items: List[ItemDraft]) -> str:
 
 _BULLET_RE = re.compile(r"^\s*-\s*(Knowledge of|Ability to)\s.+$", re.IGNORECASE)
 
-
 def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
-    """
-    Filter model output to a constrained, predictable K/A bullet format.
-    """
+    """Filter model output to a constrained, predictable K/A bullet format."""
     if not raw:
         return []
     out: List[str] = []
@@ -638,7 +579,6 @@ def _sanitize_lines(raw: str, max_len: int = 120) -> List[str]:
             deduped.append(l)
     return deduped
 
-
 def _normalize_item_text(s: str) -> str:
     """Normalize text for approximate duplicate detection."""
     s = s.lower().strip()
@@ -648,11 +588,8 @@ def _normalize_item_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s)
     return s
 
-
 def _filter_against_existing(generated: List[str], existing_block: str) -> List[str]:
-    """
-    Remove near-duplicates vs existing items using simple normalization.
-    """
+    """Remove near-duplicates vs existing items using simple normalization."""
     existing_norm = []
     for line in existing_block.splitlines():
         line = line.strip()
@@ -666,11 +603,8 @@ def _filter_against_existing(generated: List[str], existing_block: str) -> List[
             keep.append(g)
     return keep
 
-
 def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
-    """
-    Parse LLM output into (ItemType, text) tuples.
-    """
+    """Parse LLM output into (ItemType, text) tuples."""
     out: List[Tuple[ItemType, str]] = []
     if not raw:
         return out
@@ -706,7 +640,6 @@ def _parse_llm_lines(raw: str) -> List[Tuple[ItemType, str]]:
 # Public API
 # -------------------------
 
-
 def enhance_items_with_llm(
     afsc_code: str,
     afsc_text: str,
@@ -714,9 +647,7 @@ def enhance_items_with_llm(
     *,
     max_new: int = 6,
 ) -> List[ItemDraft]:
-    """
-    Enrich items with Knowledge/Ability statements via LLM or heuristics.
-    """
+    """Enrich items with Knowledge/Ability statements via LLM or heuristics."""
     provider = get_llm_provider()
 
     # If disabled, use heuristics
@@ -772,9 +703,7 @@ def enhance_items_with_llm(
                 )
             )
 
-        logger.info(
-            f"Generated {len(new_items)} new items for {afsc_code} via {provider}"
-        )
+        logger.info(f"Generated {len(new_items)} new items for {afsc_code} via {provider}")
         return new_items
 
     except Exception as e:
