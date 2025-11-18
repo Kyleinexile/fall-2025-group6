@@ -32,7 +32,6 @@ _PAGE_HEADER = re.compile(
     re.IGNORECASE | re.MULTILINE,
 )
 _PAGE_FOOTER = re.compile(r"^\s*\d{1,4}\s*$", re.MULTILINE)  # bare page numbers
-_SECTION_NUM_GUNK = re.compile(r"\s{2,}")  # collapse long spacing (kept for future use)
 _HYPHEN_BREAK = re.compile(r"(\w)-\n(\w)")  # some- \n thing -> something
 _NOTE_TRAILER = re.compile(r"^\s*NOTE:.*$", re.IGNORECASE | re.MULTILINE)
 
