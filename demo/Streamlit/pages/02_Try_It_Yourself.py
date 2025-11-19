@@ -65,6 +65,8 @@ if "tiy_search_results" not in st.session_state:
     st.session_state.tiy_search_results = None
 if "tiy_search_info" not in st.session_state:
     st.session_state.tiy_search_info = {}
+if "tiy_pages" not in st.session_state:
+    st.session_state.tiy_pages = []
 if "tiy_selected_page_text" not in st.session_state:
     st.session_state.tiy_selected_page_text = ""
 if "tiy_afsc_code" not in st.session_state:
@@ -241,9 +243,6 @@ source = st.radio(
 )
 st.session_state.tiy_selected_source = source
 
-# Load pages for this source (cached)
-pages = load_pdf_pages(source)
-
 st.markdown("#### 🔍 Search within the document")
 query = st.text_input(
     "Search term (e.g., '14N', '1N4X1', 'Intelligence')",
@@ -264,7 +263,11 @@ if search_btn:
     if not query.strip():
         st.warning("⚠️ Enter a search term")
     else:
-        with st.spinner("Searching pages..."):
+        with st.spinner("Loading document and searching..."):
+            # LAZY LOAD: Only fetch PDF when user actually searches
+            pages = load_pdf_pages(source)
+            # Store in session state for "Load Page" buttons
+            st.session_state.tiy_pages = pages
             results = search_pages(pages, query)
             st.session_state.tiy_search_results = results
             st.session_state.tiy_search_info = {
@@ -275,6 +278,9 @@ if search_btn:
 results = st.session_state.tiy_search_results
 
 if results is not None:
+    # Retrieve pages from session state (loaded during search)
+    pages = st.session_state.get("tiy_pages", [])
+    
     # Show when these results were generated
     search_info = st.session_state.tiy_search_info
     if "timestamp" in search_info:
