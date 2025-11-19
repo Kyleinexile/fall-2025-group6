@@ -177,7 +177,7 @@ def _call_llm_gemini(
     prompt: str,
     *,
     temperature: float = 0.3,
-    max_tokens: int = 512,
+    max_tokens: int = 1024,
     model: str | None = None,
 ) -> str:
     """Call Google Gemini API with permissive safety and generation settings."""
