@@ -343,13 +343,6 @@ See [Pipeline README](src/afsc_pipeline/README.md) for detailed troubleshooting.
 - **USAF** for AFSC documentation (AFOCD/AFECD source materials)
 
 ---
-
-## 📄 License
-
-MIT License
-
----
-
 ## 📧 Contact
 
 For questions about this project, please contact:
@@ -357,7 +350,5 @@ For questions about this project, please contact:
 - Repository: [github.com/Kyleinexile/fall-2025-group6](https://github.com/Kyleinexile/fall-2025-group6)
 
 ---
-
-**⭐ Star this repo if you found it useful!**
 
 Built with ❤️ at George Washington University
