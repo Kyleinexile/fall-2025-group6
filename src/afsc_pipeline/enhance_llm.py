@@ -673,7 +673,7 @@ def enhance_items_with_llm(
 
     existing_formatted = _format_existing(items)
     prompt = _PROMPT.format(
-        afsc_text=afsc_text.strip()[:2000],
+        afsc_text=afsc_text.strip()[:5000],
         existing=existing_formatted,
         missing_hint=missing_hint,
     )
