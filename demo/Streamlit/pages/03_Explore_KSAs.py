@@ -280,4 +280,6 @@ with st.sidebar:
         **Use filters**: Narrow down by type, confidence, or text search
         
         **Export**: Download filtered results as CSV
+        
+        **Admin Tools**: Use Admin Tools page to delete entire AFSCs (admin-only)
         """)

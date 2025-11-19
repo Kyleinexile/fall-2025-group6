@@ -205,8 +205,9 @@ def log_admin_ingest(
     error: str | None = None,
 ) -> None:
     """Append an audit record to admin_ingest_log.jsonl."""
+    # FIXED: Use timezone-aware datetime instead of deprecated utcnow()
     record = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
         "afsc": afsc_code,
         "mode": mode,  # "single" | "bulk"
         "status": status,  # "success" | "error"
@@ -285,9 +286,10 @@ def load_pdf_pages(url: str):
     return pages
 
 def highlight_matches(text: str, pattern: str) -> str:
+    """FIXED: Simpler highlighting to prevent character-by-character wrapping"""
     try:
         rx = re.compile(pattern, flags=re.IGNORECASE)
-        return rx.sub(lambda m: f"**`{m.group(0)}`**", text)
+        return rx.sub(lambda m: f"**{m.group(0)}**", text)
     except Exception:
         return text
 
@@ -402,7 +404,7 @@ with tab1:
                                         if st.button("→ Load to Ingest", key=f"send_{i}", use_container_width=True):
                                             st.session_state.admin_loaded_text = h["full"]
                                             st.session_state.admin_loaded_code = ""
-                                        st.success("✅ Loaded! Go to Ingest & Process tab →")
+                                            st.success("✅ Loaded! Go to Ingest & Process tab →")
                             
                             st.markdown("---")
     
@@ -661,8 +663,13 @@ with tab4:
                     ksas_deleted = rec["ksas_deleted"] if rec else 0
                 
                 driver.close()
-                st.success(f"Deleted {len(afsc_list)} AFSCs and {ksas_deleted} orphaned KSAs")
+                
+                # CRITICAL: Clear all caches so Explore KSAs page refreshes
                 st.cache_data.clear()
+                st.cache_resource.clear()
+                
+                st.success(f"✅ Deleted {len(afsc_list)} AFSCs and {ksas_deleted} orphaned KSAs")
+                st.info("💡 Cache cleared - Explore KSAs will show updated data")
         
         except Exception as e:
             st.error(f"Delete failed: {e}")

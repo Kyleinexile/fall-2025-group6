@@ -58,19 +58,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ===== SESSION STATE =====
-if "selected_source" not in st.session_state:
-    st.session_state.selected_source = "AFECD (Enlisted)"
-if "search_results" not in st.session_state:
-    st.session_state.search_results = None
-if "search_info" not in st.session_state:
-    st.session_state.search_info = {}
-if "selected_page_text" not in st.session_state:
-    st.session_state.selected_page_text = ""
-if "afsc_code" not in st.session_state:
-    st.session_state.afsc_code = ""
-if "afsc_text" not in st.session_state:
-    st.session_state.afsc_text = ""
+# ===== SESSION STATE (TIY-namespaced to prevent collision with Admin Tools) =====
+if "tiy_selected_source" not in st.session_state:
+    st.session_state.tiy_selected_source = "AFECD (Enlisted)"
+if "tiy_search_results" not in st.session_state:
+    st.session_state.tiy_search_results = None
+if "tiy_search_info" not in st.session_state:
+    st.session_state.tiy_search_info = {}
+if "tiy_selected_page_text" not in st.session_state:
+    st.session_state.tiy_selected_page_text = ""
+if "tiy_afsc_code" not in st.session_state:
+    st.session_state.tiy_afsc_code = ""
+if "tiy_afsc_text" not in st.session_state:
+    st.session_state.tiy_afsc_text = ""
 
 # ===== UTILITIES =====
 @st.cache_data(show_spinner=False)
@@ -123,6 +123,22 @@ def search_pages(pages, query: str, max_hits: int = 50):
                 break
     return results
 
+# Sidebar: Cache Management
+with st.sidebar:
+    st.markdown("### 🔬 Try It Yourself")
+    
+    if st.button("🔄 Clear Page Cache", use_container_width=True, help="Clear search results and reset form"):
+        # Clear all TIY-specific session state
+        for key in list(st.session_state.keys()):
+            if key.startswith("tiy_"):
+                del st.session_state[key]
+        st.cache_data.clear()
+        st.success("Cache cleared!")
+        st.rerun()
+    
+    st.markdown("---")
+    st.caption("💡 Use this to reset the page if you encounter any issues")
+
 # Main UI
 st.title("🔬 Try It Yourself - Interactive KSA Extraction")
 st.markdown("**Test the pipeline with your own LLM API key** (LAiSER uses system OpenAI)")
@@ -132,21 +148,46 @@ st.divider()
 # ============ ARCHITECTURE INFO ============
 with st.expander("ℹ️ How This Works", expanded=False):
     st.markdown("""
-    ### Pipeline Architecture
+    ### Pipeline Architecture (5-Stage Process)
     
-    **1. LAiSER (Skill Extraction)**
+    **Stage 1: LAiSER Skill Extraction** 🎯
     - ✅ Uses **system OpenAI API key** (from app secrets)
-    - ⚠️ LAiSER's Gemini integration is broken - OpenAI only
-    - ✅ Extracts skills with ESCO taxonomy codes
+    - ⚠️ LAiSER's Gemini integration is currently broken - OpenAI only
+    - 📊 Extracts 20-30 skills per AFSC from job descriptions
+    - 🏷️ Automatically aligns skills to ESCO/O*NET taxonomy codes
+    - 📚 [LAiSER Taxonomy Reference (ESCO + O*NET combined)](https://github.com/LAiSER-Software/extract-module/blob/main/laiser/public/combined.csv)
     
-    **2. LLM Enhancement (Knowledge & Abilities)**
+    **Stage 2: Quality Filtering** ✂️
+    - Removes duplicates and low-confidence extractions
+    - Filters out generic/vague skills
+    - Ensures minimum text length and coherence
+    
+    **Stage 3: ESCO Mapping** 🗺️
+    - Maps extracted skills to standardized taxonomy IDs
+    - Links to European Skills/Competences/Occupations framework
+    - Enables cross-AFSC skill comparison
+    
+    **Stage 4: LLM Enhancement (Knowledge & Abilities)** 🤖
     - 🔑 Uses **YOUR API key** (whichever provider you choose)
-    - 🔑 Generates complementary Knowledge and Ability items
+    - 🧠 Generates complementary Knowledge items (what you need to know)
+    - 💪 Generates complementary Ability items (what you need to be capable of)
     - 🔑 Supports: OpenAI, Anthropic, Gemini, HuggingFace
+    - ⚡ Produces 15-25 additional KSAs to complement LAiSER's skills
     
-    **Privacy:**
+    **Stage 5: Deduplication & Output** 🎯
+    - Final deduplication pass across all KSA types
+    - Confidence scoring and source attribution
+    - Structured output ready for Neo4j database (but not written in demo mode)
+    
+    **Privacy & Security:**
     - Your API key is session-only (cleared when you close browser)
     - Results are NOT saved to database (demo mode only)
+    - No data retention or logging of your inputs
+    
+    **Expected Output:**
+    - 25-50 total KSAs per AFSC (varies by complexity)
+    - ~60-70% with ESCO taxonomy alignment
+    - Mix of Skills (from LAiSER), Knowledge & Abilities (from LLM)
     """)
 
 st.divider()
@@ -195,10 +236,10 @@ st.markdown('<div class="step-header">🔍 Step 2: Search Documentation</div>', 
 source = st.radio(
     "Select Document",
     list(SOURCES.keys()),
-    index=list(SOURCES.keys()).index(st.session_state.selected_source),
+    index=list(SOURCES.keys()).index(st.session_state.tiy_selected_source),
     horizontal=True,
 )
-st.session_state.selected_source = source
+st.session_state.tiy_selected_source = source
 
 # Load pages for this source (cached)
 pages = load_pdf_pages(source)
@@ -206,8 +247,8 @@ pages = load_pdf_pages(source)
 st.markdown("#### 🔍 Search within the document")
 query = st.text_input(
     "Search term (e.g., '14N', '1N4X1', 'Intelligence')",
-    value=st.session_state.search_info.get("query", ""),
-    key="search_query_input"
+    value=st.session_state.tiy_search_info.get("query", ""),
+    key="tiy_search_query_input"
 )
 
 col_search_btn, col_clear_btn = st.columns([3, 1])
@@ -215,9 +256,8 @@ with col_search_btn:
     search_btn = st.button("🔎 Search Document", type="primary", use_container_width=True)
 with col_clear_btn:
     if st.button("Clear Results", use_container_width=True):
-        st.session_state.search_results = None
-        st.session_state.search_info = {}
-        st.session_state.search_query_input = ""  # Clear the text input too
+        st.session_state.tiy_search_results = None
+        st.session_state.tiy_search_info = {}
         st.rerun()
 
 if search_btn:
@@ -226,17 +266,17 @@ if search_btn:
     else:
         with st.spinner("Searching pages..."):
             results = search_pages(pages, query)
-            st.session_state.search_results = results
-            st.session_state.search_info = {
+            st.session_state.tiy_search_results = results
+            st.session_state.tiy_search_info = {
                 "query": query,
                 "timestamp": time.time()
             }
 
-results = st.session_state.search_results
+results = st.session_state.tiy_search_results
 
 if results is not None:
     # Show when these results were generated
-    search_info = st.session_state.search_info
+    search_info = st.session_state.tiy_search_info
     if "timestamp" in search_info:
         time_ago = int(time.time() - search_info["timestamp"])
         time_str = f"{time_ago}s ago" if time_ago < 60 else f"{time_ago//60}m ago"
@@ -247,8 +287,10 @@ if results is not None:
         st.info("No matches found. Try another search term.")
     else:
         for r in results:
-            with st.expander(f"📄 Page {r['page']} • {r['matches']} match(es)"):
-                st.markdown(r["snippet"])
+            # FIXED: Safety check for 'matches' key to prevent KeyError
+            match_count = r.get('matches', '?')
+            with st.expander(f"📄 Page {r['page']} • {match_count} match(es)"):
+                st.markdown(r.get("snippet", ""))
                 
                 # Show full text in expandable section
                 with st.expander("📖 Show full page text"):
@@ -258,20 +300,20 @@ if results is not None:
                             "Full page content",
                             value=page_full["text"],
                             height=400,
-                            key=f"fulltext_{r['page']}",
+                            key=f"tiy_fulltext_{r['page']}",
                             label_visibility="collapsed"
                         )
                 
                 # Load button
                 if st.button(
                     f"✅ Load Page {r['page']} into Step 3",
-                    key=f"use_page_{r['page']}",
+                    key=f"tiy_use_page_{r['page']}",
                     use_container_width=True,
                 ):
                     page_full = next((p for p in pages if p["page"] == r["page"]), None)
                     if page_full:
-                        st.session_state.selected_page_text = page_full["text"]
-                        st.session_state.afsc_text = page_full["text"]
+                        st.session_state.tiy_selected_page_text = page_full["text"]
+                        st.session_state.tiy_afsc_text = page_full["text"]
                         st.success(f"✅ Loaded page {r['page']}! Scroll down to Step 3")
                         st.rerun()
 else:
@@ -287,27 +329,27 @@ col_code, col_info = st.columns([2, 1])
 with col_code:
     afsc_code = st.text_input(
         "AFSC Code *",
-        value=st.session_state.afsc_code,
+        value=st.session_state.tiy_afsc_code,
         placeholder="e.g., 14N, 1N4X1"
     )
-    st.session_state.afsc_code = afsc_code
+    st.session_state.tiy_afsc_code = afsc_code
 
 with col_info:
-    char_count = len(st.session_state.afsc_text or st.session_state.selected_page_text or "")
+    char_count = len(st.session_state.tiy_afsc_text or st.session_state.tiy_selected_page_text or "")
     st.metric("Text Length", f"{char_count:,} chars")
 
 afsc_text = st.text_area(
     "AFSC Documentation",
-    value=st.session_state.afsc_text or st.session_state.selected_page_text,
+    value=st.session_state.tiy_afsc_text or st.session_state.tiy_selected_page_text,
     height=300,
     placeholder="Paste AFSC text, or load from search above..."
 )
-st.session_state.afsc_text = afsc_text
+st.session_state.tiy_afsc_text = afsc_text
 
 if st.button("🗑️ Clear", use_container_width=True):
-    st.session_state.afsc_code = ""
-    st.session_state.afsc_text = ""
-    st.session_state.selected_page_text = ""
+    st.session_state.tiy_afsc_code = ""
+    st.session_state.tiy_afsc_text = ""
+    st.session_state.tiy_selected_page_text = ""
     st.rerun()
 
 st.divider()
@@ -447,11 +489,11 @@ if st.button("🚀 Extract KSAs", type="primary", disabled=not can_run, use_cont
         # Quick reset button
         st.divider()
         if st.button("🔄 Start New Extraction", type="primary", use_container_width=True):
-            st.session_state.afsc_code = ""
-            st.session_state.afsc_text = ""
-            st.session_state.selected_page_text = ""
-            st.session_state.search_results = None
-            st.session_state.search_info = {}
+            st.session_state.tiy_afsc_code = ""
+            st.session_state.tiy_afsc_text = ""
+            st.session_state.tiy_selected_page_text = ""
+            st.session_state.tiy_search_results = None
+            st.session_state.tiy_search_info = {}
             st.rerun()
         
     except Exception as e:
