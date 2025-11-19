@@ -974,21 +974,15 @@ elif section == "💰 Cost Analysis":
     
     st.markdown("### 📈 Cost Scaling")
     
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    
-    # Create scaling data
-    afsc_counts = [1, 12, 50, 100, 200]
-    laiser_only = [c * 0.005 for c in afsc_counts]
-    with_llm = [c * 0.0075 for c in afsc_counts]
-    
-    chart_data = pd.DataFrame({
-        "AFSCs": afsc_counts,
-        "LAiSER Only": laiser_only,
-        "LAiSER + Gemini": with_llm
+    # Create scaling data as table instead of chart
+    scaling_data = pd.DataFrame({
+        "AFSCs Processed": [1, 12, 50, 100, 200],
+        "LAiSER Only": ["$0.005", "$0.06", "$0.25", "$0.50", "$1.00"],
+        "LAiSER + Gemini": ["$0.0075", "$0.09", "$0.38", "$0.75", "$1.50"]
     })
     
-    st.line_chart(chart_data.set_index("AFSCs"))
+    st.dataframe(scaling_data, use_container_width=True, hide_index=True)
+    st.caption("💡 Cost scales linearly with number of AFSCs processed")
     
     st.markdown("### 🎯 ROI Analysis")
     
