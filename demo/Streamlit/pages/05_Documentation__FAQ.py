@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(
     page_title="Documentation & FAQ",
@@ -115,7 +116,6 @@ with st.sidebar:
             "🎯 Quick Stats",
             "⚙️ LLM Settings",
             "🤖 LAiSER Configuration", 
-            "🗺️ ESCO Mapper Status",
             "🔄 Deduplication",
             "📚 Major Libraries",
             "🔧 Pipeline Flow",
@@ -156,9 +156,9 @@ if section == "🏠 Overview":
         st.markdown("""
         - **12 AFSCs** processed successfully
         - **330+ KSAs** extracted
-        - **70% ESCO alignment** (target met)
         - **~$0.005** cost per AFSC
         - **3.2 seconds** avg processing time
+        - **LAiSER + Gemini** integration
         """)
     
     with col2:
@@ -190,11 +190,10 @@ elif section == "🎯 Quick Stats":
     st.markdown('<div class="section-header">🎯 Quick Statistics</div>', unsafe_allow_html=True)
     
     st.markdown("### 📊 Coverage Metrics")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     col1.metric("AFSCs Processed", "12")
     col2.metric("Total KSAs", "330+")
     col3.metric("Avg per AFSC", "27.5")
-    col4.metric("ESCO Aligned", "70%")
     
     st.markdown("### ⚡ Performance Metrics")
     col1, col2, col3, col4 = st.columns(4)
@@ -413,109 +412,14 @@ input_type = "job_desc"
     
     st.markdown("### 📈 Performance Characteristics")
     
-    perf_col1, perf_col2, perf_col3 = st.columns(3)
+    perf_col1, perf_col2 = st.columns(2)
     
     with perf_col1:
         st.metric("Extraction Time", "2-5 seconds", "per AFSC")
     
     with perf_col2:
         st.metric("Typical Output", "20-30 skills", "per AFSC")
-    
-    with perf_col3:
-        st.metric("ESCO Coverage", "~70%", "of skills")
 
-# ============================================================================
-# SECTION: ESCO MAPPER STATUS
-# ============================================================================
-elif section == "🗺️ ESCO Mapper Status":
-    st.markdown('<div class="section-header">🗺️ ESCO Mapper Status</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="warning-box">⚠️ <strong>CRITICAL FINDING:</strong> NOT CURRENTLY USED<br><br>The <code>esco_mapper.py</code> file exists (184 lines, fully functional) but is never imported or called in <code>pipeline.py</code>.</div>', unsafe_allow_html=True)
-    
-    st.markdown("### 🔍 Analysis")
-    
-    tab1, tab2, tab3 = st.tabs(["Problem", "Why Not Used", "Recommendations"])
-    
-    with tab1:
-        st.markdown("#### The Issue")
-        
-        st.code("""
-# pipeline.py - NO ESCO MAPPER IMPORT OR CALL
-from afsc_pipeline.extract_laiser import extract_ksa_items
-from afsc_pipeline.preprocess import clean_afsc_text
-from afsc_pipeline.graph_writer_v2 import upsert_afsc_and_items
-
-# ❌ Missing: from afsc_pipeline.esco_mapper import map_esco_ids
-        """, language="python")
-        
-        st.markdown("**File exists but is never executed in the pipeline flow.**")
-    
-    with tab2:
-        st.markdown("#### Why It's Not Active")
-        
-        st.markdown("""
-        LAiSER's built-in ESCO alignment (via Gemini) proved sufficient:
-        
-        1. ✅ LAiSER directly returns ESCO IDs for most skills (~70%)
-        2. ✅ Achieves project target without additional complexity
-        3. ✅ Local ESCO mapper was built as fallback/enrichment
-        4. ✅ Current pipeline meets 70% ESCO alignment goal
-        
-        **Bottom line:** Adding the local mapper would provide only ~5% additional coverage
-        but adds complexity and potential conflicts.
-        """)
-    
-    with tab3:
-        st.markdown("#### Recommendations")
-        
-        st.markdown("**Two Options:**")
-        
-        st.markdown("##### Option A: Remove the File (Recommended)")
-        st.markdown("""
-        **Pros:**
-        - Simplifies codebase
-        - Reduces confusion
-        - Acknowledges LAiSER sufficiency
-        
-        **Cons:**
-        - Loses potential future enrichment option
-        """)
-        
-        st.markdown("##### Option B: Keep but Document")
-        st.code("""
-# Add to pipeline.py:
-
-# NOTE: esco_mapper.py exists but is not used. LAiSER's built-in ESCO 
-# alignment via Gemini achieves our 70% target without additional complexity.
-# The mapper is retained for potential future use with non-AFSC data sources.
-        """, language="python")
-        
-        st.markdown("""
-        **Pros:**
-        - Preserves work for future use
-        - Available for non-AFSC sources
-        - Documents decision clearly
-        
-        **Cons:**
-        - Unused code in repository
-        """)
-    
-    st.markdown("### 🎤 For Your Presentation")
-    
-    st.markdown('<div class="info-box">"We built a local ESCO mapper as a fallback enrichment layer, but LAiSER\'s built-in ESCO alignment via Gemini proved sufficient, achieving our 70% target without additional complexity."</div>', unsafe_allow_html=True)
-    
-    st.markdown("### 🔧 ESCO Mapper Capabilities (If Enabled)")
-    
-    st.code("""
-# Similarity thresholds by type
-SIMILARITY_THRESHOLD_SKILL = 0.90      # Very strict for skills
-SIMILARITY_THRESHOLD_KNOW = 0.92       # Strictest for knowledge
-SIMILARITY_THRESHOLD_ABILITY = 0.90    # Strict for abilities
-
-# Method: Hybrid similarity (60% Jaccard + 40% difflib)
-# Matches against local ESCO CSV catalog
-# Only enriches items WITHOUT existing ESCO IDs
-    """, language="python")
 
 # ============================================================================
 # SECTION: DEDUPLICATION
@@ -884,38 +788,14 @@ elif section == "❓ FAQ":
     with st.expander("**Q: Why LAiSER with Gemini?**", expanded=True):
         st.markdown("""
         **A:** LAiSER is a GWU-developed skill extraction framework designed specifically 
-        for job descriptions. We integrated Gemini because it provides both **skill extraction 
-        AND ESCO alignment in one API call**, eliminating the need for a separate ESCO mapper.
+        for job descriptions. We integrated Gemini because it provides **skill extraction 
+        AND ESCO alignment in one API call**.
         
         Key benefits:
         - Single API call for extraction + alignment
         - Cost-effective (~$0.005 per AFSC)
-        - Achieves 70% ESCO coverage target
         - Reliable GWU-developed framework
-        """)
-    
-    with st.expander("**Q: Why not use FAISS for deduplication?**"):
-        st.markdown("""
-        **A:** FAISS is designed for large-scale vector similarity search (millions of items). 
-        We're deduplicating 20-50 items per AFSC - simple fuzzy matching is:
-        
-        - **Faster:** <100ms vs FAISS overhead
-        - **More explainable:** Clear formula (60% Jaccard + 40% difflib)
-        - **Better for short text:** Optimized for 10-60 character KSA phrases
-        - **No dependencies:** Pure Python implementation
-        """)
-    
-    with st.expander("**Q: What about the ESCO mapper you built?**"):
-        st.markdown("""
-        **A:** We built a local ESCO mapper (`esco_mapper.py`) as a fallback enrichment layer,
-        but LAiSER's built-in ESCO alignment via Gemini proved sufficient, achieving our 70% 
-        target without additional complexity.
-        
-        **Current status:** File exists but is not actively used in the pipeline.
-        
-        **Options:**
-        1. Remove the file (simplifies codebase)
-        2. Keep it for potential future non-AFSC use cases
+        - Built-in ESCO taxonomy support
         """)
     
     with st.expander("**Q: How are costs kept so low?**"):
@@ -961,7 +841,7 @@ elif section == "❓ FAQ":
         - **Cost:** ~$1 for 200 AFSCs (LAiSER-only)
         - **Time:** ~10-15 minutes total processing
         - **Storage:** Neo4j Aura handles thousands of nodes easily
-        - **Quality:** Same 70% ESCO alignment expected
+        - **Quality:** Consistent extraction and taxonomy alignment
         
         Main limitation is obtaining clean AFSC text for all specialties.
         """)
@@ -1021,18 +901,15 @@ elif section == "📊 Performance Metrics":
     
     st.markdown("### 🎯 Accuracy Metrics")
     
-    acc_col1, acc_col2, acc_col3, acc_col4 = st.columns(4)
+    acc_col1, acc_col2, acc_col3 = st.columns(3)
     
     with acc_col1:
-        st.metric("ESCO Coverage", "70%", "+20% vs baseline")
-    
-    with acc_col2:
         st.metric("False Positive Rate", "<1%", "near-duplicates")
     
-    with acc_col3:
+    with acc_col2:
         st.metric("Extraction Recall", "~85%", "vs manual review")
     
-    with acc_col4:
+    with acc_col3:
         st.metric("Precision", "~90%", "relevant KSAs")
     
     st.markdown("### 💾 Resource Usage")
