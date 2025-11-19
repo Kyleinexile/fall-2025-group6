@@ -257,7 +257,7 @@ def _call_llm_openai(prompt: str) -> str:
         response = client.chat.completions.create(
             model=LLM_MODEL_OPENAI,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=512,
+            max_tokens=1024,
             temperature=0.3,
         )
         return (response.choices[0].message.content or "").strip()
