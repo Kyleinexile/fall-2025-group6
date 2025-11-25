@@ -12,8 +12,8 @@
 ---
 
 <p align="center">
-  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank" style="text-decoration: none;">
-    <img src="https://img.shields.io/badge/🚀_LAUNCH_LIVE_DEMO-Click_to_Open_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&labelColor=262730" height="70" alt="Launch Demo">
+  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank">
+    <img src="https://img.shields.io/badge/🚀_LAUNCH_LIVE_DEMO-Click_to_Open_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&labelColor=262730&scale=2" height="50" alt="Launch Demo">
   </a>
 </p>
 
@@ -86,7 +86,7 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 
 #### 🧪 **Try It Yourself** (Public Demo)
 - Bring-Your-Own-API key mode
-- Search 1000+ page AFOCD/AFECD documents with pypdf
+- Search 700+ page AFOCD/AFECD documents with pypdf
 - Run full extraction pipeline without database writes
 - Test multiple LLM providers
 - Download results as CSV
@@ -296,11 +296,11 @@ Visit `http://localhost:8501` in your browser!
 
 ### Sample AFSCs
 - 14N - Intelligence Officer
-- 1N0X1 - All Source Intelligence Analyst
-- 1N4X1 - Cyber Intelligence Analyst
+- 1N0 - All Source Intelligence Analyst
+- 1N4 - Fusion Analyst / Cyber Intelligence
 - 11F3 - Fighter Pilot
 - 21A - Aircraft Maintenance Officer
-- 2A3X3 - Tactical Aircraft Maintenance
+- 2A3 - Tactical Aircraft Maintenance
 - *...and 6 more*
 
 ### Performance Metrics
