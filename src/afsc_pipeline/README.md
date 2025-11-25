@@ -10,10 +10,11 @@
 
 ## 🎯 Quick Stats
 
-- ✅ **12 AFSCs processed** with 330+ KSAs extracted
-- ✅ **~$0.005 per AFSC** processing cost (LAiSER-only mode)
-- ✅ **3-8 seconds** average processing time
+- ✅ **12 AFSCs processed** with 253 KSAs extracted
+- ✅ **~20% ESCO taxonomy alignment**
+- ✅ **60-80 seconds** average processing time
 - ✅ **LAiSER + Gemini integration** for skill extraction and taxonomy alignment
+- ✅ **Multi-provider LLM support** (OpenAI, Anthropic, Gemini, HuggingFace)
 
 ---
 
@@ -38,7 +39,7 @@
        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. SKILL EXTRACTION (extract_laiser.py)                     │
-│    • LAiSER + Gemini: Extract 20-30 skills per AFSC        │
+│    • LAiSER + Gemini: Extract 15-25 skills per AFSC        │
 │    • Built-in ESCO taxonomy alignment                       │
 │    • Fallback: Regex heuristics if LAiSER unavailable      │
 └──────┬──────────────────────────────────────────────────────┘
@@ -46,7 +47,7 @@
        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 3. QUALITY FILTERING (quality_filter.py)                    │
-│    • Length constraints (3-80 characters)                   │
+│    • Length constraints (3-80 chars for skills, 150 for K/A)│
 │    • Domain relevance filtering                             │
 │    • Canonical text mapping                                 │
 │    • Exact deduplication on (type, text)                    │
@@ -56,8 +57,8 @@
 ┌─────────────────────────────────────────────────────────────┐
 │ 4. LLM ENHANCEMENT (enhance_llm.py) - OPTIONAL              │
 │    • Generate complementary Knowledge & Ability items       │
-│    • Default: DISABLED (cost optimization)                  │
-│    • When enabled: Gemini Flash, 1024 token max            │
+│    • Multi-provider: Gemini, OpenAI, Anthropic, HuggingFace │
+│    • When enabled: 1024 token max output                    │
 └──────┬──────────────────────────────────────────────────────┘
        │
        ▼
@@ -111,31 +112,50 @@ cp .env.example .env
 
 ### Required Environment Variables
 
-```bash
-# Neo4j Configuration (Required)
-NEO4J_URI=neo4j+s://your-instance.databases.neo4j.io
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your-password
-NEO4J_DATABASE=neo4j
+```toml
+# ================================
+# LAiSER (Skill Extractor)
+# ================================
+USE_LAISER            = "true"
+LAISER_ALIGN_TOPK     = "25"
+LAISER_LLM_ENABLED    = "true"
+LAISER_LLM_PROVIDER   = "gemini"
+LAISER_MODEL_GEMINI   = "gemini-2.0-flash"
 
-# LAiSER Configuration (Required)
-GEMINI_API_KEY=your-gemini-api-key
-USE_LAISER=true
-LAISER_ALIGN_TOPK=25
+# ================================
+# LLM Enhancement Layer (K/A)
+# ================================
+USE_LLM_ENHANCER      = "true"
+LLM_PROVIDER          = "openai"
 
-# LLM Enhancement (Optional - Disabled by Default)
-USE_LLM_ENHANCER=false
-LLM_PROVIDER=gemini
-LLM_MODEL_GEMINI=gemini-2.0-flash
+# Model configuration
+LLM_MODEL_OPENAI      = "gpt-4o-mini-2024-07-18"
+LLM_MODEL_ANTHROPIC   = "claude-sonnet-4-5-20250929"
+LLM_MODEL_GEMINI      = "gemini-2.0-flash"
 
+# API Keys
+OPENAI_API_KEY        = "sk-..."
+ANTHROPIC_API_KEY     = "sk-ant-..."
+GEMINI_API_KEY        = "AIza..."
+
+# ================================
+# Neo4j Database
+# ================================
+NEO4J_URI             = "neo4j+s://your-instance.databases.neo4j.io:7687"
+NEO4J_USER            = "neo4j"
+NEO4J_PASSWORD        = "your-password"
+NEO4J_DATABASE        = "neo4j"
+
+# ================================
 # Quality Filtering
-QUALITY_MIN_LEN=3
-QUALITY_MAX_LEN=80
-LOW_CONF_SKILL_THRESHOLD=0.60
-STRICT_SKILL_FILTER=false
+# ================================
+QUALITY_MIN_LEN       = "3"
+QUALITY_MAX_LEN       = "80"
+QUALITY_MAX_LEN_KA    = "150"
+LOW_CONF_SKILL_THRESHOLD = "0.60"
 
 # Deduplication
-AGGRESSIVE_DEDUPE=true
+AGGRESSIVE_DEDUPE     = "true"
 ```
 
 ---
@@ -157,7 +177,7 @@ driver = GraphDatabase.driver(
 # Process a single AFSC
 with driver.session() as session:
     summary = run_pipeline(
-        afsc_code="1N0X1",
+        afsc_code="1N0",
         afsc_raw_text=open("afsc_text.txt").read(),
         neo4j_session=session,
     )
@@ -171,7 +191,7 @@ print(f"Extracted {summary['n_items_after_dedupe']} KSAs")
 from afsc_pipeline.pipeline import run_pipeline_demo
 
 summary = run_pipeline_demo(
-    afsc_code="1N0X1",
+    afsc_code="1N0",
     afsc_raw_text="Your AFSC text here...",
 )
 
@@ -183,7 +203,8 @@ for item in summary['items']:
 ### Streamlit Web Interface
 
 ```bash
-streamlit run src/streamlit_app/Home.py
+cd demo/Streamlit
+streamlit run Home.py
 ```
 
 Navigate to:
@@ -200,27 +221,15 @@ Navigate to:
 
 **Default configuration prioritizes cost efficiency:**
 
-**1. LLM Enhancement Disabled** (`USE_LLM_ENHANCER=false`)
-- LAiSER extraction alone achieves coverage goals
-- Enable only when Knowledge/Ability items are required
+**1. Model Selection**
+- **Gemini Flash**: Cost-effective for LAiSER backend
+- **GPT-4o-mini**: Affordable option for LLM enhancement
+- Both models provide good quality at low cost
 
-**2. Gemini Flash Model** (when LLM enabled)
-- Cheapest available option (~$0.075 per 1M input tokens)
-- Alternative: `gpt-4o-mini` (~$0.15 per 1M tokens)
-
-**3. Token Limits**
+**2. Token Limits**
 - Input limit: 5000 characters (full AFSC context)
 - Output limit: 1024 tokens
 - Max new items: 6 per AFSC
-
-**Cost breakdown per AFSC:**
-
-| Configuration | Per AFSC | 12 AFSCs | 200 AFSCs |
-|--------------|----------|----------|-----------|
-| LAiSER-only | $0.005 | $0.06 | $1.00 |
-| + Gemini Flash | $0.005-0.010 | $0.06-0.12 | $1.00-2.00 |
-| + GPT-4o-mini | $0.015-0.025 | $0.18-0.30 | $3.00-5.00 |
-| + Claude Sonnet | $0.050-0.100 | $0.60-1.20 | $10-20 |
 
 ### 🔍 LAiSER Configuration
 
@@ -240,11 +249,6 @@ input_type = "job_desc"       # Job description format
 - ✅ Assigns confidence scores (0-1 range)
 - ✅ Provides ESCO taxonomy IDs automatically
 - ✅ Graceful fallback to regex heuristics if API fails
-
-**Why Gemini?**
-- Cost-effective for skill extraction workloads
-- Built-in ESCO catalog access
-- Fast inference (2-5 seconds per AFSC)
 
 ### 🔄 Deduplication Strategy
 
@@ -284,18 +288,14 @@ similarity_threshold = 0.86  # Tuned for 10-60 character KSA phrases
 Configurable via environment variables:
 
 ```bash
-# Strict mode: Require ESCO IDs for low-confidence skills
-STRICT_SKILL_FILTER=false
+# Length constraints
+QUALITY_MIN_LEN=3         # Minimum characters
+QUALITY_MAX_LEN=80        # Maximum for skills
+QUALITY_MAX_LEN_KA=150    # Maximum for Knowledge/Abilities
 
-# Confidence threshold for strict filtering
+# Confidence threshold
 LOW_CONF_SKILL_THRESHOLD=0.60
 ```
-
-**Filter stages:**
-1. Length validation (3-80 chars)
-2. Banned phrase removal
-3. Canonical text mapping
-4. Exact deduplication
 
 ---
 
@@ -305,37 +305,27 @@ LOW_CONF_SKILL_THRESHOLD=0.60
 
 **Typical processing times (per AFSC):**
 
-| Stage | Min Time | Avg Time | Max Time | Bottleneck |
-|-------|----------|----------|----------|------------|
-| Preprocessing | <0.1s | <0.1s | <0.1s | No |
-| LAiSER extraction | 2s | 3.5s | 5s | Yes |
-| Quality filtering | <0.1s | <0.1s | <0.1s | No |
-| LLM enhancement* | 1s | 2s | 3s | Yes (optional) |
-| Deduplication | <0.1s | <0.1s | <0.1s | No |
-| Neo4j write | 0.5s | 0.7s | 1s | No |
-| **TOTAL** | **3s** | **6.3s** | **9.1s** | - |
-
-*LLM Enhancement is optional and disabled by default
+| Stage | Description | Time |
+|-------|-------------|------|
+| Preprocessing | Text cleaning | <1s |
+| LAiSER extraction | Skill extraction + ESCO | 30-45s |
+| Quality filtering | Length/domain filters | <1s |
+| LLM enhancement | K/A generation (optional) | 15-25s |
+| Deduplication | Fuzzy matching | <1s |
+| Neo4j write | Graph persistence | 1-2s |
+| **TOTAL** | End-to-end | **60-80s** |
 
 ### 📉 Item Flow
 
 **Reduction through pipeline:**
 
-| Stage | Typical Count | Reduction % | Description |
-|-------|---------------|-------------|-------------|
-| LAiSER Extract | 20-30 | - | Raw skills from LAiSER |
-| Quality Filter | 18-27 | ~10% | Remove noise, short items |
-| LLM Enhance* | 25-40 | - | Add K/A items (optional) |
-| Deduplication | 21-34 | ~15% | Remove near-duplicates |
-| Final Output | 25-35 | - | Clean, canonical KSAs |
-
-### 🎯 Accuracy Metrics
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| False Positive Rate | <1% | Near-duplicates |
-| Extraction Recall | ~85% | vs manual review |
-| Precision | ~90% | Relevant KSAs |
+| Stage | Typical Count | Description |
+|-------|---------------|-------------|
+| LAiSER Extract | 15-25 | Raw skills from LAiSER |
+| Quality Filter | 12-22 | Remove noise, short items |
+| LLM Enhance* | 18-30 | Add K/A items (optional) |
+| Deduplication | 15-25 | Remove near-duplicates |
+| Final Output | ~21 avg | Clean, canonical KSAs |
 
 ### 💾 Resource Usage
 
@@ -380,7 +370,7 @@ LOW_CONF_SKILL_THRESHOLD=0.60
 **Key function:** `apply_quality_filter(items: List[ItemDraft], **kwargs) -> List[ItemDraft]`
 
 **Filter stages:**
-1. Length constraints (3-80 chars)
+1. Length constraints (3-80 chars for skills, 150 for K/A)
 2. Domain relevance filtering
 3. Canonical text mapping
 4. Exact deduplication
@@ -467,7 +457,7 @@ export GEMINI_API_KEY=your-key
 
 ### Low Extraction Quality
 
-**Problem:** Only extracting 5-10 items instead of 20-30
+**Problem:** Only extracting 5-10 items instead of 15-25
 
 **Solutions:**
 1. Verify `USE_LAISER=true`
@@ -494,7 +484,7 @@ export GEMINI_API_KEY=your-key
 pytest tests/
 
 # Test single AFSC extraction
-python -m afsc_pipeline.cli process-afsc 1N0X1 path/to/text.txt
+python -m afsc_pipeline.cli process-afsc 1N0 path/to/text.txt
 
 # Validate Neo4j schema
 python -m afsc_pipeline.graph_writer_v2 --validate
@@ -529,7 +519,7 @@ python -m afsc_pipeline.graph_writer_v2 --validate
 
 ### Why LAiSER + Gemini?
 - **Integrated ESCO alignment**: Single API call extracts skills AND taxonomy IDs
-- **Cost-effective**: Gemini Flash at ~$0.075 per 1M tokens
+- **Cost-effective**: Gemini Flash provides good performance at low cost
 - **Reliable**: Built by GWU specifically for job description analysis
 
 ### Why Custom Deduplication (Not FAISS)?
@@ -544,7 +534,6 @@ python -m afsc_pipeline.graph_writer_v2 --validate
 
 ### Why 5000 Character Input Limit?
 - **Full context**: Most AFSCs are ~4000 characters
-- **Negligible cost**: Only ~$0.0001 more per AFSC vs 2000 chars
 - **Better quality**: Complete descriptions improve extraction accuracy
 
 ---
