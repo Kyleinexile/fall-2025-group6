@@ -1,11 +1,31 @@
 # AFSC → KSA Graph Explorer
 
-**Fall 2025 – GWU Data Science Capstone (Group 6)**  
+**Fall 2025 — GWU Data Science Capstone (Group 6)**  
 **Sponsor:** [LAiSER](https://github.com/LAiSER-Software) / George Washington University
+https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/
 
 ![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.40.0-red.svg)
 ![Neo4j](https://img.shields.io/badge/neo4j-5.0+-green.svg)
+![Status](https://img.shields.io/badge/Status-Complete-success)
+![GWU](https://img.shields.io/badge/GWU-Fall%202025-blue)
+
+---
+
+## 🎓 Project Status
+
+**✅ COMPLETE** — December 2025 Capstone Submission
+
+This project successfully demonstrates an automated, cost-effective pipeline for extracting and mapping military skills to civilian career frameworks, achieving **85% extraction recall** at **$0.005 per AFSC**—10,000x more cost-effective than manual extraction.
+
+| Metric | Result |
+|--------|--------|
+| AFSCs Processed | 12 |
+| Total KSAs Extracted | 330+ |
+| Avg KSAs per AFSC | 27.5 |
+| Cost per AFSC | $0.005 |
+| Processing Time | 3-8 seconds |
+| Taxonomy Alignment | 60-68% ESCO/O*NET |
 
 ---
 
@@ -13,26 +33,26 @@
 
 This repository contains an end-to-end system that converts **Air Force Specialty Code (AFSC)** descriptions into a structured graph of **Knowledge, Skills, and Abilities (KSAs)** and exposes them through an interactive **Streamlit web application**.
 
-The system transforms unstructured military job descriptions from AFOCD/AFECD documents into structured, taxonomy-aligned KSAs, extracting **25-35 items per AFSC** with automatic alignment to **ESCO/OSN taxonomies** via LAiSER's integrated Gemini backend.
+The system transforms unstructured military job descriptions from AFOCD/AFECD documents into structured, taxonomy-aligned KSAs, extracting **25-35 items per AFSC** with automatic alignment to **ESCO/O*NET taxonomies** via LAiSER's integrated Gemini backend.
 
 ### Integration Stack
 
-- 🔍 **[LAiSER](https://github.com/LAiSER-Software)** – Skill extraction with built-in ESCO taxonomy alignment
-- 🤖 **LLMs** – Multi-provider support (Google Gemini, OpenAI, Anthropic Claude) for optional Knowledge & Ability generation
-- 🗄️ **Neo4j Aura** – Graph database for persistent storage and relationship modeling
-- 🖥️ **Streamlit** – Interactive web interface with exploration, admin tools, and demo modes
+- 🔍 **[LAiSER](https://github.com/LAiSER-Software)** — Skill extraction with built-in ESCO taxonomy alignment
+- 🤖 **LLMs** — Multi-provider support (Google Gemini, OpenAI, Anthropic Claude) for optional Knowledge & Ability generation
+- 🗄️ **Neo4j Aura** — Graph database for persistent storage and relationship modeling
+- 🖥️ **Streamlit** — Interactive web interface with exploration, admin tools, and demo modes
 
 ---
 
 ## ✨ Key Features
 
 ### 📊 AFSC → KSA Extraction Pipeline
-- **Intelligent Text Preprocessing** – Cleans AFOCD/AFECD documents (headers, footers, hyphenation fixes)
-- **LAiSER Skill Extraction** – Extracts 20-30 skills with automatic ESCO/OSN taxonomy alignment via Gemini
-- **Optional LLM Enhancement** – Generates 5-15 complementary Knowledge/Ability items (disabled by default)
-- **Quality Assurance** – Confidence filtering (0.54-0.82 range), format validation, and hybrid fuzzy deduplication
-- **Graph Persistence** – Idempotent Neo4j MERGE operations with full relationship modeling
-- **Cost Optimized** – ~$0.005 per AFSC in LAiSER-only mode
+- **Intelligent Text Preprocessing** — Cleans AFOCD/AFECD documents (headers, footers, hyphenation fixes)
+- **LAiSER Skill Extraction** — Extracts 20-30 skills with automatic ESCO/O*NET taxonomy alignment via Gemini
+- **Optional LLM Enhancement** — Generates 5-15 complementary Knowledge/Ability items (disabled by default)
+- **Quality Assurance** — Confidence filtering (0.54-0.82 range), format validation, and hybrid fuzzy deduplication
+- **Graph Persistence** — Idempotent Neo4j MERGE operations with full relationship modeling
+- **Cost Optimized** — ~$0.005 per AFSC in LAiSER-only mode
 
 ### 🌐 Streamlit Web Application
 
@@ -45,7 +65,7 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 - Browse 12 AFSCs with 330+ total KSAs
 - Filter by type (Knowledge/Skill/Ability), confidence, or text search
 - Compare multiple AFSCs and identify skill overlaps
-- View ESCO/OSN taxonomy alignments
+- View ESCO/O*NET taxonomy alignments
 - Export results as CSV
 
 #### 🛠️ **Admin Tools** (Authentication Required)
@@ -71,7 +91,7 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 
 ---
 
-## 🗃️ Architecture
+## 🏗️ Architecture
 
 ### Data Flow Pipeline
 ```
@@ -124,27 +144,43 @@ Streamlit Application
 ```
 fall-2025-group6/
 ├── src/
-│   └── afsc_pipeline/                   # Core extraction pipeline
-│       ├── README.md                    # Detailed pipeline docs
-│       ├── pipeline.py                  # Main orchestrator
-│       ├── preprocess.py                # Text cleaning
-│       ├── extract_laiser.py            # LAiSER integration
-│       ├── enhance_llm.py               # Optional LLM enhancement
-│       ├── quality_filter.py            # QC filtering
-│       ├── dedupe.py                    # Fuzzy deduplication
-│       └── graph_writer_v2.py           # Neo4j persistence
+│   ├── afsc_pipeline/          # Core extraction pipeline
+│   │   ├── README.md           # Detailed pipeline docs
+│   │   ├── pipeline.py         # Main orchestrator
+│   │   ├── preprocess.py       # Text cleaning
+│   │   ├── extract_laiser.py   # LAiSER integration
+│   │   ├── enhance_llm.py      # Optional LLM enhancement
+│   │   ├── quality_filter.py   # QC filtering
+│   │   ├── dedupe.py           # Fuzzy deduplication
+│   │   └── graph_writer_v2.py  # Neo4j persistence
+│   ├── LAiSER/                 # LAiSER integration code
+│   ├── Data/                   # Pipeline artifacts & samples
+│   └── docs/                   # AFOCD/AFECD source documents
 │
-├── demo/Streamlit/                      # Web application
-│   ├── Home.py                          # Main entry point
-│   └── pages/
-│       ├── 02_Try_It_Yourself.py        # Public demo mode
-│       ├── 03_Explore_KSAs.py           # AFSC/KSA browser
-│       ├── 04_Admin_Tools.py            # Admin ingestion
-│       └── 05_Documentation__FAQ.py     # Technical docs
+├── demo/
+│   └── Streamlit/              # Web application
+│       ├── Home.py             # Main entry point
+│       └── pages/
+│           ├── 02_Try_It_Yourself.py
+│           ├── 03_Explore_KSAs.py
+│           ├── 04_Admin_Tools.py
+│           └── 05_Documentation__FAQ.py
 │
-├── requirements.txt                     # Python dependencies
-├── .gitignore                           # Git exclusions
-└── README.md                            # This file
+├── reports/                    # Project documentation
+│   ├── Latex_report/           # LaTeX format reports
+│   ├── Markdown_Report/        # Markdown reports
+│   ├── Progress_Report/        # Weekly progress updates
+│   └── Word_Report/            # Word format reports
+│
+├── research_paper/             # Conference/journal paper
+│   ├── Latex/
+│   └── Word/
+│
+├── presentation/               # Final presentation materials
+├── .streamlit/                 # Streamlit configuration
+├── requirements.txt            # Python dependencies
+├── .gitignore                  # Git exclusions
+└── README.md                   # This file
 ```
 
 ---
@@ -220,7 +256,7 @@ Visit `http://localhost:8501` in your browser!
 - **12 AFSCs** processed (Officer and Enlisted specialties)
 - **330+ KSAs** extracted across all AFSCs
 - **Average 27.5 KSAs per AFSC**
-- **Taxonomy alignment** via LAiSER's built-in ESCO integration
+- **Taxonomy alignment**: 60-68% via LAiSER's built-in ESCO integration
 - **Processing cost**: ~$0.005 per AFSC (LAiSER-only mode)
 - **Processing time**: 3-8 seconds per AFSC
 
@@ -279,25 +315,11 @@ AGGRESSIVE_DEDUPE=true
 - **Pipeline Documentation**: [src/afsc_pipeline/README.md](src/afsc_pipeline/README.md)
 - **LAiSER Project**: [GitHub](https://github.com/LAiSER-Software)
 - **ESCO Taxonomy**: [European Skills Framework](https://esco.ec.europa.eu/)
+- **O*NET**: [Occupational Information Network](https://www.onetonline.org/)
 
 ---
 
-## 🧪 Testing
-
-```bash
-# Run all tests
-pytest
-
-# Test specific module
-pytest tests/test_pipeline.py
-
-# With coverage report
-pytest --cov=afsc_pipeline tests/
-```
-
----
-
-## 🐛 Troubleshooting
+## 🛠 Troubleshooting
 
 ### Common Issues
 
@@ -326,11 +348,14 @@ See [Pipeline README](src/afsc_pipeline/README.md) for detailed troubleshooting.
 
 ## 👥 Team
 
-**GWU Data Science Capstone – Fall 2025, Group 6**
+**GWU Data Science Capstone — Fall 2025, Group 6**
 
-- Kyle Hall - Lead Developer
+- **Kyle Hall** — Lead Developer & Project Manager
 
-**Advisor:** [Advisor Name]
+**Advisor:** Dr. Amir Jafari  
+**Sponsor:** LAiSER (George Washington University)
+
+**Graduation:** December 2025
 
 ---
 
@@ -338,17 +363,19 @@ See [Pipeline README](src/afsc_pipeline/README.md) for detailed troubleshooting.
 
 - **LAiSER Team** (GWU) for the skill extraction framework and taxonomy integration
 - **ESCO** for the European Skills, Competences, Qualifications and Occupations framework
+- **O*NET** for the Occupational Information Network
 - **Neo4j** for graph database platform and Aura cloud hosting
 - **Streamlit** for the interactive web application framework
 - **USAF** for AFSC documentation (AFOCD/AFECD source materials)
 
 ---
+
 ## 📧 Contact
 
 For questions about this project, please contact:
-- Kyle Hall: [kyle.hall@gwmail.gwu.edu](mailto:kyle.hall@gwmail.gwu.edu)
-- Repository: [github.com/Kyleinexile/fall-2025-group6](https://github.com/Kyleinexile/fall-2025-group6)
+- **Kyle Hall**: [kyle.hall@gwmail.gwu.edu](mailto:kyle.hall@gwmail.gwu.edu)
+- **Repository**: [github.com/Kyleinexile/fall-2025-group6](https://github.com/Kyleinexile/fall-2025-group6)
 
 ---
 
-Built with ❤️ at George Washington University
+<p align="center">Built with ❤️ at George Washington University</p>
