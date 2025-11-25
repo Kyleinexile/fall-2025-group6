@@ -2,7 +2,6 @@
 
 **Fall 2025 — GWU Data Science Capstone (Group 6)**  
 **Sponsor:** [LAiSER](https://github.com/LAiSER-Software) / George Washington University
-https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/
 
 ![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.40.0-red.svg)
@@ -12,20 +11,29 @@ https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/
 
 ---
 
+## 🌐 Live Demo
+
+**[Launch Application →](https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/)**
+
+---
+
 ## 🎓 Project Status
 
 **✅ COMPLETE** — December 2025 Capstone Submission
 
-This project successfully demonstrates an automated, cost-effective pipeline for extracting and mapping military skills to civilian career frameworks, achieving **85% extraction recall** at **$0.005 per AFSC**—10,000x more cost-effective than manual extraction.
+This project demonstrates an automated, cost-effective pipeline for extracting and mapping military skills to civilian career frameworks, achieving **85% extraction recall** at **$0.005 per AFSC**—10,000x more cost-effective than manual extraction.
 
 | Metric | Result |
 |--------|--------|
 | AFSCs Processed | 12 |
-| Total KSAs Extracted | 330+ |
-| Avg KSAs per AFSC | 27.5 |
-| Cost per AFSC | $0.005 |
+| Total KSAs Extracted | 253 |
+| Skills | 188 |
+| Knowledge | 35 |
+| Abilities | 30 |
+| Avg KSAs per AFSC | ~21 |
+| ESCO Taxonomy Alignment | ~20% |
+| Cost per AFSC | ~$0.005 |
 | Processing Time | 3-8 seconds |
-| Taxonomy Alignment | 60-68% ESCO/O*NET |
 
 ---
 
@@ -33,7 +41,7 @@ This project successfully demonstrates an automated, cost-effective pipeline for
 
 This repository contains an end-to-end system that converts **Air Force Specialty Code (AFSC)** descriptions into a structured graph of **Knowledge, Skills, and Abilities (KSAs)** and exposes them through an interactive **Streamlit web application**.
 
-The system transforms unstructured military job descriptions from AFOCD/AFECD documents into structured, taxonomy-aligned KSAs, extracting **25-35 items per AFSC** with automatic alignment to **ESCO/O*NET taxonomies** via LAiSER's integrated Gemini backend.
+The system transforms unstructured military job descriptions from AFOCD/AFECD documents into structured, taxonomy-aligned KSAs, extracting **15-30 items per AFSC** with automatic alignment to **ESCO/O*NET taxonomies** via LAiSER's integrated Gemini backend.
 
 ### Integration Stack
 
@@ -48,7 +56,7 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 
 ### 📊 AFSC → KSA Extraction Pipeline
 - **Intelligent Text Preprocessing** — Cleans AFOCD/AFECD documents (headers, footers, hyphenation fixes)
-- **LAiSER Skill Extraction** — Extracts 20-30 skills with automatic ESCO/O*NET taxonomy alignment via Gemini
+- **LAiSER Skill Extraction** — Extracts 15-25 skills with automatic ESCO/O*NET taxonomy alignment via Gemini
 - **Optional LLM Enhancement** — Generates 5-15 complementary Knowledge/Ability items (disabled by default)
 - **Quality Assurance** — Confidence filtering (0.54-0.82 range), format validation, and hybrid fuzzy deduplication
 - **Graph Persistence** — Idempotent Neo4j MERGE operations with full relationship modeling
@@ -62,7 +70,7 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 - Interactive pipeline visualization
 
 #### 🔍 **Explore KSAs**
-- Browse 12 AFSCs with 330+ total KSAs
+- Browse 12 AFSCs with 253 total KSAs
 - Filter by type (Knowledge/Skill/Ability), confidence, or text search
 - Compare multiple AFSCs and identify skill overlaps
 - View ESCO/O*NET taxonomy alignments
@@ -103,7 +111,7 @@ Raw AFSC Text (AFOCD/AFECD)
            │
            ▼
   LAiSER Extraction
-  (20-30 Skills with ESCO IDs via Gemini)
+  (15-25 Skills with ESCO IDs via Gemini)
            │
            ▼
   Quality Filtering
@@ -124,6 +132,19 @@ Raw AFSC Text (AFOCD/AFECD)
            ▼
 Streamlit Application
 (Explore, Admin, Demo modes)
+```
+
+### Graph Schema
+```
+(:AFSC {code, title, source})
+    │
+    │ :REQUIRES
+    ▼
+(:KSA {text, type, confidence, source})
+    │
+    │ :ALIGNS_TO
+    ▼
+(:ESCOSkill {uri, label, description})
 ```
 
 ### Technology Stack
@@ -254,18 +275,19 @@ Visit `http://localhost:8501` in your browser!
 
 ### Current Database Statistics
 - **12 AFSCs** processed (Officer and Enlisted specialties)
-- **330+ KSAs** extracted across all AFSCs
-- **Average 27.5 KSAs per AFSC**
-- **Taxonomy alignment**: 60-68% via LAiSER's built-in ESCO integration
+- **253 KSAs** extracted across all AFSCs
+- **KSA Breakdown**: 188 Skills, 35 Knowledge, 30 Abilities
+- **Average ~21 KSAs per AFSC**
+- **Taxonomy alignment**: ~20% linked to ESCO taxonomy codes
 - **Processing cost**: ~$0.005 per AFSC (LAiSER-only mode)
 - **Processing time**: 3-8 seconds per AFSC
 
 ### Sample AFSCs
 - 14N - Intelligence Officer
-- 17D - Cyberspace Operations Officer
 - 1N0X1 - All Source Intelligence Analyst
 - 1N4X1 - Cyber Intelligence Analyst
 - 11F3 - Fighter Pilot
+- 21A - Aircraft Maintenance Officer
 - 2A3X3 - Tactical Aircraft Maintenance
 - *...and 6 more*
 
@@ -300,7 +322,10 @@ Tunable via environment variables:
 ```bash
 # Filtering thresholds
 QUALITY_MIN_LEN=3
-QUALITY_MAX_LEN=80
+QUALITY_MAX_LEN=80        # For Skills
+QUALITY_MAX_LEN_KA=150    # For Knowledge/Abilities
+
+# Confidence
 LOW_CONF_SKILL_THRESHOLD=0.60
 
 # Deduplication
