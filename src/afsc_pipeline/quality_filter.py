@@ -46,7 +46,8 @@ def _get_float(name: str, default: float) -> float:
 
 # Length constraints for item text
 MIN_LEN = int(os.getenv("QUALITY_MIN_LEN", "3"))
-MAX_LEN = int(os.getenv("QUALITY_MAX_LEN", "80"))
+MAX_LEN_SKILL = int(os.getenv("QUALITY_MAX_LEN", "80"))
+MAX_LEN_KA = int(os.getenv("QUALITY_MAX_LEN_KA", "150"))  # Higher limit for Knowledge/Ability
 
 # If a SKILL's confidence is below this, we may require ESCO (strict mode)
 # and/or a GEOINT hint (geoint_bias mode).
@@ -114,6 +115,19 @@ def _has_esco(it: ItemDraft) -> bool:
     return bool((getattr(it, "esco_id", "") or "").strip())
 
 
+def _get_max_len(itype: str) -> int:
+    """
+    Return the appropriate max length based on item type.
+    
+    Skills use stricter limits (80 chars) since they should be concise.
+    Knowledge and Ability items are naturally more verbose (150 chars).
+    """
+    if itype == "skill":
+        return MAX_LEN_SKILL
+    else:
+        return MAX_LEN_KA
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -132,8 +146,9 @@ def apply_quality_filter(
     ------------------
     - Drop items with:
         * Empty text
-        * Length < QUALITY_MIN_LEN
-        * Length > QUALITY_MAX_LEN
+        * Length < QUALITY_MIN_LEN (default: 3)
+        * Length > MAX_LEN_SKILL for skills (default: 80)
+        * Length > MAX_LEN_KA for knowledge/abilities (default: 150)
         * Text in the BANNED list
     - Normalize item text via `_canon_text` (lowercase, trimmed, punctuation-stripped,
       plus any CANON_MAP replacements).
@@ -172,12 +187,16 @@ def apply_quality_filter(
             continue
 
         txt = _canon_text(txt0)
-        if not txt or len(txt) < MIN_LEN or len(txt) > MAX_LEN:
+        itype = _itype_str(getattr(it, "item_type", ""))
+        
+        # Use type-specific max length
+        max_len = _get_max_len(itype)
+        
+        if not txt or len(txt) < MIN_LEN or len(txt) > max_len:
             continue
         if txt in BANNED:
             continue
 
-        itype = _itype_str(getattr(it, "item_type", ""))
         conf = float(getattr(it, "confidence", 0.0) or 0.0)
 
         # GEOINT bias prefers on-topic skills when confidence is low
