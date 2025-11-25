@@ -218,7 +218,6 @@ elif section == "🎯 Quick Stats":
     stage_data = pd.DataFrame({
         "Stage": ["Preprocessing", "LAiSER Extract", "Quality Filter", "LLM Enhance*", "Deduplication", "Neo4j Write"],
         "Avg Time": ["<1s", "30-45s", "<1s", "15-25s", "<1s", "1-2s"],
-        "Reduction": ["-", "-", "~10%", "-", "~15%", "-"],
         "Output": ["Clean text", "15-25 skills", "Filtered items", "+5-10 K/A", "Unique items", "Graph"]
     })
     
@@ -262,7 +261,7 @@ LLM_MODEL_HF = "meta-llama/Llama-3.2-3B"        # Open source option
         
         st.code("""
 # Strict token limits to reduce costs
-max_tokens: int = 512          # Very short responses only
+max_tokens: int = 1024         # Controlled response length
 temperature: float = 0.3       # Deterministic, consistent output
 max_new: int = 6               # Cap at 6 new K/A items per AFSC
         """, language="python")
@@ -272,7 +271,6 @@ max_new: int = 6               # Cap at 6 new K/A items per AFSC
         - Limits output length to reduce token costs
         - Low temperature reduces need for regeneration
         - Hard cap prevents runaway generation
-        - Estimated savings: **60-70% vs. unlimited tokens**
         """)
     
     with tab3:
@@ -286,7 +284,7 @@ afsc_text=afsc_text.strip()[:2000]
         st.markdown("**Rationale:**")
         st.markdown("""
         - Most relevant KSAs appear early in AFSC descriptions
-        - Reduces input token costs by ~50%
+        - Reduces input token costs
         - Maintains extraction quality
         - Speeds up processing time
         """)
@@ -427,7 +425,7 @@ input_type = "job_desc"
 elif section == "🔄 Deduplication":
     st.markdown('<div class="section-header">🔄 Deduplication Strategy</div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="success-box">✅ <strong>NOT Using FAISS</strong> - Custom hybrid fuzzy matching optimized for short text</div>', unsafe_allow_html=True)
+    st.markdown('<div class="success-box">✅ <strong>Custom hybrid fuzzy matching</strong> optimized for short text</div>', unsafe_allow_html=True)
     
     st.markdown("### 🧮 Similarity Algorithm")
     
@@ -520,39 +518,18 @@ def _quality_tuple(item):
 3. Graph writes "imagery exploitation" with ESCO ID
     """)
     
-    st.markdown("### ❓ Why Not FAISS?")
-    
-    comparison_data = pd.DataFrame({
-        "Aspect": ["Dataset Size", "Performance", "Explainability", "Complexity", "Our Use Case"],
-        "FAISS": [
-            "Optimized for millions of vectors",
-            "Approximate (ANN)",
-            "Black box similarity",
-            "High (external dependency)",
-            "❌ Overkill"
-        ],
-        "Custom Hybrid": [
-            "Perfect for 20-50 items",
-            "Exact similarity",
-            "Clear formula (60% + 40%)",
-            "Low (pure Python)",
-            "✅ Just right"
-        ]
-    })
-    st.dataframe(comparison_data, use_container_width=True, hide_index=True)
-    
     st.markdown("### 📊 Performance Metrics")
     
     metric_col1, metric_col2, metric_col3 = st.columns(3)
     
     with metric_col1:
-        st.metric("Deduplication Reduction", "10-20%", "of items removed")
+        st.metric("Deduplication", "Active", "removes near-duplicates")
     
     with metric_col2:
         st.metric("Execution Time", "<100ms", "per AFSC")
     
     with metric_col3:
-        st.metric("False Positive Rate", "<1%", "verified manually")
+        st.metric("Precision", "High", "manual tuning")
 
 # ============================================================================
 # SECTION: MAJOR LIBRARIES
@@ -648,7 +625,7 @@ for page in reader.pages:
         st.markdown("- Searches for AFSC codes across pages")
         st.markdown("- Provides interactive text selection")
         
-        st.markdown('<div class="info-box">💡 <strong>User Experience:</strong> pypdf enables users to search thousand-page documents without downloading, locate AFSC sections, and load relevant text directly into the extraction pipeline.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-box">💡 <strong>User Experience:</strong> pypdf enables users to search 700+ page documents without downloading, locate AFSC sections, and load relevant text directly into the extraction pipeline.</div>', unsafe_allow_html=True)
     
     with tab5:
         st.markdown("#### Utilities")
@@ -716,7 +693,7 @@ elif section == "🔧 Pipeline Flow":
     │ 3. LLM ENHANCEMENT [OPTIONAL] (enhance_llm.py)  │
     │    • Generate Knowledge/Ability items           │
     │    • Balance item types (K/S/A)                 │
-    │    • Add 5-15 complementary items               │
+    │    • Add 5-10 complementary items               │
     │    Output: Extended KSA set                     │
     └─────────────────────────────────────────────────┘
         ↓
@@ -804,7 +781,7 @@ elif section == "❓ FAQ":
         
         1. **LLM enhancement disabled by default** - LAiSER alone achieves coverage goals
         2. **Gemini Flash when enabled** - Cheapest option (~$0.075 per 1M tokens)
-        3. **Token limits** - Max 512 output tokens, 2000 input chars
+        3. **Token limits** - Max 1024 output tokens, controlled input
         
         **Result:** Minimal cost per AFSC extraction
         """)
@@ -838,10 +815,10 @@ elif section == "❓ FAQ":
         st.markdown("""
         **A:** Yes! The pipeline is designed for scalability:
         
-        - **Cost:** ~$1 for 200 AFSCs (LAiSER-only)
-        - **Time:** ~10-15 minutes total processing
+        - **Processing:** Each AFSC takes 60-80 seconds
         - **Storage:** Neo4j Aura handles thousands of nodes easily
         - **Quality:** Consistent extraction and taxonomy alignment
+        - **Cost:** Minimal API costs scale linearly
         
         Main limitation is obtaining clean AFSC text for all specialties.
         """)
@@ -888,7 +865,6 @@ elif section == "📊 Performance Metrics":
     reduction_data = pd.DataFrame({
         "Stage": ["LAiSER Extract", "Quality Filter", "LLM Enhance*", "Deduplication", "Final Output"],
         "Typical Count": ["15-25", "12-22", "18-30", "15-25", "~21"],
-        "Reduction %": ["-", "~10%", "-", "~15%", "-"],
         "Description": [
             "Raw skills from LAiSER",
             "Remove noise, short items",
@@ -904,7 +880,7 @@ elif section == "📊 Performance Metrics":
     acc_col1, acc_col2, acc_col3 = st.columns(3)
     
     with acc_col1:
-        st.metric("False Positive Rate", "<1%", "near-duplicates")
+        st.metric("Total KSAs", "253", "extracted")
     
     with acc_col2:
         st.metric("ESCO Alignment", "~20%", "taxonomy linked")
@@ -915,12 +891,12 @@ elif section == "📊 Performance Metrics":
     st.markdown("### 💾 Resource Usage")
     
     resource_data = pd.DataFrame({
-        "Resource": ["Memory Peak", "CPU Cores", "Network (per AFSC)", "Storage (per AFSC)"],
-        "Usage": ["~200MB", "1-2 cores", "~50KB", "~5KB"],
+        "Resource": ["Memory", "CPU", "Network", "Storage"],
+        "Usage": ["Low", "1-2 cores", "API calls only", "Minimal per AFSC"],
         "Notes": [
-            "Includes LAiSER + LLM libraries",
+            "LAiSER + LLM libraries",
             "Parallelizable across AFSCs",
-            "Mostly API calls (LAiSER, Gemini)",
+            "LAiSER and LLM API calls",
             "Neo4j node/relationship storage"
         ]
     })
@@ -956,7 +932,7 @@ elif section == "💰 Cost Analysis":
         st.markdown("""
         ✅ **LLM disabled by default** - Only use when K/A items needed  
         ✅ **Gemini Flash** - Cheapest model when LLM enabled  
-        ✅ **Token limits** - 512 max output, 2000 char input  
+        ✅ **Token limits** - 1024 max output tokens  
         ✅ **Smart prompting** - Reduce unnecessary generation  
         ✅ **Caching** - LAiSER results reused across runs  
         """)
