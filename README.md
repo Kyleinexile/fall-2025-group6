@@ -12,8 +12,8 @@
 ---
 
 <p align="center">
-  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank">
-    <img src="https://img.shields.io/badge/🚀%20Launch%20Live%20Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Launch Demo">
+  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank" style="text-decoration: none;">
+    <img src="https://img.shields.io/badge/🚀_LAUNCH_LIVE_DEMO-Click_to_Open_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&labelColor=262730" height="70" alt="Launch Demo">
   </a>
 </p>
 
