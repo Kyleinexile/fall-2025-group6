@@ -252,7 +252,7 @@ input_type = "job_desc"       # Job description format
 
 ### 🔄 Deduplication Strategy
 
-**NOT using FAISS** - Custom hybrid approach optimized for short text:
+Custom hybrid approach optimized for short text:
 
 ```python
 # Similarity calculation
@@ -267,16 +267,6 @@ similarity_threshold = 0.86  # Tuned for 10-60 character KSA phrases
 2. Higher confidence score
 3. Source is "laiser"
 4. Longer text length (tiebreaker)
-
-**Why not FAISS?**
-
-| Aspect | FAISS | Custom Hybrid |
-|--------|-------|---------------|
-| Dataset Size | Millions of vectors | 20-50 items |
-| Performance | Approximate (ANN) | Exact similarity |
-| Explainability | Black box | Clear formula (60% + 40%) |
-| Complexity | High (external dependency) | Low (pure Python) |
-| Our Use Case | ❌ Overkill | ✅ Just right |
 
 **Performance:**
 - Deduplication reduction: 10-20% of items removed
@@ -522,9 +512,9 @@ python -m afsc_pipeline.graph_writer_v2 --validate
 - **Cost-effective**: Gemini Flash provides good performance at low cost
 - **Reliable**: Built by GWU specifically for job description analysis
 
-### Why Custom Deduplication (Not FAISS)?
-- **Scale**: 20-50 items per AFSC (FAISS optimized for millions)
-- **Explainability**: Hybrid similarity score (60% Jaccard + 40% difflib)
+### Why Custom Deduplication?
+- **Scale**: 20-50 items per AFSC (right-sized solution)
+- **Explainability**: Clear hybrid formula (60% Jaccard + 40% difflib)
 - **Performance**: <100ms per AFSC with full transparency
 
 ### Why Neo4j?
