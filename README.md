@@ -11,9 +11,11 @@
 
 ---
 
-## 🌐 Live Demo
-
-**[Launch Application →](https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/)**
+<p align="center">
+  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank">
+    <img src="https://img.shields.io/badge/🚀%20Launch%20Live%20Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Launch Demo">
+  </a>
+</p>
 
 ---
 
@@ -21,7 +23,7 @@
 
 **✅ COMPLETE** — December 2025 Capstone Submission
 
-This project demonstrates an automated, cost-effective pipeline for extracting and mapping military skills to civilian career frameworks, achieving **85% extraction recall** at **$0.005 per AFSC**—10,000x more cost-effective than manual extraction.
+This project demonstrates an automated, cost-effective pipeline for extracting and mapping military skills to civilian career frameworks using LAiSER skill extraction and multi-provider LLM enhancement.
 
 | Metric | Result |
 |--------|--------|
@@ -32,8 +34,7 @@ This project demonstrates an automated, cost-effective pipeline for extracting a
 | Abilities | 30 |
 | Avg KSAs per AFSC | ~21 |
 | ESCO Taxonomy Alignment | ~20% |
-| Cost per AFSC | ~$0.005 |
-| Processing Time | 3-8 seconds |
+| Processing Time | 60-80 seconds |
 
 ---
 
@@ -57,10 +58,10 @@ The system transforms unstructured military job descriptions from AFOCD/AFECD do
 ### 📊 AFSC → KSA Extraction Pipeline
 - **Intelligent Text Preprocessing** — Cleans AFOCD/AFECD documents (headers, footers, hyphenation fixes)
 - **LAiSER Skill Extraction** — Extracts 15-25 skills with automatic ESCO/O*NET taxonomy alignment via Gemini
-- **Optional LLM Enhancement** — Generates 5-15 complementary Knowledge/Ability items (disabled by default)
+- **Optional LLM Enhancement** — Generates 5-15 complementary Knowledge/Ability items
 - **Quality Assurance** — Confidence filtering (0.54-0.82 range), format validation, and hybrid fuzzy deduplication
 - **Graph Persistence** — Idempotent Neo4j MERGE operations with full relationship modeling
-- **Cost Optimized** — ~$0.005 per AFSC in LAiSER-only mode
+- **Multi-Provider Support** — OpenAI, Anthropic, Gemini, and HuggingFace LLM backends
 
 ### 🌐 Streamlit Web Application
 
@@ -236,29 +237,41 @@ pip install -r requirements.txt
 
 4. **Configure environment variables**
 
-Create a `.env` file or use Streamlit secrets:
-```bash
-# Neo4j Database (Required for database operations)
-NEO4J_URI=neo4j+s://your-instance.neo4j.io
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your-password
-NEO4J_DATABASE=neo4j
+Create a `.env` file or use Streamlit secrets (`.streamlit/secrets.toml`):
+```toml
+# ================================
+# LAiSER (Skill Extractor)
+# ================================
+USE_LAISER            = "true"
+LAISER_ALIGN_TOPK     = "25"
+LAISER_LLM_ENABLED    = "true"
+LAISER_LLM_PROVIDER   = "gemini"
+LAISER_MODEL_GEMINI   = "gemini-2.0-flash"
 
-# Google Gemini (Required for LAiSER)
-GEMINI_API_KEY=AIza...
+# ================================
+# LLM Enhancement Layer (K/A)
+# ================================
+USE_LLM_ENHANCER      = "true"
+LLM_PROVIDER          = "openai"        # Options: openai, anthropic, gemini
 
-# LAiSER Configuration
-USE_LAISER=true
-LAISER_ALIGN_TOPK=25
+# Model configuration
+LLM_MODEL_OPENAI      = "gpt-4o-mini-2024-07-18"
+LLM_MODEL_ANTHROPIC   = "claude-sonnet-4-5-20250929"
+LLM_MODEL_GEMINI      = "gemini-2.0-flash"
 
-# Optional: LLM Enhancement (Disabled by default)
-USE_LLM_ENHANCER=false
-LLM_PROVIDER=gemini
-OPENAI_API_KEY=sk-...        # If using OpenAI
-ANTHROPIC_API_KEY=sk-ant-... # If using Anthropic
+# API Keys (required for respective providers)
+OPENAI_API_KEY        = "sk-..."
+ANTHROPIC_API_KEY     = "sk-ant-..."
+GEMINI_API_KEY        = "AIza..."
+GOOGLE_API_KEY        = ""              # Optional alias for Gemini
 
-# Optional: Admin Access
-ADMIN_KEY=your-secret-key
+# ================================
+# Neo4j Database
+# ================================
+NEO4J_URI             = "neo4j+s://your-instance.databases.neo4j.io:7687"
+NEO4J_USER            = "neo4j"
+NEO4J_PASSWORD        = "your-password"
+NEO4J_DATABASE        = "neo4j"
 ```
 
 5. **Run the application**
@@ -279,8 +292,7 @@ Visit `http://localhost:8501` in your browser!
 - **KSA Breakdown**: 188 Skills, 35 Knowledge, 30 Abilities
 - **Average ~21 KSAs per AFSC**
 - **Taxonomy alignment**: ~20% linked to ESCO taxonomy codes
-- **Processing cost**: ~$0.005 per AFSC (LAiSER-only mode)
-- **Processing time**: 3-8 seconds per AFSC
+- **Processing time**: 60-80 seconds per AFSC
 
 ### Sample AFSCs
 - 14N - Intelligence Officer
@@ -292,10 +304,9 @@ Visit `http://localhost:8501` in your browser!
 - *...and 6 more*
 
 ### Performance Metrics
-- **Extraction Recall**: ~85% vs manual review
-- **Precision**: ~90% relevant KSAs
-- **False Positive Rate**: <1% (deduplication)
 - **Confidence Range**: 0.54-0.82 (LAiSER skills)
+- **Deduplication**: Hybrid fuzzy matching reduces redundancy
+- **Multi-provider Support**: OpenAI, Anthropic, Gemini, HuggingFace
 
 ---
 
@@ -304,17 +315,11 @@ Visit `http://localhost:8501` in your browser!
 ### Cost Optimization
 
 **Default settings prioritize cost efficiency:**
-- LLM enhancement: **Disabled** (LAiSER alone achieves coverage goals)
-- Model: **Gemini Flash** when LLM enabled (cheapest option at ~$0.075/1M tokens)
+- LLM enhancement: **Configurable** (can use LAiSER-only for minimal cost)
+- Models: **Gemini Flash** and **GPT-4o-mini** (cost-effective options)
 - Token limits: **1024 tokens max output**, 5000 chars input
-- Result: **~$0.005 per AFSC** in LAiSER-only mode
 
-**Scaling estimates:**
-- 12 AFSCs: $0.06
-- 50 AFSCs: $0.25
-- 200 AFSCs: $1.00
-
-**10,000x more cost-effective than manual extraction!**
+**Significantly more cost-effective than manual extraction!**
 
 ### Quality Settings
 
