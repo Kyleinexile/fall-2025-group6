@@ -535,13 +535,6 @@ This is a GWU Data Science capstone project. For questions or collaboration:
 - **GitHub Issues**: [Report bugs or request features](https://github.com/Kyleinexile/fall-2025-group6/issues)
 - **Email**: Contact via GWU email
 
----
-
-## 📄 License
-
-MIT License
-
----
 
 ## 🙏 Acknowledgments
 
