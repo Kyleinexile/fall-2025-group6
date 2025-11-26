@@ -641,26 +641,29 @@ with tab4:
             else:
                 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
                 with driver.session(database=NEO4J_DATABASE) as s:
-                    result = s.run("""
+                    # Step 1: Count AFSCs that will be deleted
+                    count_result = s.run("""
                         MATCH (a:AFSC)
                         WHERE a.code IN $codes
-                        OPTIONAL MATCH (a)-[:REQUIRES]->(k:KSA)
-                        WITH collect(DISTINCT a) AS afscs, collect(DISTINCT k) AS ksa_nodes
-                        
-                        UNWIND afscs AS a
+                        RETURN count(a) AS afsc_count
+                    """, {"codes": afsc_list})
+                    afsc_count = count_result.single()["afsc_count"]
+                    
+                    # Step 2: Delete AFSCs and their relationships
+                    s.run("""
+                        MATCH (a:AFSC)
+                        WHERE a.code IN $codes
                         DETACH DELETE a
-                        
-                        WITH ksa_nodes
-                        UNWIND ksa_nodes AS k
-                        WITH DISTINCT k
-                        WHERE k IS NOT NULL AND NOT (k)<-[:REQUIRES]-(:AFSC)
-                        
-                        DETACH DELETE k
-                        RETURN count(k) AS ksas_deleted
                     """, {"codes": afsc_list})
                     
-                    rec = result.single()
-                    ksas_deleted = rec["ksas_deleted"] if rec else 0
+                    # Step 3: Clean up orphaned KSAs (no longer connected to any AFSC)
+                    orphan_result = s.run("""
+                        MATCH (k:KSA)
+                        WHERE NOT (k)<-[:REQUIRES]-(:AFSC)
+                        DETACH DELETE k
+                        RETURN count(*) AS ksas_deleted
+                    """)
+                    ksas_deleted = orphan_result.single()["ksas_deleted"]
                 
                 driver.close()
                 
@@ -668,7 +671,7 @@ with tab4:
                 st.cache_data.clear()
                 st.cache_resource.clear()
                 
-                st.success(f"✅ Deleted {len(afsc_list)} AFSCs and {ksas_deleted} orphaned KSAs")
+                st.success(f"✅ Deleted {afsc_count} AFSCs and {ksas_deleted} orphaned KSAs")
                 st.info("💡 Cache cleared - Explore KSAs will show updated data")
         
         except Exception as e:
