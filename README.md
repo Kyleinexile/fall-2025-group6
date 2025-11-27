@@ -11,7 +11,7 @@
 
 ## 🎬 60-Second Demo
 
-[https://github.com/Kyleinexile/fall-2025-group6/raw/main/presentation/AFSC_KSA_Capstone_Promo.mp4](https://github.com/Kyleinexile/fall-2025-group6/issues/34#issue-3673061752)
+https://github.com/user-attachments/assets/502a5636-8618-4b70-a89f-8459f2d2981a
 
 *A quick overview of the AFSC → KSA extraction pipeline and Streamlit application.*
 ---
