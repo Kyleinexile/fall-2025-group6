@@ -10,7 +10,7 @@
 ![GWU](https://img.shields.io/badge/GWU-Fall%202025-blue)
 
 ## 🎬 60-Second Demo
-[![Watch Demo](presentation/video_thumbnail.png)](https://kyleinexile.github.io/fall-2025-group6/)
+[![Watch the Demo](https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/presentation/video_thumbnail.png)](https://kyleinexile.github.io/fall-2025-group6/)
 *Click to watch a quick overview of the AFSC → KSA extraction pipeline.*
 ---
 
