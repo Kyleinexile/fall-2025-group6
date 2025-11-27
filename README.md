@@ -8,6 +8,13 @@
 ![Neo4j](https://img.shields.io/badge/neo4j-5.0+-green.svg)
 ![Status](https://img.shields.io/badge/Status-Complete-success)
 ![GWU](https://img.shields.io/badge/GWU-Fall%202025-blue)
+<p align="center">
+  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank">
+    <img src="https://img.shields.io/badge/🚀_LAUNCH_LIVE_DEMO-Click_to_Open_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&labelColor=262730&scale=2" height="50" alt="Launch Demo">
+  </a>
+</p>
+
+---
 
 ## 🎬 60-Second Demo
 
@@ -16,13 +23,7 @@ https://github.com/user-attachments/assets/502a5636-8618-4b70-a89f-8459f2d2981a
 *A quick overview of the AFSC → KSA extraction pipeline and Streamlit application.*
 ---
 
-<p align="center">
-  <a href="https://fall-2025-group6-4w9txe2nuc2gn5h5ymtwbk.streamlit.app/" target="_blank">
-    <img src="https://img.shields.io/badge/🚀_LAUNCH_LIVE_DEMO-Click_to_Open_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&labelColor=262730&scale=2" height="50" alt="Launch Demo">
-  </a>
-</p>
 
----
 
 ## 🎓 Project Status
 
