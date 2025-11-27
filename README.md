@@ -11,7 +11,17 @@
 
 ## 🎬 60-Second Demo
 
-[![Watch Demo](presentation/video_thumbnail.png)](https://github.com/Kyleinexile/fall-2025-group6/raw/main/presentation/AFSC_KSA_Capstone_Promo.mp4)
+<video
+  src="presentation/AFSC_KSA_Capstone_Promo.mp4"
+  controls
+  playsinline
+  muted
+  poster="presentation/video_thumbnail.png"
+  width="100%">
+  Sorry, your browser doesn’t support embedded videos. 
+  Here’s a <a href="presentation/AFSC_KSA_Capstone_Promo.mp4">link to the video</a>.
+</video>
+
 
 *Click to watch a quick overview of the AFSC → KSA extraction pipeline.*
 ---
