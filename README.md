@@ -10,19 +10,7 @@
 ![GWU](https://img.shields.io/badge/GWU-Fall%202025-blue)
 
 ## 🎬 60-Second Demo
-
-<video
-  src="presentation/AFSC_KSA_Capstone_Promo.mp4"
-  controls
-  playsinline
-  muted
-  poster="presentation/video_thumbnail.png"
-  width="100%">
-  Sorry, your browser doesn’t support embedded videos. 
-  Here’s a <a href="presentation/AFSC_KSA_Capstone_Promo.mp4">link to the video</a>.
-</video>
-
-
+[![Watch Demo](presentation/video_thumbnail.png)](https://raw.githubusercontent.com/Kyleinexile/fall-2025-group6/main/presentation/AFSC_KSA_Capstone_Promo.mp4)
 *Click to watch a quick overview of the AFSC → KSA extraction pipeline.*
 ---
 
