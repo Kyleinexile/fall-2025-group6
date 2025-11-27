@@ -1,0 +1,5 @@
+# Project site config
+title: "AFSC → KSA Graph Explorer"
+theme: minima
+# IMPORTANT: repo name, case-sensitive
+baseurl: "/fall-2025-group6"
