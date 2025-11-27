@@ -16,7 +16,7 @@
 
 ---
 
-## 🎬 60-Second Demo
+## 🎬 Video Guide
 
 https://github.com/user-attachments/assets/502a5636-8618-4b70-a89f-8459f2d2981a
 
