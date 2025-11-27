@@ -9,6 +9,11 @@
 ![Status](https://img.shields.io/badge/Status-Complete-success)
 ![GWU](https://img.shields.io/badge/GWU-Fall%202025-blue)
 
+## 🎬 60-Second Demo
+
+https://github.com/Kyleinexile/fall-2025-group6/raw/main/presentation/AFSC_KSA_Capstone_Promo.mp4
+
+*A quick overview of the AFSC → KSA extraction pipeline and Streamlit application.*
 ---
 
 <p align="center">
